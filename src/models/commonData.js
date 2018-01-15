@@ -113,7 +113,8 @@ export default  {
           id: `${item.id}`,
           name: item.quantityranges.data.map((item)=>{
                   return item.min + '~';
-                }).join('')
+                }).join(''),
+          quantityranges: item.quantityranges.data
         }
       })
       return {...state}

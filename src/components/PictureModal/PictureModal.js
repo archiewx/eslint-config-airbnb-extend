@@ -9,17 +9,31 @@ export default class PictureModal extends PureComponent {
   state = {
     previewVisible: false,
     previewImage: '',
-    fileList: []
+    imageFileList: {}
   }
 
-  handleBeforeUpload = (file) => {
-    console.log(file)
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      imageFileList:nextProps.value
+    })
+  }
+
+  handleBeforeUpload = (id,file) => {
     file.url = URL.createObjectURL(file)
-    this.setState(({fileList}) => ({
-      fileList: [...fileList,file]
-    }))
-    // URL.revokeObjectURL(file.src)
-    // this.props.onChange([...alreadyFileList,file])
+    let current = this.state.imageFileList;
+    if(this.props.itemImageLevel === 'item') {
+      current.fileList.push(file)
+      this.setState({
+        imageFileList: {...current}
+      })
+    }else {
+      current[`${id}`].fileList.push(file)
+      this.setState({
+        imageFileList: {...current}
+      })
+    }
+    URL.revokeObjectURL(file.src)
+    this.props.onChange(current)
     return false
   }
 
@@ -36,19 +50,27 @@ export default class PictureModal extends PureComponent {
     })
   }
 
-  hanldeRemove = (file) => {
-    let alreadyFileList = this.state.fileList;
-    const index = alreadyFileList.indexOf(file)
-    alreadyFileList.splice(index,1)
-    this.setState({
-      fileList: [].concat(alreadyFileList)
-    })
-    // this.props.onChange(alreadyFileList)
+  hanldeRemove = (id,file) => {
+    let current = this.state.imageFileList;
+    if(this.props.itemImageLevel === 'item') {
+      const index = current.fileList.indexOf(file)
+      current.fileList.splice(index,1)
+      this.setState({
+        imageFileList: {...current}
+      })
+    }else {
+      const index = current[`${id}`].fileList.indexOf(file)
+      current[`${id}`].fileList.splice(index,1)
+      this.setState({
+        imageFileList: {...current}
+      })
+    }
+    this.props.onChange(current)
   }
 
   render() {  
     const {selectColors,itemImageLevel} = this.props
-    const {previewVisible,previewImage,fileList} = this.state
+    const {previewVisible,previewImage,imageFileList} = this.state
 
     const uploadButton = (
       <div>
@@ -62,20 +84,25 @@ export default class PictureModal extends PureComponent {
         {
           itemImageLevel === 'item' ? (
             <div className={styles.pictureModal}>
-              <Upload
-                action = 'http://duoke3api.duoke.net/api/images'
-                listType='picture-card'
-                fileList={fileList}
-                beforeUpload={this.handleBeforeUpload}
-                onPreview={this.handlePreview}
-                onRemove={this.hanldeRemove}
-                multiple = {true}
-              >
-                {uploadButton}
-              </Upload>
-              <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel} > 
-                <img alt="image" style={{ width: '100%' }} src={previewImage} />
-              </Modal>
+              <Row>
+                <Col span={3}><label className={styles.pictureModalTitle}>上传图片:</label></Col>
+                <Col span={21}>
+                  <Upload
+                    action = 'http://duoke3api.duoke.net/api/images'
+                    listType='picture-card'
+                    fileList={imageFileList.fileList}
+                    beforeUpload={this.handleBeforeUpload.bind(null,-1)}
+                    onPreview={this.handlePreview}
+                    onRemove={this.hanldeRemove.bind(null,-1)}
+                    multiple = {true}
+                  >
+                    {uploadButton}
+                  </Upload>
+                  <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel} className={styles.modalClosePostion}> 
+                    <img alt="image" style={{ width: '100%' }} src={previewImage} />
+                  </Modal>
+                </Col>
+              </Row>
             </div>
           ) : (
             <div>
@@ -83,22 +110,25 @@ export default class PictureModal extends PureComponent {
                 {
                   selectColors.map( item => {
                     return (
-                      <Col span={12} key={item.id}>
-                        <Upload
-                          action = 'http://duoke3api.duoke.net/api/images'
-                          listType='picture-card'
-                          fileList={fileList}
-                          beforeUpload={this.handleBeforeUpload}
-                          onPreview={this.handlePreview}
-                          onRemove={this.hanldeRemove}
-                          multiple = {true}
-                        >
-                          {uploadButton}
-                        </Upload>
-                        <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel} > 
-                          <img alt="image" style={{ width: '100%' }} src={previewImage} />
-                        </Modal>
-                      </Col>
+                      <div key={item.id}>
+                        <Col span={3}><label className={styles.pictureModalTitle}>{`${item.name}:`}</label></Col>
+                        <Col span={9}>
+                          <Upload
+                            action = 'http://duoke3api.duoke.net/api/images'
+                            listType='picture-card'
+                            fileList={(imageFileList[`${item.id}`] || {}).fileList}
+                            beforeUpload={this.handleBeforeUpload.bind(null,item.id)}
+                            onPreview={this.handlePreview}
+                            onRemove={this.hanldeRemove.bind(null,item.id)}
+                            multiple = {true}
+                          >
+                            {uploadButton}
+                          </Upload>
+                          <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel} className={styles.modalClosePostion}> 
+                            <img alt="image" style={{ width: '100%' }} src={previewImage} />
+                          </Modal>
+                        </Col>
+                      </div>
                     )
                   })
                 }

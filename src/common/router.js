@@ -41,6 +41,9 @@ export const getRouterData = (app) => {
     '/goods-create': {
       component: dynamicWrapper(app, ['goodsCreate'], () => import('../routes/Goods/GoodsCreate/GoodsCreate')),
     },
+    '/goods-detail/:id': {
+      component: dynamicWrapper(app, ['goodsDetail'], () => import('../routes/Goods/GoodsDetail/GoodsDetail')),
+    },
     '/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },

@@ -49,7 +49,8 @@ export default class GoodsCreate extends PureComponent {
           value,
           selectUnits,
           warehouses:this.props.commonData.warehouses,
-          itemBarcodeLevel: this.props.configSetting.itemBarcodeLevel
+          itemBarcodeLevel: this.props.configSetting.itemBarcodeLevel,
+          itemImageLevel: this.props.configSetting.itemImageLevel
         }})
       }
     })
@@ -78,6 +79,19 @@ export default class GoodsCreate extends PureComponent {
       current.push({
         name: item.props.children,
         id: item.props.eventKey
+      })
+      let currentQuantityRange = this.props.commonData.priceQuantitySteps.find( n => n.id == item.props.eventKey)
+      current = currentQuantityRange.quantityranges.map( item => {
+        let name;
+        if(item.max == -1) {
+          name = `${item.min} ~`
+        }else {
+          name = `${item.min} ~ ${item.max - 1}`
+        }
+        return {
+          id: item.id,
+          name: name
+        }
       })
     }
     this.setState({selectQuantityStep:[...current]})
@@ -152,28 +166,18 @@ export default class GoodsCreate extends PureComponent {
     return current
   }
 
-  handleSkuBarcodes = (selectColors,selectSizes,itemBarcodeLevel) => {
+  handleSkuImages = (selectColors,itemImageLevel) => {
     let current = {};
-    if(selectColors.length === 0 || itemBarcodeLevel === 0 ) {
+    if(itemImageLevel === 'item') {
       current = {
-        barcode: null
+        fileList: []
       }
     }else {
-      if(selectSizes.length === 0) {
-        selectColors.forEach( item => {
-          current[`${item.id}`] = {
-            barcode: null
-          }
-        })
-      }else {
-        selectColors.forEach( item => {
-          selectSizes.forEach( subItem => {
-            current[`${item.id}_${subItem.id}`] = {
-              barcode: null
-            }
-          })
-        })
-      }
+      selectColors.forEach( item => {
+        current[`${item.id}`] = {
+          fileList: []
+        }
+      })
     }
     return current
   }
@@ -212,6 +216,34 @@ export default class GoodsCreate extends PureComponent {
     }
     return current
   }
+
+  handleSkuBarcodes = (selectColors,selectSizes,itemBarcodeLevel) => {
+    let current = {};
+    if(selectColors.length === 0 || itemBarcodeLevel === 0 ) {
+      current = {
+        barcode: null
+      }
+    }else {
+      if(selectSizes.length === 0) {
+        selectColors.forEach( item => {
+          current[`${item.id}`] = {
+            barcode: null
+          }
+        })
+      }else {
+        selectColors.forEach( item => {
+          selectSizes.forEach( subItem => {
+            current[`${item.id}_${subItem.id}`] = {
+              barcode: null
+            }
+          })
+        })
+      }
+    }
+    return current
+  }
+
+
 
   handleUnitStockSelect = (value) => {
     this.setState({
@@ -255,23 +287,25 @@ export default class GoodsCreate extends PureComponent {
     units.forEach( item => {
       if(item.default == '1') {
         defaultSelectUnits.push(item.id);
-        defaultStockUnit = {
-          name: item.name,
-          number: item.number
-        }
+        // defaultStockUnit = {
+        //   name: item.name,
+        //   number: item.number
+        // }
       }
     })
+
     selectUnits = this.handleCalculateSelect(units,getFieldValue('unit_select'))
     selectColors = this.handleCalculateSelect(colors,getFieldValue('color_select'),'other')
     selectSizes = this.handleCalculateSelect(sizeLibrarys,getFieldValue('size_select'),'other')
 
     let priceTableValue = this.handlePriceTableValue(shops,selectUnits,selectQuantityStep,priceGrades,usePricelelvel,priceModel) 
+    let skuImages = this.handleSkuImages(selectColors,itemImageLevel)
     let skuStocks = this.handleSkuStocks(warehouses,selectColors,selectSizes)
     let skuBarcodes = this.handleSkuBarcodes(selectColors,selectSizes,itemBarcodeLevel)
 
 
     const unitStockSelect = (
-      <Select style={{ width: 200 }} defaultValue={`库存单位：${defaultStockUnit.name} ( x ${defaultStockUnit.number} )`} onChange={this.handleUnitStockSelect} type='combobox' optionLabelProp='value'>
+      <Select style={{ width: 200 }} defaultValue={`库存单位：件 ( x 1 )`} onChange={this.handleUnitStockSelect} type='combobox' optionLabelProp='value'>
         {
           units.map( item => {
             return (
@@ -460,8 +494,9 @@ export default class GoodsCreate extends PureComponent {
         </Card>
         <Card title='图片' bordered={false} className={styles.bottomCardDivided}>
           <Form layout = 'horizontal'>
-            <FormItem label ='上传图片' {...pictureItemLayout}>
+            <FormItem>
               {getFieldDecorator('picture',{
+                initialValue: skuImages
               })(
                 <PictureModal selectColors={selectColors} itemImageLevel={itemImageLevel}/>
               )}

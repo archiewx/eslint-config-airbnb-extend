@@ -158,7 +158,7 @@ export default class PriceTable extends React.Component {
                             <td className={cx({priceGradeTableHead:true})}><span className={styles.spanColTitlePostion}>{item.name}</span></td>
                             {
                               tableRow.map( (subItem,subIndex) => {
-                                return <td key={subItem.id}><InputNumber value={(tableValue[`${item.id}_${subItem.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,subItem.id)} precision={2} min={0} placeholder='请输入' style={{textAlign:'right'}} className={styles.priceGradeInput} /></td>
+                                return <td key={subItem.id}><InputNumber value={(tableValue[`${item.id}_${subItem.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,subItem.id)} precision={2} min={0} placeholder='请输入' style={{textAlign:'right'}} className={cx({priceGradeInput:true,inputColor:(tableValue[`${item.id}_${subItem.id}`] || {}).price === 0})} /></td>
                               })
                             }
                           </tr>
@@ -184,7 +184,7 @@ export default class PriceTable extends React.Component {
                     <tr>
                       {
                         tableRow.map( item => {
-                          return <td key={item.id}><InputNumber value={(tableValue[`${item.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,-1)} precision={2} min={0} placeholder='请输入' style={{textAlign:'right'}} className={styles.priceGradeInput} /></td>
+                          return <td key={item.id}><InputNumber value={(tableValue[`${item.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,-1)} precision={2} min={0} placeholder='请输入' style={{textAlign:'right'}} className={cx({priceGradeInput:true,inputColor:(tableValue[`${item.id}_${subItem.id}`] || {}).price === 0})} /></td>
                         })
                       }
                     </tr>
@@ -201,7 +201,7 @@ export default class PriceTable extends React.Component {
                       return (
                         <Col span={8} key={item.id}>
                           <label className={styles.priceGradeLabelTitle}>{item.name}</label>
-                          <InputNumber value={(tableValue[`${item.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,-1)} placeholder='请输入' style={{width:'100%'}} min={0} precision={2}/>
+                          <InputNumber value={(tableValue[`${item.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,-1)} placeholder='请输入' style={{width:'100%'}} min={0} precision={2} className={cx({inputColor:(tableValue[`${item.id}_${subItem.id}`] || {}).price === 0})}/>
                         </Col>
                       )
                     })

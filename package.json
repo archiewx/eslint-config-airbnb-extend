@@ -4,7 +4,6 @@
   "description": "An out-of-box UI solution for enterprise applications",
   "private": true,
   "scripts": {
-    "precommit": "npm run lint-staged",
     "start": "roadhog server",
     "start:no-proxy": "cross-env NO_PROXY=true roadhog server",
     "build": "roadhog build",
@@ -16,7 +15,8 @@
     "lint-staged": "lint-staged",
     "lint-staged:js": "eslint --ext .js",
     "test": "jest",
-    "test:all": "node ./tests/run-tests.js"
+    "test:all": "node ./tests/run-tests.js",
+    "publish": "scp -rf dist root@121.40.192.30:/var/www/dev/duoke-admin-new"
   },
   "dependencies": {
     "@antv/data-set": "^0.8.0",

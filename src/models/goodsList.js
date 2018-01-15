@@ -22,6 +22,11 @@ export default  {
         goodsListSales:data1.result.data,
         goodsListPurchases:data2.result.data
       }})
+    },
+
+    *changeGoodsStatus({payload},{call,put}) {
+      const data = yield call(goodsService.changeGoodsStatus,payload)
+      yield put({type:'getGoodsList'})
     }
   },
 

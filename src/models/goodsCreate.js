@@ -24,7 +24,7 @@ export default  {
       return { ...state, ...action.payload }
     },
 
-    setServerData (state,{payload:{value,selectUnits,warehouses,itemBarcodeLevel}}) {
+    setServerData (state,{payload:{value,selectUnits,warehouses,itemBarcodeLevel,itemImageLevel}}) {
       console.log(value)
       state.serverData.item_ref = value.item_ref;
       state.serverData.purchase_price = value.purchase_price || null;
@@ -97,6 +97,7 @@ export default  {
           })
         })
       }
+      // itemImageLevel === 'item' ? state.serverData.image
       itemBarcodeLevel === 0 ? state.serverData.barcode = value.barcode.barcode : null
       console.log(state.serverData)
       return {...state}

@@ -1,11 +1,15 @@
 const menuData = [{
-  name:'商品',
-  icon:'smile-o',
-  path:'goods-list'
+  name: '商品',
+  icon: 'smile-o',
+  path: 'goods-list'
 },{
   name: '404',
   icon: 'warning',
   path: '404',
+},{
+  name: 'version: 0.0.1',
+  icon: 'smile-o',
+  path: '/'
 }];
 
 function formatter(data, parentPath = '') {
