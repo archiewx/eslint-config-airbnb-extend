@@ -49,13 +49,13 @@ export default class SelectMultiple extends PureComponent {
                 <Col span={8} key={item.id}>
                   <div><label className={styles.SelectMultipleLabelTitle}>{item.name}</label></div>
                   <Select mode='multiple' placeholder='请选择商品分组' value={goodsGroupsId[`${item.id}`]} onSelect={this.handleSelect.bind(null,item.id)} onDeselect={this.handleDeSelect.bind(null,item.id)}>
-                   {
-                     item.children.data.map( subItem => {
-                       return (
-                         <Option key={subItem.id} value={subItem.id}>{subItem.name}</Option>
-                       )
-                     })
-                   }
+                    {
+                      item.children.data.map( subItem => {
+                        return (
+                          <Option key={subItem.id} value={(subItem.id).toString()}>{subItem.name}</Option>
+                        )
+                      })
+                    }
                   </Select>
                 </Col>
               )

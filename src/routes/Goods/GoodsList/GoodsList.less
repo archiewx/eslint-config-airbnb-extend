@@ -6,11 +6,28 @@
   color: red;
 }
 
-.goodsListExtra {
-  .detail {
-    div:nth-child(2) {
-      margin-bottom: 0px;
+.goodsList {
+  :global {
+    .ant-card-head {
+      border-bottom: none;
+      margin-bottom: -20px;
     }
+  }
+}
+
+.bottomCardDivided {
+  margin-bottom: 30px;
+}
+
+
+.goodsListExtra {
+  :global {
+    .ant-tabs {
+      width: 50%
+    }
+  }
+  > div:nth-child(2) {
+    margin-bottom: -50px;
   }
 }
 

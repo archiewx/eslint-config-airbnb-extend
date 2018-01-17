@@ -1,5 +1,6 @@
 import * as goodsService from '../services/goods'
 import pathToRegexp from 'path-to-regexp'
+import { routerRedux } from 'dva/router';
 
 export default  {
 
@@ -27,9 +28,14 @@ export default  {
   },
 
   effects: {
-    *getSingle({payload},{call,put}) {  
+    *getSingle({payload},{call,put,select}) {  
+      const {usePricelelvel,priceModel} = yield select(({configSetting}) => (configSetting))
       const [data1,data2,data3,data4,data5,data6] = yield [call(goodsService.getSingle,payload),call(goodsService.getSingleSales,payload),call(goodsService.getSinglePurchases,payload),call(goodsService.getSingleCustomers,payload),call(goodsService.getSingleSuppliers,payload),call(goodsService.getSingleStocks,payload)]
-      yield put({type:'setShowData',payload:data1.result.data})
+      yield put({type:'setShowData',payload:{
+        value: data1.result.data,
+        usePricelelvel,
+        priceModel,
+      }})
       yield put({type:'setState',payload:{
         singleGoodsSales:data2.result.data.list,
         singleGoodsPurchases:data3.result.data.list,
@@ -37,6 +43,24 @@ export default  {
         singleGoodsSuppliers:data5.result.data.list,
         singleGoodsStocks:data6.result.data.list,
         currentId:payload
+      }})
+    },
+
+    *deleteSingleGoods({payload},{call,put}) {
+      const data = yield call(goodsService.deleteSingleGoods,payload)
+      yield put(routerRedux.push('/goods-list'));
+    },
+
+    *changeGoodsStatus({payload},{call,put}) {
+      const data = yield call(goodsService.changeGoodsStatus,payload)
+      yield put({type:'getSingleMessage',payload:payload})
+    },
+
+    *getSingleMessage({payload},{call,put}) {
+
+      const data = yield call(goodsService.getSingle,payload)
+      yield put({type:'setShowData',payload:{
+        value:data.result.data
       }})
     }
   },
@@ -47,16 +71,19 @@ export default  {
       return { ...state, ...action.payload }
     },
 
-    setShowData (state,{payload}) {
-      state.singleGoodsDetail.item_ref = payload.item_ref;
-      state.singleGoodsDetail.not_sale = payload.not_sale;
-      state.singleGoodsDetail.purchase_price = payload.purchase_price;
-      state.singleGoodsDetail.standard_price = payload.standard_price;
-      state.singleGoodsDetail.name = payload.name;
-      state.singleGoodsDetail.desc = payload.desc;
-      state.singleGoodsDetail.units = payload.units.data.map( item => (`${item.name} x ( ${item.number} )`)).join('、')
+    setShowData (state,{payload:{value,usePricelelvel,priceModel}}) {
+      console.log(value)
+      state.singleGoodsDetail.item_ref = value.item_ref;
+      state.singleGoodsDetail.not_sale = value.not_sale;
+      state.singleGoodsDetail.purchase_price = value.purchase_price;
+      state.singleGoodsDetail.standard_price = value.standard_price;
+      state.singleGoodsDetail.name = value.name;
+      state.singleGoodsDetail.desc = value.desc;
+
+      state.singleGoodsDetail.units = value.units.data.map( item => (`${item.name} x ( ${item.number} )`)).join('、')
       let colors = [] , sizes = [];
-      payload.skus.data.forEach( item => {
+      state.singleGoodsDetail.images = [];
+      value.skus.data.forEach( item => {
         item.skuattributes.data.forEach( subItem => {
           if(subItem.skuattributetype_id === '1') {
             if(!colors.some( colorItem => colorItem.id === subItem.id)) {
@@ -75,11 +102,20 @@ export default  {
             }
           }
         })
+        item.skuimages.data.forEach( subItem => {
+          if(!state.singleGoodsDetail.images.some( imageItem => imageItem.name  == subItem.name)) {
+            state.singleGoodsDetail.images.push({
+              name: subItem.name,
+              url: subItem.url,
+              id: subItem.id
+            })
+          }
+        })
       })
-      console.log(colors)
       state.singleGoodsDetail.colors = colors.map( item => item.name).join('、')
       state.singleGoodsDetail.sizes = sizes.map( item => item.name).join('、')
-      state.singleGoodsDetail.goodsGroup = payload.itemgroups.data.map( item => item.name ).join('、')
+      state.singleGoodsDetail.goodsGroup = value.itemgroups.data.map( item => item.name ).join('、')
+
       return {...state}
     }
 

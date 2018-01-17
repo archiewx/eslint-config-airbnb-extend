@@ -151,7 +151,7 @@ class BasicLayout extends React.PureComponent {
                     />
                   ))
                 }
-                <Redirect exact from="/" to="404" />
+                <Redirect exact from="/" to="goods-list" />
                 <Route render={NotFound} />
               </Switch>
             </div>

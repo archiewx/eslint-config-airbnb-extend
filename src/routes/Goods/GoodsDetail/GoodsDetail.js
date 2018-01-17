@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
-import { Row, Col, Card, Button, message, Table,Icon,Menu,Dropdown,Popconfirm,Divider} from 'antd';
+import { Row, Col, Card, Button, message, Table,Icon,Menu,Dropdown,Popconfirm,Divider,Modal} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/antd-pro/DescriptionList';
 import styles from './GoodsDetail.less'
@@ -20,10 +20,21 @@ export default class GoodsDetail extends PureComponent {
     this.setState({activeTabKey: key})
   }
 
+  handleSelectGoodStatus = (not_sale,{id}) => {
+    this.props.dispatch({type:'goodsDetail/changeGoodsStatus',payload:{
+      id,
+      not_sale: not_sale == 1 ? 0 : 1
+    }})
+  }
+
+  handleDeleteSingleGoods = (id,{item,key,keyPath}) => {
+    this.props.dispatch({type:'goodsDetail/deleteSingleGoods',payload:id})
+  }
+
   render() {
 
     const {activeTabKey} = this.state
-    const {singleGoodsDetail,singleGoodsSales,singleGoodsPurchases,singleGoodsCustomers,singleGoodsSuppliers,singleGoodsStocks} = this.props.goodsDetail
+    const {singleGoodsDetail,singleGoodsSales,singleGoodsPurchases,singleGoodsCustomers,singleGoodsSuppliers,singleGoodsStocks,currentId} = this.props.goodsDetail
 
     const tabList = [{
       key:'message',
@@ -138,14 +149,14 @@ export default class GoodsDetail extends PureComponent {
 
     const menu = (
       <Menu>
-        <Menu.Item key="1">删除</Menu.Item>
+        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" onConfirm={this.handleDeleteSingleGoods.bind(null,currentId)}>删除</Popconfirm></Menu.Item>
       </Menu>
     );
 
     const action = (
       <div>
         <ButtonGroup>
-          <Button>{singleGoodsDetail.not_sale === '1' ? '在售' : '停售'}</Button>
+          <Popconfirm title={ singleGoodsDetail.not_sale === '1' ? '确认解除停售此商品' : '确认停售此商品'} onConfirm={this.handleSelectGoodStatus.bind(null,singleGoodsDetail.not_sale,currentId)}><Button>{singleGoodsDetail.not_sale === '1' ? '在售' : '停售'}</Button></Popconfirm>
           <Dropdown overlay={menu} placement="bottomRight">
             <Button><Icon type="ellipsis" /></Button>
           </Dropdown>
@@ -160,12 +171,12 @@ export default class GoodsDetail extends PureComponent {
           singleGoodsDetail.not_sale == 0 ? (
             <div>
               <span className={styles.onSaleStatus}>• </span>
-              <span>在售</span>
+              <span style={{color: 'rgba(0, 0, 0, 0.85)'}}>在售</span>
             </div>
           ) : (
             <div>
               <span className={styles.stopSaleStatus}>• </span>
-              <span>停售</span>
+              <span style={{color: 'rgba(0, 0, 0, 0.85)'}}>停售</span>
             </div>
           )
         }
@@ -175,18 +186,29 @@ export default class GoodsDetail extends PureComponent {
     const singleGoodsTab = {
       message: (
         <div>
-          <DescriptionList title='价格等级&价格组成'>
+          <DescriptionList title='价格等级&价格组成' size='large' >
           </DescriptionList>
           <Divider style={{ marginBottom: 32 }} />
-          <DescriptionList title='属性' col='2'>
+          <DescriptionList title='属性' col='2' size='large'>
             <Description term='单位'>{singleGoodsDetail.units || ''}</Description>
-            <Description term='颜色'>{singleGoodsDetail.colors || ''}</Description>
-            <Description term='尺码'>{singleGoodsDetail.sizes || ''}</Description>
-            <Description term='商品分组'>{singleGoodsDetail.goodsGroup || ''}</Description>
+            <Description term='颜色' style={{display: singleGoodsDetail.colors ? 'block' : 'none'}}>{singleGoodsDetail.colors || ''}</Description>
+            <Description term='尺码' style={{display: singleGoodsDetail.sizes ? 'block' : 'none'}}>{singleGoodsDetail.sizes || ''}</Description>
+            <Description term='商品分组' style={{display: singleGoodsDetail.goodsGroup ? 'block' : 'none'}}>{singleGoodsDetail.goodsGroup || ''}</Description>
           </DescriptionList>
-          <Divider style={{ marginBottom: 32 }} />
-          <DescriptionList title='图片'>
-          </DescriptionList>
+          {
+            (singleGoodsDetail.images || []).length === 0 ? null : (
+              <div>
+                <Divider style={{ marginBottom: 32 }} />
+                <DescriptionList title='图片' style={{paddingBottom:32}} size='large' >
+                  {
+                    singleGoodsDetail.images.map( item => {
+                      return <img src={`${item.url}`} alt = {item.name} style={{height:104}} key={item.id}/>
+                    })
+                  }
+                </DescriptionList>
+              </div>
+            )
+          }
         </div>
       ),
       sale: (

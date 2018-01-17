@@ -27,11 +27,26 @@ export async function changeGoodsStatus (params) {
   })
 }
 
+export async function deleteSingleGoods (params) {
+  return request(`${apiBase}/api/items/${params.id}`,{
+    method:'DELETE',
+    headers: {'Authorization': token}
+  })
+}
+
 export async function createSingle (params) {
   return request(`${apiBase}/api/items`, {
     method: 'POST',
     headers: { "Authorization": token },
     body: params,
+  })
+}
+
+export async function editSingle (params) {
+  return request(`${apiBase}/api/items/${params.id}`, {
+    method: 'PUT',
+    headers: { 'Authorization': token},
+    body: params
   })
 }
 

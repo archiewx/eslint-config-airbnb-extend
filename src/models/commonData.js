@@ -85,8 +85,8 @@ export default  {
       }})
     },
 
-    *getGoodsCreate ({payload},{call,put}) {
-      const [data1,data2,data3,data4,data5,data6,data7,data8] = yield [call(goodsGroupService.getListGroup),call(colorService.getList),call(sizeLibraryService.getList),call(unitService.getList),call(priceGradeService.getList),call(priceQuantityStepService.getList),call(shopService.getList),call(warehouseService.getList)]
+    *getGoodsCreateOrEdit ({payload},{call,put,all}) {
+      const [data1,data2,data3,data4,data5,data6,data7,data8] = yield all([call(goodsGroupService.getListGroup),call(colorService.getList),call(sizeLibraryService.getList),call(unitService.getList),call(priceGradeService.getList),call(priceQuantityStepService.getList),call(shopService.getList),call(warehouseService.getList)])
       yield put({type:'setState',payload:{
         goodsGroups:data1.result.data,
         colors:data2.result.data.skuattributes.data,

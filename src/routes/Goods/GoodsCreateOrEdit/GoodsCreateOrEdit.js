@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Row, Col, Card, Button, Form, Input, InputNumber ,Select ,Menu, Dropdown, Icon} from 'antd';
+import { Row, Col, Card, Button, Form, Input, InputNumber ,Select ,Menu, Dropdown, Icon , Popconfirm} from 'antd';
+import { routerRedux } from 'dva/router';
 import classNames from 'classnames/bind'
 import StandardTable from '../../../components/antd-pro/StandardTable';
 import FooterToolbar from '../../../components/antd-pro/FooterToolbar';
@@ -10,18 +11,18 @@ import StockTable from '../../../components/StockTable/StockTable'
 import SelectMultiple from '../../../components/SelectMultiple/SelectMultiple'
 import PictureModal from '../../../components/PictureModal/PictureModal'
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
-import styles from './GoodsCreate.less'
+import styles from './GoodsCreateOrEdit.less'
 const FormItem = Form.Item;
 const Option = Select.Option;
 let cx = classNames.bind(styles);
 let selectUnits = [] , selectColors = [] ,selectSizes = [];
 @Form.create()
-@connect(({configSetting,goodsCreate,commonData}) => ({
+@connect(({configSetting,goodsCreateOrEdit,commonData}) => ({
   configSetting,
-  goodsCreate,
+  goodsCreateOrEdit,
   commonData,
 }))
-export default class GoodsCreate extends PureComponent {
+export default class GoodsCreateOrEdit extends PureComponent {
 
   state = {
     selectWarehouseId:'',
@@ -37,7 +38,6 @@ export default class GoodsCreate extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.dispatch({type:'commonData/getGoodsCreate'})
   }
 
   handleSubmit = (e) => {
@@ -45,22 +45,28 @@ export default class GoodsCreate extends PureComponent {
     e.preventDefault();
     validateFields((err,value) =>{
       if(!err){
-        this.props.dispatch({type:'goodsCreate/setServerData',payload:{
+        this.props.dispatch({type:'goodsCreateOrEdit/setServerData',payload:{
           value,
           selectUnits,
           warehouses:this.props.commonData.warehouses,
           itemBarcodeLevel: this.props.configSetting.itemBarcodeLevel,
           itemImageLevel: this.props.configSetting.itemImageLevel
         }})
+        this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods'})
       }
     })
   }
 
+  handleCancel = () => {
+    this.props.form.resetFields()
+    this.props.dispatch(routerRedux.push('/goods-list'))
+  }
+
   handleCalculateSelect = (arr = [],selectIds = [],type = 'unit') => {
     let arrSelect = [];
-    selectIds.forEach( item => {
-      if(arr.some( subItem => subItem.id === item)) {
-        let current = arr.find( n => n.id === item)
+    arr.forEach( item => {
+      if(selectIds.some( subItem => subItem == item.id)) {
+        let current = item;
         arrSelect.push({
           name: type === 'unit' ? `${current.name} ( x ${current.number} )` : `${current.name}`,
           number: type === 'unit' ? `${current.number}` : '',
@@ -188,7 +194,7 @@ export default class GoodsCreate extends PureComponent {
       warehouses.forEach( item => {
         current[`${item.id}`] = {
           warehouse_id: item.id,
-          store_quantity: null
+          store_quantity: 0
         }
       })
     }else {
@@ -197,7 +203,7 @@ export default class GoodsCreate extends PureComponent {
           selectColors.forEach( colorItem => {
             current[`${item.id}_${colorItem.id}`] = {
               warehouse_id: item.id,
-              store_quantity: null
+              store_quantity: 0
             }
           })
         })
@@ -207,7 +213,7 @@ export default class GoodsCreate extends PureComponent {
             selectSizes.forEach( sizeItem => {
               current[`${item.id}_${colorItem.id}_${sizeItem.id}`] = {
                 warehouse_id: item.id,
-                store_quantity: null
+                store_quantity: 0
               }
             })
           })
@@ -221,20 +227,20 @@ export default class GoodsCreate extends PureComponent {
     let current = {};
     if(selectColors.length === 0 || itemBarcodeLevel === 0 ) {
       current = {
-        barcode: null
+        barcode: ''
       }
     }else {
       if(selectSizes.length === 0) {
         selectColors.forEach( item => {
           current[`${item.id}`] = {
-            barcode: null
+            barcode: ''
           }
         })
       }else {
         selectColors.forEach( item => {
           selectSizes.forEach( subItem => {
             current[`${item.id}_${subItem.id}`] = {
-              barcode: null
+              barcode: ''
             }
           })
         })
@@ -258,11 +264,11 @@ export default class GoodsCreate extends PureComponent {
   }
 
   render() {
-
     const {getFieldDecorator,getFieldValue,setFieldsValue} = this.props.form
     const {goodsGroups,colors,sizeLibrarys,units,priceGrades,priceQuantitySteps,shops,warehouses} = this.props.commonData
     const {usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel} = this.props.configSetting
     const {selectWarehouseId,selecStockUnitNum,selectQuantityStep} = this.state
+    const {showData} = this.props.goodsCreateOrEdit
 
     const formItemLayout = {
       labelCol: {
@@ -286,7 +292,7 @@ export default class GoodsCreate extends PureComponent {
     let defaultSelectUnits =[],defaultStockUnit = {};
     units.forEach( item => {
       if(item.default == '1') {
-        defaultSelectUnits.push(item.id);
+        defaultSelectUnits.push((item.id).toString());
         // defaultStockUnit = {
         //   name: item.name,
         //   number: item.number
@@ -297,7 +303,7 @@ export default class GoodsCreate extends PureComponent {
     selectUnits = this.handleCalculateSelect(units,getFieldValue('unit_select'))
     selectColors = this.handleCalculateSelect(colors,getFieldValue('color_select'),'other')
     selectSizes = this.handleCalculateSelect(sizeLibrarys,getFieldValue('size_select'),'other')
-
+    
     let priceTableValue = this.handlePriceTableValue(shops,selectUnits,selectQuantityStep,priceGrades,usePricelelvel,priceModel) 
     let skuImages = this.handleSkuImages(selectColors,itemImageLevel)
     let skuStocks = this.handleSkuStocks(warehouses,selectColors,selectSizes)
@@ -332,14 +338,15 @@ export default class GoodsCreate extends PureComponent {
 
     return (
       <PageHeaderLayout
-        title='新建商品'
+        title={showData.item_ref ? '编辑商品' : '新建商品'}
       >
         <Card title='属性' bordered={false} className={styles.bottomCardDivided}>
           <Form layout='vertical'>
             <Row gutter={64}>
               <Col span={8}>
-                <FormItem label='货号'>
+                <FormItem label='货号' hasFeedback>
                   {getFieldDecorator('item_ref',{
+                    initialValue: showData.item_ref || '',
                     rules: [{required:true,message:'货号不能为空'}],
                   })(
                     <Input placeholder="请输入"/>
@@ -347,8 +354,9 @@ export default class GoodsCreate extends PureComponent {
                 </FormItem>
               </Col>
               <Col span={8}>
-                <FormItem label='标准价'>
+                <FormItem label='标准价' hasFeedback>
                   {getFieldDecorator('standard_price',{
+                    initialValue: showData.standard_price || '',
                     rules: [{required:true,message:'标准价不能为空'}],
                   })(
                     <InputNumber placeholder="请输入" style={{width:'100%'}} precision={2} min={0}/>
@@ -358,6 +366,7 @@ export default class GoodsCreate extends PureComponent {
               <Col span={8}>
                 <FormItem label='进货价'>
                   {getFieldDecorator('purchase_price',{
+                    initialValue: showData.purchase_price || '',
                   })(
                     <InputNumber placeholder="请输入" style={{width:'100%'}} precision={2} min={0}/>
                   )}
@@ -419,13 +428,13 @@ export default class GoodsCreate extends PureComponent {
           <Form layout='horizontal' className={styles.leftLabelTitle}>
             <FormItem label='单位' {...formItemLayout}> 
               {getFieldDecorator('unit_select',{
-                initialValue: defaultSelectUnits
+                initialValue: showData.units ||  defaultSelectUnits
               })(
               <Select mode='multiple' placeholder='请输入单位'>
                 {
                   units.map( item => {
                     return (
-                      <Option key={item.id} value={item.id} disabled={item.default == '1' ? true : false}>{`${item.name} ( x ${item.number} )`}</Option>
+                      <Option key={item.id} value={(item.id).toString()} disabled={item.default == '1' ? true : false}>{`${item.name} ( x ${item.number} )`}</Option>
                     )
                   })
                 }
@@ -434,13 +443,13 @@ export default class GoodsCreate extends PureComponent {
             </FormItem>
             <FormItem label='颜色' {...formItemLayout}>
               {getFieldDecorator('color_select',{
-                initialValue:[]
+                initialValue: showData.colors || []
               })(
               <Select mode='multiple' placeholder='请选择颜色'>
                 {
                   colors.map( item => {
                     return (
-                      <Option key={item.id} value={item.id}>{`${item.name}`}</Option>
+                      <Option key={item.id} value={(item.id).toString()}>{`${item.name}`}</Option>
                     )
                   })
                 }
@@ -449,13 +458,13 @@ export default class GoodsCreate extends PureComponent {
             </FormItem>
             <FormItem label='尺码' {...formItemLayout}>
               {getFieldDecorator('size_select',{
-                initialValue:[]
+                initialValue: showData.sizes ||  []
               })(
               <Select mode='multiple' placeholder={selectColors.length == 0 ? '请先选择颜色' : '请选择尺码'} disabled={selectColors.length ==  0 ? true : false }>
                 {
                   sizeLibrarys.map( item => {
                     return (
-                      <Option key={item.id} value={item.id}>{`${item.name}`}</Option>
+                      <Option key={item.id} value={(item.id).toString()}>{`${item.name}`}</Option>
                     )
                   })
                 }
@@ -470,6 +479,7 @@ export default class GoodsCreate extends PureComponent {
               <Col span={8}>
                 <FormItem label='名称'>
                   {getFieldDecorator('name',{
+                    initialValue: showData.name || ''
                   })(
                     <Input placeholder='请输入商品名称' />  
                   )}
@@ -478,6 +488,7 @@ export default class GoodsCreate extends PureComponent {
               <Col span={8}>
                 <FormItem label='备注'>
                   {getFieldDecorator('desc',{
+                    initialValue: showData.desc || ''
                   })(
                     <Input placeholder='请输入' />  
                   )}
@@ -486,6 +497,7 @@ export default class GoodsCreate extends PureComponent {
             </Row>
             <FormItem>
               {getFieldDecorator('goods_group',{
+                initialValue: showData.goodsGroup
               })(
                 <SelectMultiple  goodsGroups={goodsGroups}/>
               )}
@@ -509,7 +521,7 @@ export default class GoodsCreate extends PureComponent {
               <Form>
                 <FormItem>
                   {getFieldDecorator('stock',{
-                    initialValue:skuStocks
+                    initialValue: showData.stocks || skuStocks
                   })(
                     <StockTable skuStocks={skuStocks} selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
                   )}
@@ -520,7 +532,7 @@ export default class GoodsCreate extends PureComponent {
                 <Form>
                   <FormItem>
                     {getFieldDecorator('stock',{
-                      initialValue:skuStocks
+                      initialValue: showData.stocks || skuStocks
                     })(
                       <StockTable skuStocks={skuStocks} selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
                     )}
@@ -536,7 +548,7 @@ export default class GoodsCreate extends PureComponent {
               <Form>
                 <FormItem>
                   {getFieldDecorator('barcode',{
-                    initialValue: skuBarcodes
+                    initialValue: showData.barcode || skuBarcodes
                   })(
                      <BarCodeTable skuBarcodes={skuBarcodes} selectColors={selectColors} selectSizes={selectSizes} itemBarcodeLevel={itemBarcodeLevel}/>
                   )}
@@ -546,8 +558,9 @@ export default class GoodsCreate extends PureComponent {
           ) : null
         }
         <FooterToolbar>
+          <Popconfirm title={ showData.item_ref ?  '确认放弃编辑商品' : '确认放弃新建商品'} onConfirm={this.handleCancel}><Button>取消</Button></Popconfirm>
           <Button type="primary" onClick={this.handleSubmit}>
-            提交
+            确认
           </Button>
         </FooterToolbar>
       </PageHeaderLayout>

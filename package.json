@@ -16,7 +16,7 @@
     "lint-staged:js": "eslint --ext .js",
     "test": "jest",
     "test:all": "node ./tests/run-tests.js",
-    "publish": "scp -rf dist root@121.40.192.30:/var/www/dev/duoke-admin-new"
+    "publish": "scp -r dist/* root@116.62.53.184:/var/www/duoke-admin-new/"
   },
   "dependencies": {
     "@antv/data-set": "^0.8.0",
