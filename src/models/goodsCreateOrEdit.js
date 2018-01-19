@@ -63,7 +63,56 @@ export default  {
       state.showData.item_ref = value.item_ref;
       state.showData.standard_price = value.standard_price;
       state.showData.purchase_price = value.purchase_price;
-
+      let priceMatrix = [...value.itemprices.data];
+      priceMatrix = priceMatrix.splice(0,priceMatrix.length-1);
+      state.showData.prices = {};
+      if(usePricelelvel == 'yes') {
+        if(priceModel == '') {
+          priceMatrix.forEach( item => {
+            state.showData.prices[`${item.pricelevel_id}`] = {
+              price:item.price
+            }
+          })
+        }else if(priceModel == 'shop') {
+          priceMatrix.forEach( item => {
+            state.showData.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
+              price:item.price
+            }
+          })
+        }else if(priceModel == 'unit') {
+          priceMatrix.forEach( item => {
+            stata.showData.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
+              price:item.price
+            }
+          })
+        }else if(priceModel == 'quantityrange') {
+          priceMatrix.forEach( item => {
+            state.showData.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
+              price:item.price
+            }
+          })
+        }
+      }else {
+        if(priceModel == 'shop') {
+          priceMatrix.forEach( item => {
+            state.showData.prices[`${item.shop_id}`] = {
+              price: item.price
+            }
+          })
+        }else if(priceModel == 'unit') {
+          priceMatrix.forEach( item => {
+            state.showData.prices[`${item.unit_id}`] = {
+              price: item.price
+            }
+          })
+        }else if(priceModel == 'quantityrange') {
+          priceMatrix.forEach( item => {
+            state.showData.prices[`${item.quantityrange_id}`] = {
+              price: item.price
+            }
+          })
+        }
+      }
       state.showData.units = value.units.data.map( item => {
         return (item.id).toString()
       })

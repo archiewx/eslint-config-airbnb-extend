@@ -1,8 +1,8 @@
-import * as layoutServices from '../services/layout'
+import * as layoutFilterServices from '../services/layoutFilter'
 
 export default  {
 
-  namespace: 'layout',
+  namespace: 'layoutFilter',
 
   state: {
     goodsSaleFilter:[],
@@ -12,13 +12,13 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      dispatch({type:'getLayout'})
+      dispatch({type:'getLayoutFilter'})
     },
   },
 
   effects: {
-    *getLayout({payload},{call,put}) {
-      const data = yield call(layoutServices.getLayout)
+    *getLayoutFilter({payload},{call,put}) {
+      const data = yield call(layoutFilterServices.getLayoutFilter)
       yield put({type:'setState',payload:{
         goodsSaleFilter: data.result.item_sales_list.filter.groups,
         goodsPurchaseFilter:data.result.item_purchase_list.filter.groups,

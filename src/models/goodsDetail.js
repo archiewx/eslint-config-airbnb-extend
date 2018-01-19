@@ -13,7 +13,7 @@ export default  {
     singleGoodsCustomers:[],
     singleGoodsSuppliers:[],
     singleGoodsStocks:[],
-    currentId: ''
+    currentId: '',
   },
 
   subscriptions: {
@@ -28,20 +28,27 @@ export default  {
   },
 
   effects: {
-    *getSingle({payload},{call,put,select}) {  
+    *getSingle({payload},{call,put,select,all}) {  
       const {usePricelelvel,priceModel} = yield select(({configSetting}) => (configSetting))
-      const [data1,data2,data3,data4,data5,data6] = yield [call(goodsService.getSingle,payload),call(goodsService.getSingleSales,payload),call(goodsService.getSinglePurchases,payload),call(goodsService.getSingleCustomers,payload),call(goodsService.getSingleSuppliers,payload),call(goodsService.getSingleStocks,payload)]
+      const [data1,data2,data3,data4,data5,data6] = yield all([
+        call(goodsService.getSingle,payload),
+        call(goodsService.getSingleSales,payload),
+        call(goodsService.getSinglePurchases,payload),
+        call(goodsService.getSingleCustomers,payload),
+        call(goodsService.getSingleSuppliers,payload),
+        call(goodsService.getSingleStocks,payload)
+      ])
       yield put({type:'setShowData',payload:{
         value: data1.result.data,
         usePricelelvel,
         priceModel,
       }})
+      yield put({type:'setShowSaleList',payload:data2.result.data.list})
+      yield put({type:'setShowPurchaseList',payload:data3.result.data.list})
+      yield put({type:'setShowStockList',payload:data6.result.data.list})
       yield put({type:'setState',payload:{
-        singleGoodsSales:data2.result.data.list,
-        singleGoodsPurchases:data3.result.data.list,
         singleGoodsCustomers:data4.result.data.list,
         singleGoodsSuppliers:data5.result.data.list,
-        singleGoodsStocks:data6.result.data.list,
         currentId:payload
       }})
     },
@@ -57,10 +64,44 @@ export default  {
     },
 
     *getSingleMessage({payload},{call,put}) {
-
       const data = yield call(goodsService.getSingle,payload)
       yield put({type:'setShowData',payload:{
         value:data.result.data
+      }})
+    },
+
+    *getSingleSales({payload},{call,put}) {
+      const data = yield call(goodsService.getSingleSales,payload) 
+      yield put({type:'setState',payload:{
+        singleGoodsSales: data.result.data.list
+      }})
+    },
+
+    *getSinglePurchases({payload},{call,put}) {
+      const data = yield call(goodsService.getSinglePurchases,payload) 
+      yield put({type:'setState',payload:{
+        singleGoodsPurchases: data.result.data.list
+      }})
+    },
+
+    *getSingleCustomers({payload},{call,put}) {
+      const data = yield call(goodsService.getSingleCustomers,payload) 
+      yield put({type:'setState',payload:{
+        singleGoodsCustomers: data.result.data.list
+      }})
+    },
+
+    *getSingleSuppliers({payload},{call,put}) {
+      const data = yield call(goodsService.getSingleSuppliers,payload) 
+      yield put({type:'setState',payload:{
+        singleGoodsSuppliers: data.result.data.list
+      }})
+    },
+
+    *getSingleStocks({payload},{call,put}) {
+      const data = yield call(goodsService.getSingleStocks,payload) 
+      yield put({type:'setState',payload:{
+        singleGoodsStocks: data.result.data.list
       }})
     }
   },
@@ -79,7 +120,7 @@ export default  {
       state.singleGoodsDetail.standard_price = value.standard_price;
       state.singleGoodsDetail.name = value.name;
       state.singleGoodsDetail.desc = value.desc;
-
+      
       state.singleGoodsDetail.units = value.units.data.map( item => (`${item.name} x ( ${item.number} )`)).join('、')
       let colors = [] , sizes = [];
       state.singleGoodsDetail.images = [];
@@ -115,10 +156,195 @@ export default  {
       state.singleGoodsDetail.colors = colors.map( item => item.name).join('、')
       state.singleGoodsDetail.sizes = sizes.map( item => item.name).join('、')
       state.singleGoodsDetail.goodsGroup = value.itemgroups.data.map( item => item.name ).join('、')
+      return {...state}
+    },
 
+
+    setShowSaleList(state,{payload}) {
+      let colorCurrent = [];
+      let sizeCurrent = {};
+      let flagId = '';
+      payload.forEach( item => {
+        if(!colorCurrent.some( subItem => subItem.id == item.skuattributes[0].id)) {
+          colorCurrent.push({
+            id: item.skuattributes[0].id,
+            name: item.skuattributes[0].name,
+            childrens: [],
+            sales_quantity: '',
+            sales_amount: '',
+            profit: '',
+            stock_quantity: '',
+          })
+        }
+        if(flagId != item.skuattributes[0].id) {
+          flagId = item.skuattributes[0].id;
+          sizeCurrent[`${item.skuattributes[0].id}`] = [];
+          sizeCurrent[`${item.skuattributes[0].id}`].push({
+            id: item.skuattributes[1].id,
+            name: item.skuattributes[1].name,
+            sales_quantity: item.sales_quantity,
+            sales_amount: item.sales_amount,
+            profit: item.profit,
+            stock_quantity: item.stock_quantity
+          })
+        }else {
+          sizeCurrent[`${flagId}`].push({
+            id: item.skuattributes[1].id,
+            name: item.skuattributes[1].name,
+            sales_quantity: item.sales_quantity,
+            sales_amount: item.sales_amount,
+            profit: item.profit,
+            stock_quantity: item.stock_quantity
+          })
+        }
+      })
+      for(let key in sizeCurrent) {
+        colorCurrent[(colorCurrent.findIndex( item => item.id == key))].childrens = sizeCurrent[key]
+      }
+      colorCurrent.forEach( item => {
+        let sales_quantity = 0 ,sales_amount = 0,profit = 0,stock_quantity = 0;
+        item.childrens.forEach( subItem => {
+          sales_quantity += Number(subItem.sales_quantity );
+          sales_amount += Number(subItem.sales_amount );
+          profit += Number(subItem.profit );
+          stock_quantity += Number(subItem.stock_quantity );
+        })
+        item.sales_quantity = sales_quantity;
+        item.sales_amount = (sales_amount).toFixed(2);
+        item.profit = (profit).toFixed(2);
+        item.stock_quantity = stock_quantity;
+      })
+      state.singleGoodsSales = colorCurrent
+
+      return {...state}
+    },
+
+    setShowPurchaseList(state,{payload}) {
+      let colorCurrent = [];
+      let sizeCurrent = {};
+      let flagId = '';
+      payload.forEach( item => {
+        if(!colorCurrent.some( subItem => subItem.id == item.skuattributes[0].id)) {
+          colorCurrent.push({
+            id: item.skuattributes[0].id,
+            name: item.skuattributes[0].name,
+            childrens: [],
+            purchase_quantity: '',
+            purchase_amount: '',
+            stock_quantity: '',
+          })
+        }
+        if(flagId != item.skuattributes[0].id) {
+          flagId = item.skuattributes[0].id;
+          sizeCurrent[`${item.skuattributes[0].id}`] = [];
+          sizeCurrent[`${item.skuattributes[0].id}`].push({
+            id: item.skuattributes[1].id,
+            name: item.skuattributes[1].name,
+            purchase_quantity: item.purchase_quantity,
+            purchase_amount: item.purchase_amount,
+            stock_quantity: item.stock_quantity
+          })
+        }else {
+          sizeCurrent[`${flagId}`].push({
+            id: item.skuattributes[1].id,
+            name: item.skuattributes[1].name,
+            purchase_quantity: item.purchase_quantity,
+            purchase_amount: item.purchase_amount,
+            stock_quantity: item.stock_quantity
+          })
+        }
+      })
+      for(let key in sizeCurrent) {
+        colorCurrent[(colorCurrent.findIndex( item => item.id == key))].childrens = sizeCurrent[key]
+      }
+      colorCurrent.forEach( item => {
+        let purchase_quantity = 0 ,purchase_amount = 0,stock_quantity = 0;
+        item.childrens.forEach( subItem => {
+          purchase_quantity += Number(subItem.purchase_quantity );
+          purchase_amount += Number(subItem.purchase_amount );
+          stock_quantity += Number(subItem.stock_quantity );
+        })
+        item.purchase_quantity = purchase_quantity;
+        item.purchase_amount = (purchase_amount).toFixed(2);
+        item.stock_quantity = stock_quantity;
+      })
+      state.singleGoodsPurchases = colorCurrent
+      return {...state}
+    },
+
+    setShowStockList(state,{payload}) {
+      let colorCurrent = [];
+      let sizeCurrent = {};
+      let flagId = '';
+      payload.forEach( item => {
+        if(!colorCurrent.some( subItem => subItem.id == item.skuattributes[0].id)) {
+          colorCurrent.push({
+            id: item.skuattributes[0].id,
+            name: item.skuattributes[0].name,
+            childrens: [],
+            sales_quantity: '',
+            purchase_quantity: '',
+            stock_quantity: '',
+          })
+        }
+        if(flagId != item.skuattributes[0].id) {
+          flagId = item.skuattributes[0].id;
+          sizeCurrent[`${item.skuattributes[0].id}`] = [];
+          sizeCurrent[`${item.skuattributes[0].id}`].push({
+            id: item.skuattributes[1].id,
+            name: item.skuattributes[1].name,
+            sales_quantity: item.sales_quantity,
+            purchase_quantity: item.purchase_quantity,
+            stock_quantity: item.stock_quantity
+          })
+        }else {
+          sizeCurrent[`${flagId}`].push({
+            id: item.skuattributes[1].id,
+            name: item.skuattributes[1].name,
+            sales_quantity: item.sales_quantity,
+            purchase_quantity: item.purchase_quantity,
+            stock_quantity: item.stock_quantity
+          })
+        }
+      })
+      for(let key in sizeCurrent) {
+        colorCurrent[(colorCurrent.findIndex( item => item.id == key))].childrens = sizeCurrent[key]
+      }
+      colorCurrent.forEach( item => {
+        let sales_quantity = 0 ,purchase_quantity = 0,stock_quantity = 0;
+        item.childrens.forEach( subItem => {
+          sales_quantity += Number(subItem.sales_quantity );
+          purchase_quantity += Number(subItem.purchase_quantity );
+          stock_quantity += Number(subItem.stock_quantity );
+        })
+        item.sales_quantity = sales_quantity;
+        item.purchase_quantity = (purchase_quantity).toFixed(2);
+        item.stock_quantity = stock_quantity;
+      })
+      state.singleGoodsStocks = colorCurrent
       return {...state}
     }
 
   },
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

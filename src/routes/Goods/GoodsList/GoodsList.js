@@ -12,7 +12,7 @@ const { RangePicker } = DatePicker;
 @Form.create()
 @connect(state => ({
   goodsList:state.goodsList,
-  layout:state.layout
+  layoutFilter:state.layoutFilter
 }))
 export default class GoodsList extends PureComponent {
 
@@ -250,7 +250,7 @@ export default class GoodsList extends PureComponent {
   render() {
     const {activeTabKey,sortSaleOptions,sortPurchaseOptions,sortSale,sortPurchase} = this.state
     const {goodsListSales,goodsListPurchases,goodsSalePagination,goodsPurchasePagination} = this.props.goodsList
-    const {goodsSaleFilter,goodsPurchaseFilter} = this.props.layout
+    const {goodsSaleFilter,goodsPurchaseFilter} = this.props.layoutFilter
     const {getFieldDecorator} = this.props.form
     const {dispatch} = this.props;
 

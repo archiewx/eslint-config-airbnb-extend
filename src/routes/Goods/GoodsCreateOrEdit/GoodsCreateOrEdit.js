@@ -103,7 +103,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     this.setState({selectQuantityStep:[...current]})
   }
 
-  handlePriceTableValue = (shops,selectUnits,selectQuantityStep,priceGrades,usePricelelvel,priceModel) =>  {
+  handlePriceTableValue = (prices = {} ,shops,selectUnits,selectQuantityStep,priceGrades,usePricelelvel,priceModel) =>  {
     let current = {};
     let standardPrice = this.props.form.getFieldValue('standard_price')
     if(usePricelelvel === 'yes') {
@@ -111,7 +111,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
         priceGrades.forEach( item => {
           current[`${item.id}`] = {
             pricelevel_id: item.id,
-            price: standardPrice || null
+            price: (prices[`${item.id}`] || {}).price || standardPrice || null
           }
         })
       }else if(priceModel === 'shop') {
@@ -120,7 +120,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             current[`${item.id}_${subItem.id}`] = {
               shop_id: item.id,
               pricelevel_id: subItem.id,
-              price: standardPrice || null
+              price: (prices[`${item.id}_${subItem.id}`] || {}).price || standardPrice  || null
             }
           })
         })
@@ -130,7 +130,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             current[`${item.id}_${subItem.id}`] = {
               unit_id: item.id,
               pricelevel_id: subItem.id,
-              price: standardPrice || null
+              price: (prices[`${item.id}_${subItem.id}`] || {}).price || standardPrice || null
             }
           })
         })
@@ -140,7 +140,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             current[`${item.id}_${subItem.id}`] = {
               quantityrange_id: item.id,
               pricelevel_id: subItem.id,
-              price: standardPrice || null
+              price: (prices[`${item.id}_${subItem.id}`] || {}).price || standardPrice || null
             }
           })
         })
@@ -150,21 +150,21 @@ export default class GoodsCreateOrEdit extends PureComponent {
         shops.forEach( item => {
           current[`${item.id}`] = {
             shop_id: item.id,
-            price: standardPrice || null
+            price: (prices[`${item.id}`] || {}).price || standardPrice || null
           }
         })
       }else if(priceModel === 'unit') {
         selectUnits.forEach( item => {
           current[`${item.id}`] = {
             unit_id: item.id,
-            price: standardPrice || null
+            price: (prices[`${item.id}`] || {}).price || standardPrice || null
           }
         })
       }else if(priceModel === 'quantityrange') {
         selectQuantityStep.forEach( item => {
           current[`${item.id}`] = {
             quantityrange_id: item.id,
-            price: standardPrice || null
+            price: (prices[`${item.id}`] || {}).price || standardPrice || null
           }
         })
       }
@@ -188,13 +188,13 @@ export default class GoodsCreateOrEdit extends PureComponent {
     return current
   }
 
-  handleSkuStocks = (warehouses,selectColors,selectSizes) => {
+  handleSkuStocks = (stocks = {} ,warehouses,selectColors,selectSizes) => {
     let current = {}
     if(selectColors.length === 0) {
       warehouses.forEach( item => {
         current[`${item.id}`] = {
           warehouse_id: item.id,
-          store_quantity: 0
+          store_quantity: (stocks[`${item.id}`] || {}).store_quantity || 0
         }
       })
     }else {
@@ -203,7 +203,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
           selectColors.forEach( colorItem => {
             current[`${item.id}_${colorItem.id}`] = {
               warehouse_id: item.id,
-              store_quantity: 0
+              store_quantity: (stocks[`${item.id}_${colorItem.id}`] || {}).store_quantity || 0
             }
           })
         })
@@ -213,7 +213,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             selectSizes.forEach( sizeItem => {
               current[`${item.id}_${colorItem.id}_${sizeItem.id}`] = {
                 warehouse_id: item.id,
-                store_quantity: 0
+                store_quantity: (stocks[`${item.id}_${colorItem.id}_${sizeItem.id}`] || {}).store_quantity || 0
               }
             })
           })
@@ -304,9 +304,9 @@ export default class GoodsCreateOrEdit extends PureComponent {
     selectColors = this.handleCalculateSelect(colors,getFieldValue('color_select'),'other')
     selectSizes = this.handleCalculateSelect(sizeLibrarys,getFieldValue('size_select'),'other')
     
-    let priceTableValue = this.handlePriceTableValue(shops,selectUnits,selectQuantityStep,priceGrades,usePricelelvel,priceModel) 
+    let priceTableValue = this.handlePriceTableValue(showData.prices,shops,selectUnits,selectQuantityStep,priceGrades,usePricelelvel,priceModel) 
     let skuImages = this.handleSkuImages(selectColors,itemImageLevel)
-    let skuStocks = this.handleSkuStocks(warehouses,selectColors,selectSizes)
+    let skuStocks = this.handleSkuStocks(showData.stocks,warehouses,selectColors,selectSizes)
     let skuBarcodes = this.handleSkuBarcodes(selectColors,selectSizes,itemBarcodeLevel)
 
 
@@ -497,7 +497,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             </Row>
             <FormItem>
               {getFieldDecorator('goods_group',{
-                initialValue: showData.goodsGroup
+                initialValue: showData.goodsGroup || []
               })(
                 <SelectMultiple  goodsGroups={goodsGroups}/>
               )}
@@ -521,7 +521,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
               <Form>
                 <FormItem>
                   {getFieldDecorator('stock',{
-                    initialValue: showData.stocks || skuStocks
+                    initialValue: skuStocks
                   })(
                     <StockTable skuStocks={skuStocks} selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
                   )}
@@ -532,7 +532,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                 <Form>
                   <FormItem>
                     {getFieldDecorator('stock',{
-                      initialValue: showData.stocks || skuStocks
+                      initialValue: skuStocks
                     })(
                       <StockTable skuStocks={skuStocks} selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
                     )}

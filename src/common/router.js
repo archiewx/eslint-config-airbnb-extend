@@ -36,7 +36,7 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['user', 'login'], () => import('../layouts/BasicLayout')),
     },
     '/goods-list': {
-      component: dynamicWrapper(app, ['goodsList','layout'], () => import('../routes/Goods/GoodsList/GoodsList')),
+      component: dynamicWrapper(app, ['goodsList','layoutFilter'], () => import('../routes/Goods/GoodsList/GoodsList')),
     },
     '/goods-create': {
       component: dynamicWrapper(app, ['goodsCreateOrEdit'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
@@ -45,11 +45,14 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['goodsCreateOrEdit'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
     },
     '/goods-detail/:id': {
-      component: dynamicWrapper(app, ['goodsDetail'], () => import('../routes/Goods/GoodsDetail/GoodsDetail')),
+      component: dynamicWrapper(app, ['goodsDetail','layoutFilter'], () => import('../routes/Goods/GoodsDetail/GoodsDetail')),
     },
     '/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },
+    '/test': {
+      component: dynamicWrapper(app, ['test'], () => import('../routes/Test/Test'))
+    }
     // '/user': {
     //   component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
     // },

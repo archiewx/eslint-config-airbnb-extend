@@ -7,6 +7,114 @@ import DescriptionList from '../../../components/antd-pro/DescriptionList';
 import styles from './GoodsDetail.less'
 const ButtonGroup = Button.Group;
 const {Description} = DescriptionList
+const tabList = [{
+  key:'message',
+  tab:'信息'
+},{
+  key:'sale',
+  tab:'销售',
+},{
+  key:'purchase',
+  tab:'进货'
+},{
+  key:'customer',
+  tab:'客户'
+},{
+  key:'supplier',
+  tab:'供应商'
+},{
+  key:'stock',
+  tab:'库存'
+}]
+
+const saleColumns = [{
+  title:'名称',
+  dataIndex:'name',
+},{
+  title:'销售量',
+  dataIndex:'sales_quantity',
+  sorter:true
+},{
+  title:'销售额',
+  dataIndex:'sales_amount',
+  sorter:true
+},{
+  title:'利润',
+  dataIndex:'profit',
+  sorter:true
+},{
+  title:'库存',
+  dataIndex:'stock_quantity',
+  sorter:true
+}]
+
+const purchaseColumns = [{
+  title:'名称',
+  dataIndex:'name',
+},{
+  title:'进货量',
+  dataIndex:'purchase_quantity',
+  sorter:true
+},{
+  title:'进货额',
+  dataIndex:'purchase_amount',
+  sorter:true
+},{
+  title:'库存',
+  dataIndex:'stock_quantity',
+  sorter:true
+}]
+
+const customerColumns = [{
+  title:'名称',
+  dataIndex:'name',
+},{
+  title:'购买量',
+  dataIndex:'sales_quantity',
+  sorter:true
+},{
+  title:'购买额',
+  dataIndex:'sales_amount',
+  sorter:true
+},{
+  title:'退货量',
+  dataIndex:'sales_return_quantity',
+  sorter:true
+},{
+  title:'利润',
+  dataIndex:'profit',
+  sorter:true
+}]
+
+const supplierColumns = [{
+  title:'名称',
+  dataIndex:'name',
+},{
+  title:'供应量',
+  dataIndex:'purchase_quantity',
+  sorter:true
+},{
+  title:'供应额',
+  dataIndex:'purchase_amount',
+  sorter:true
+}]
+
+const stockColumns = [{
+  title:'名称',
+  dataIndex:'name',
+},{
+  title:'出货量',
+  dataIndex:'sales_quantity',
+  sorter:true
+},{
+  title:'入货量',
+  dataIndex:'purchase_quantity',
+  sorter:true
+},{
+  title:'库存量',
+  dataIndex:'stock_quantity',
+  sorter:true
+}]
 @connect( state => ({
   goodsDetail: state.goodsDetail
 }))
@@ -31,112 +139,18 @@ export default class GoodsDetail extends PureComponent {
     this.props.dispatch({type:'goodsDetail/deleteSingleGoods',payload:id})
   }
 
+  handleToGoodsEdit = (id) => {
+    this.props.dispatch(routerRedux.push(`/goods-edit/${id}`))
+  }
+
+
+
   render() {
 
     const {activeTabKey} = this.state
     const {singleGoodsDetail,singleGoodsSales,singleGoodsPurchases,singleGoodsCustomers,singleGoodsSuppliers,singleGoodsStocks,currentId} = this.props.goodsDetail
 
-    const tabList = [{
-      key:'message',
-      tab:'信息'
-    },{
-      key:'sale',
-      tab:'销售',
-    },{
-      key:'purchase',
-      tab:'进货'
-    },{
-      key:'customer',
-      tab:'客户'
-    },{
-      key:'supplier',
-      tab:'供应商'
-    },{
-      key:'stock',
-      tab:'库存'
-    }]
 
-    const salesColumns = [{
-      title:'名称',
-      dataIndex:'id',
-    },{
-      title:'销售量',
-      dataIndex:'sales_quantity',
-    },{
-      title:'销售额',
-      dataIndex:'sales_amount',
-    },{
-      title:'利润',
-      dataIndex:'profit',
-    },{
-      title:'库存',
-      dataIndex:'stock_quantity',
-    }]
-
-    const purchasesColumns = [{
-      title:'名称',
-      dataIndex:'id',
-    },{
-      title:'进货量',
-      dataIndex:'purchase_quantity',
-    },{
-      title:'进货额',
-      dataIndex:'purchase_amount',
-    },{
-      title:'利润',
-      dataIndex:'profit',
-    },{
-      title:'库存',
-      dataIndex:'stock_quantity',
-    }]
-
-    const customersColumns = [{
-      title:'名称',
-      dataIndex:'id',
-    },{
-      title:'购买量',
-      dataIndex:'sales_quantity',
-    },{
-      title:'购买额',
-      dataIndex:'sales_amount',
-    },{
-      title:'退货量',
-      dataIndex:'sales_return_quantity',
-    },{
-      title:'利润',
-      dataIndex:'profit',
-    }]
-
-    const suppliersColumns = [{
-      title:'名称',
-      dataIndex:'id',
-    },{
-      title:'供应量',
-      dataIndex:'purchase_quantity',
-    },{
-      title:'供应额',
-      dataIndex:'purchase_amount',
-    },{
-      title:'返厂量',
-      dataIndex:'purchase_return_quantity',
-    },{
-      title:'利润',
-      dataIndex:'profit',
-    }]
-
-    const stocksColumns = [{
-      title:'名称',
-      dataIndex:'id',
-    },{
-      title:'销售量',
-      dataIndex:'sales_quantity',
-    },{
-      title:'进货量',
-      dataIndex:'purchase_quantity',
-    },{
-      title:'库存',
-      dataIndex:'stock_quantity',
-    }]
 
     const description = (
       <DescriptionList col='2' size="small" className={styles.descriptionPostion} >
@@ -161,9 +175,45 @@ export default class GoodsDetail extends PureComponent {
             <Button><Icon type="ellipsis" /></Button>
           </Dropdown>
         </ButtonGroup>
-        <Button type="primary">编辑</Button>
+        <Button type="primary" onClick={this.handleToGoodsEdit.bind(null,currentId.id)}>编辑</Button>
       </div>
     )
+
+    const saleExpandedRowRender = (item) => {
+      return(
+        <Table
+          showHeader={false}
+          columns={saleColumns}
+          dataSource={item.childrens}
+          pagination={false}
+          rowKey='id'
+        />
+      )
+    }
+
+    const purchaseExpandedRowRender = (item) => {
+      return(
+        <Table
+          showHeader={false}
+          columns={purchaseColumns}
+          dataSource={item.childrens}
+          pagination={false}
+          rowKey='id'
+        />
+      )
+    }
+
+    const stockExpandedRowRender = (item) => {
+      return(
+        <Table
+          showHeader={false}
+          columns={stockColumns}
+          dataSource={item.childrens}
+          pagination={false}
+          rowKey='id'
+        />
+      )
+    }
 
     const status = (
       <div>
@@ -213,27 +263,27 @@ export default class GoodsDetail extends PureComponent {
       ),
       sale: (
         <div>
-          <Table columns={salesColumns} dataSource={singleGoodsSales} rowKey='id'></Table>
+          <Table columns={saleColumns} dataSource={singleGoodsSales} expandedRowRender={saleExpandedRowRender } pagination={false} rowKey='id'></Table>
         </div>
       ),
       purchase: (
         <div>
-          <Table columns={purchasesColumns} dataSource={singleGoodsPurchases} rowKey='id'></Table>
+          <Table columns={purchaseColumns} dataSource={singleGoodsPurchases} expandedRowRender={purchaseExpandedRowRender } pagination={false} rowKey='id'></Table>
         </div>
       ),
       customer: (
         <div>
-          <Table columns={customersColumns} dataSource={singleGoodsCustomers} rowKey='id'></Table>
+          <Table columns={customerColumns} dataSource={singleGoodsCustomers} rowKey='id'></Table>
         </div>
       ),
       supplier: (
         <div>
-          <Table columns={suppliersColumns} dataSource={singleGoodsSuppliers} rowKey='id'></Table>
+          <Table columns={supplierColumns} dataSource={singleGoodsSuppliers} rowKey='id'></Table>
         </div>
       ),
       stock: (
         <div>
-          <Table columns={stocksColumns} dataSource={singleGoodsStocks} rowKey='id'></Table>
+          <Table columns={stockColumns} dataSource={singleGoodsStocks} expandedRowRender={stockExpandedRowRender } pagination={false} rowKey='id'></Table>
         </div>
       )
     }

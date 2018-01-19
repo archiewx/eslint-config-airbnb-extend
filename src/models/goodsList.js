@@ -20,7 +20,10 @@ export default  {
 
   effects: {
     *getGoodsList({payload},{call,put,all}) {
-      const [data1,data2] = yield all([call(goodsService.getListSales),call(goodsService.getListPurchase)])
+      const sorts = {
+        created_at: 'desc'
+      }
+      const [data1,data2] = yield all([call(goodsService.getListSales,sorts),call(goodsService.getListPurchase,sorts)])
       yield put({type:'setState',payload:{
         goodsListSales:data1.result.data,
         goodsListPurchases:data2.result.data,
@@ -32,14 +35,16 @@ export default  {
     *getGoodsSaleList({payload},{call,put}) {
       const data = yield call(goodsService.getListSales,payload)
       yield put({type:'setState',payload:{
-        goodsListSales:data.result.data
+        goodsListSales:data.result.data,
+        goodsSalePagination: data.result.meta.pagination,
       }})
     },
 
     *getGoodsPurchaseList({payload},{call,put}) {
       const data = yield call(goodsService.getListPurchase,payload)
       yield put({type:'setState',payload:{
-        goodsListPurchases:data.result.data
+        goodsListPurchases:data.result.data,
+        goodsPurchasePagination: data.result.meta.pagination
       }})
     },
 
