@@ -1,4 +1,5 @@
 import * as goodsService from '../services/goods'
+import * as customerGroupService from '../services/customerGroup'
 import pathToRegexp from 'path-to-regexp'
 import { routerRedux } from 'dva/router';
 
@@ -13,6 +14,12 @@ export default  {
     singleGoodsCustomers:[],
     singleGoodsSuppliers:[],
     singleGoodsStocks:[],
+    filterSaleServerData:{},
+    filterPurchaseServerData:{},
+    filterCustomerServerData:{},
+    filterSupplierServerData:{},
+    filterStockServerData:{},
+    singleCustomerMode:[],
     currentId: '',
   },
 
@@ -30,13 +37,14 @@ export default  {
   effects: {
     *getSingle({payload},{call,put,select,all}) {  
       const {usePricelelvel,priceModel} = yield select(({configSetting}) => (configSetting))
-      const [data1,data2,data3,data4,data5,data6] = yield all([
+      const [data1,data2,data3,data4,data5,data6,data7] = yield all([
         call(goodsService.getSingle,payload),
         call(goodsService.getSingleSales,payload),
         call(goodsService.getSinglePurchases,payload),
         call(goodsService.getSingleCustomers,payload),
         call(goodsService.getSingleSuppliers,payload),
-        call(goodsService.getSingleStocks,payload)
+        call(goodsService.getSingleStocks,payload),
+        call(customerGroupService.getListGroup),
       ])
       yield put({type:'setShowData',payload:{
         value: data1.result.data,
@@ -46,11 +54,12 @@ export default  {
       yield put({type:'setShowSaleList',payload:data2.result.data.list})
       yield put({type:'setShowPurchaseList',payload:data3.result.data.list})
       yield put({type:'setShowStockList',payload:data6.result.data.list})
+      yield put({type:'setShowCustomerList',payload:data4.result.data})
       yield put({type:'setState',payload:{
-        singleGoodsCustomers:data4.result.data.list,
         singleGoodsSuppliers:data5.result.data.list,
         currentId:payload
       }})
+      yield put({type:'setShowCustomerMode',payload:data7.result.data})
     },
 
     *deleteSingleGoods({payload},{call,put}) {
@@ -72,23 +81,17 @@ export default  {
 
     *getSingleSales({payload},{call,put}) {
       const data = yield call(goodsService.getSingleSales,payload) 
-      yield put({type:'setState',payload:{
-        singleGoodsSales: data.result.data.list
-      }})
+      yield put({type:'setShowSaleList',payload:data.result.data.list})
     },
 
     *getSinglePurchases({payload},{call,put}) {
       const data = yield call(goodsService.getSinglePurchases,payload) 
-      yield put({type:'setState',payload:{
-        singleGoodsPurchases: data.result.data.list
-      }})
+      yield put({type:'setShowPurchaseList',payload:data.result.data.list})
     },
 
     *getSingleCustomers({payload},{call,put}) {
       const data = yield call(goodsService.getSingleCustomers,payload) 
-      yield put({type:'setState',payload:{
-        singleGoodsCustomers: data.result.data.list
-      }})
+      yield put({type:'setShowCustomerList',payload:data.result.data})
     },
 
     *getSingleSuppliers({payload},{call,put}) {
@@ -100,9 +103,7 @@ export default  {
 
     *getSingleStocks({payload},{call,put}) {
       const data = yield call(goodsService.getSingleStocks,payload) 
-      yield put({type:'setState',payload:{
-        singleGoodsStocks: data.result.data.list
-      }})
+      yield put({type:'setShowStockList',payload:data.result.data.list})
     }
   },
 
@@ -114,13 +115,14 @@ export default  {
 
     setShowData (state,{payload:{value,usePricelelvel,priceModel}}) {
       console.log(value)
+      state.singleGoodsDetail = {}
       state.singleGoodsDetail.item_ref = value.item_ref;
       state.singleGoodsDetail.not_sale = value.not_sale;
       state.singleGoodsDetail.purchase_price = value.purchase_price;
       state.singleGoodsDetail.standard_price = value.standard_price;
       state.singleGoodsDetail.name = value.name;
       state.singleGoodsDetail.desc = value.desc;
-      
+
       state.singleGoodsDetail.units = value.units.data.map( item => (`${item.name} x ( ${item.number} )`)).join('、')
       let colors = [] , sizes = [];
       state.singleGoodsDetail.images = [];
@@ -159,6 +161,131 @@ export default  {
       return {...state}
     },
 
+    setShowCustomerMode(state,{payload}) {
+      state.singleCustomerMode.push({
+        name:'不分组',
+        mode:'customer'
+      })
+      state.singleCustomerMode.push({
+        name:'客户等级',
+        mode:'vip'
+      })
+      payload.forEach( item => {
+        state.singleCustomerMode.push({
+          name:item.name,
+          mode:`customergroup_${item.id}`
+        })
+      })
+      return {...state}
+    },  
+
+    setFilterSaleServerData (state,{payload}) {
+      let current = {}
+      for(let key in payload) {
+        if(key.indexOf('sale_') == 0) {
+          if(payload[key]) {
+            let name = key.slice(5,key.length)
+            if(name == 'datePick') {
+              current['data_type'] = 'custom'
+              current['sday'] = payload[key][0]
+              current['eday'] = payload[key][1]
+            }else {
+              current[`${name}_in`] = payload[key]
+            }
+          }
+        }
+      }
+      state.filterSaleServerData = current
+      return {...state}
+    },
+
+    setFilterPurchaseServerData (state,{payload}) {
+      let current = {}
+      for(let key in payload) {
+        if(key.indexOf('purchase_') == 0) {
+          if(payload[key]) {
+            let name = key.slice(9,key.length)
+            if(name == 'datePick') {
+              current['data_type'] = 'custom'
+              current['sday'] = payload[key][0]
+              current['eday'] = payload[key][1]
+            }else {
+              current[`${name}_in`] = payload[key]
+            }
+          }
+        }
+      }
+      state.filterPurchaseServerData = current
+      return {...state}
+    },
+
+    setFilterCustomerServerData (state,{payload}) {
+      let current = {}
+      for(let key in payload) {
+        if(key.indexOf('customer_') == 0) {
+          if(payload[key]) {
+            let name = key.slice(9,key.length)
+            if(name == 'datePick') {
+              current['data_type'] = 'custom'
+              current['sday'] = payload[key][0]
+              current['eday'] = payload[key][1]
+            }else {
+              current[`${name}_in`] = payload[key]
+            }
+          }
+        }
+      }
+      state.filterCustomerServerData = current
+      return {...state}
+    },
+
+    setFilterSupplierServerData (state,{payload}) {
+      let current = {}
+      for(let key in payload) {
+        if(key.indexOf('supplier_') == 0) {
+          if(payload[key]) {
+            let name = key.slice(9,key.length)
+            if(name == 'datePick') {
+              current['data_type'] = 'custom'
+              current['sday'] = payload[key][0]
+              current['eday'] = payload[key][1]
+            }else {
+              current[`${name}_in`] = payload[key]
+            }
+          }
+        }
+      }
+      state.filterSupplierServerData = current
+      return {...state}
+    },
+
+    setFilterStockServerData (state,{payload}) {
+      let current = {}
+      for(let key in payload) {
+        if(key.indexOf('stock_') == 0) {
+          if(payload[key]) {
+            let name = key.slice(9,key.length)
+            if(name == 'datePick') {
+              current['data_type'] = 'custom'
+              current['sday'] = payload[key][0]
+              current['eday'] = payload[key][1]
+            }else {
+              current[`${name}_in`] = payload[key]
+            }
+          }
+        }
+      }
+      state.filterStockServerData = current
+      return {...state}
+    },
+
+
+    setShowCustomerList(state,{payload}) {
+      let current = []
+      current.push(payload.guest)
+      state.singleGoodsCustomers = [].concat(current,payload.list)
+      return {...state}
+    },
 
     setShowSaleList(state,{payload}) {
       let colorCurrent = [];

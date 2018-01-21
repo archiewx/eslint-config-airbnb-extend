@@ -22,7 +22,7 @@ export default  {
       yield put({type:'setState',payload:{
         goodsSaleFilter: data.result.item_sales_list.filter.groups,
         goodsPurchaseFilter:data.result.item_purchase_list.filter.groups,
-        goodsDetailFilter:data.result.item_detail.filter.groups,
+        goodsDetailFilter: data.result.item_detail.filter.groups
       }})
     }
   },
@@ -32,7 +32,6 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
-
   },
 
 };

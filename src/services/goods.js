@@ -57,36 +57,66 @@ export async function getSingle (params) {
 }
 
 export async function getSingleSales (params) {
+  let current = Object.assign({},params);
+  delete current.id  
+  if(current.filter) {
+    current = current.filter
+  }
   return request (`${apiBase}/api/items/${params.id}/salesorders`, {
     method: 'POST',
     headers : {'Authorization': token},
+    body: current
   })
 }
 
 export async function getSinglePurchases (params) {
+  let current = Object.assign({},params);
+  delete current.id  
+  if(current.filter) {
+    current = current.filter
+  }
   return request (`${apiBase}/api/items/${params.id}/purchaseorders`, {
     method: 'POST',
     headers : {'Authorization': token},
+    body: current
   })
 }
 
 export async function getSingleCustomers (params) {
+  let current = Object.assign({},params);
+  delete current.id  
+  if(current.filter) {
+    current = Object.assign({},current.filter,{mode:current.mode})
+  }
   return request (`${apiBase}/api/items/${params.id}/customers`, {
     method: 'POST',
     headers : {'Authorization': token},
+    body: current
   })
 }
 
 export async function getSingleSuppliers (params) {
+  let current = Object.assign({},params);
+  delete current.id  
+  if(current.filter) {
+    current = current.filter
+  }
   return request (`${apiBase}/api/items/${params.id}/suppliers`, {
     method: 'POST',
     headers : {'Authorization': token},
+    body: current
   })
 }
 
 export async function getSingleStocks (params) {
+  let current = Object.assign({},params);
+  delete current.id  
+  if(current.filter) {
+    current = current.filter
+  }
   return request (`${apiBase}/api/items/${params.id}/stocks`, {
     method: 'POST',
     headers : {'Authorization': token},
+    body: current
   })
 }

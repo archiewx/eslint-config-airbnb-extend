@@ -9,6 +9,135 @@ import styles from './GoodsList.less'
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
+const tabList = [{
+  key: 'sale',
+  tab: '销售'
+},{
+  key: 'purchase',
+  tab: '进货'
+}]
+const sortSaleOptions = [{
+  name:'创建时间降序',
+  id:1,
+  sorts: {
+    created_at: 'desc'
+  }
+},{
+  name:'创建时间升序',
+  id:2,
+  sorts: {
+    created_at: 'asc'
+  }
+},{
+  name:'更新时间降序',
+  id:3,
+  sorts: {
+    updated_at: 'desc'
+  }
+},{
+  name:'更新时间升序',
+  id:4,
+  sorts: {
+    updated_at: 'asc'
+  }
+},{
+  name:'销售量降序',
+  id:5,
+  sorts: {
+    sales_quantity: 'desc'
+  }
+},{
+  name:'销售量升序',
+  id:6,
+  sorts: {
+    sales_quantity: 'asc'
+  }
+},{
+  name:'销售额降序',
+  id:7,
+  sorts: {
+    sales_amount: 'desc'
+  }
+},{
+  name:'销售额升序',
+  id:8,
+  sorts: {
+    sales_amount: 'asc'
+  }
+},{
+  name:'库存量降序',
+  id:9,
+  sorts: {
+    stock_quantity: 'desc'
+  }
+},{
+  name:'库存量升序',
+  id:10,
+  sorts: {
+    stock_quantity: 'asc'
+  }
+}]
+const sortPurchaseOptions = [{
+  name:'创建时间降序',
+  id:1,
+  sorts: {
+    created_at: 'desc'
+  }
+},{
+  name:'创建时间升序',
+  id:2,
+  sorts: {
+    created_at: 'asc'
+  }
+},{
+  name:'更新时间降序',
+  id:3,
+  sorts: {
+    updated_at: 'desc'
+  }
+},{
+  name:'更新时间升序',
+  id:4,
+  sorts: {
+    updated_at: 'asc'
+  }
+},{
+  name:'进货量降序',
+  id:5,
+  sorts: {
+    purchase_quantity: 'desc'
+  }
+},{
+  name:'进货量升序',
+  id:6,
+  sorts: {
+    purchase_quantity: 'asc'
+  }
+},{
+  name:'进货额降序',
+  id:7,
+  sorts: {
+    purchase_amount: 'desc'
+  }
+},{
+  name:'进货额升序',
+  id:8,
+  sorts: {
+    purchase_amount: 'asc'
+  }
+},{
+  name:'库存量降序',
+  id:9,
+  sorts: {
+    stock_quantity: 'desc'
+  }
+},{
+  name:'库存量升序',
+  id:10,
+  sorts: {
+    stock_quantity: 'asc'
+  }
+}]
 @Form.create()
 @connect(state => ({
   goodsList:state.goodsList,
@@ -23,129 +152,7 @@ export default class GoodsList extends PureComponent {
     },
     sortPurchase: {
       created_at: 'desc'
-    },
-    sortSaleOptions: [{
-      name:'创建时间降序',
-      id:1,
-      sorts: {
-        created_at: 'desc'
-      }
-    },{
-      name:'创建时间升序',
-      id:2,
-      sorts: {
-        created_at: 'asc'
-      }
-    },{
-      name:'更新时间降序',
-      id:3,
-      sorts: {
-        updated_at: 'desc'
-      }
-    },{
-      name:'更新时间升序',
-      id:4,
-      sorts: {
-        updated_at: 'asc'
-      }
-    },{
-      name:'销售量降序',
-      id:5,
-      sorts: {
-        sales_quantity: 'desc'
-      }
-    },{
-      name:'销售量升序',
-      id:6,
-      sorts: {
-        sales_quantity: 'asc'
-      }
-    },{
-      name:'销售额降序',
-      id:7,
-      sorts: {
-        sales_amount: 'desc'
-      }
-    },{
-      name:'销售额升序',
-      id:8,
-      sorts: {
-        sales_amount: 'asc'
-      }
-    },{
-      name:'库存量降序',
-      id:9,
-      sorts: {
-        stock_quantity: 'desc'
-      }
-    },{
-      name:'库存量升序',
-      id:10,
-      sorts: {
-        stock_quantity: 'asc'
-      }
-    }],
-    sortPurchaseOptions: [{
-      name:'创建时间降序',
-      id:1,
-      sorts: {
-        created_at: 'desc'
-      }
-    },{
-      name:'创建时间升序',
-      id:2,
-      sorts: {
-        created_at: 'asc'
-      }
-    },{
-      name:'更新时间降序',
-      id:3,
-      sorts: {
-        updated_at: 'desc'
-      }
-    },{
-      name:'更新时间升序',
-      id:4,
-      sorts: {
-        updated_at: 'asc'
-      }
-    },{
-      name:'进货量降序',
-      id:5,
-      sorts: {
-        purchase_quantity: 'desc'
-      }
-    },{
-      name:'进货量升序',
-      id:6,
-      sorts: {
-        purchase_quantity: 'asc'
-      }
-    },{
-      name:'进货额降序',
-      id:7,
-      sorts: {
-        purchase_amount: 'desc'
-      }
-    },{
-      name:'进货额升序',
-      id:8,
-      sorts: {
-        purchase_amount: 'asc'
-      }
-    },{
-      name:'库存量降序',
-      id:9,
-      sorts: {
-        stock_quantity: 'desc'
-      }
-    },{
-      name:'库存量升序',
-      id:10,
-      sorts: {
-        stock_quantity: 'asc'
-      }
-    }]
+    }
   }
 
   componentDidMount() {
@@ -206,7 +213,7 @@ export default class GoodsList extends PureComponent {
   handleSelectSort = (type,value) => {
     let targetName = value.slice(6,value.length)
     if(type == 'sale') {
-      let sortSale = this.state.sortSaleOptions.find( item => item.name == targetName).sorts;
+      let sortSale = sortSaleOptions.find( item => item.name == targetName).sorts;
       this.setState({sortSale})
       this.props.dispatch({type:'goodsList/getGoodsSaleList',payload:{
         sorts: {...sortSale},
@@ -214,7 +221,7 @@ export default class GoodsList extends PureComponent {
         page: this.props.goodsList.goodsSalePagination.current_page
       }})
     }else if(type == 'purchase') {
-      let sortPurchase = this.state.sortPurchaseOptions.find( item => item.name == targetName).sorts;
+      let sortPurchase = sortPurchaseOptions.find( item => item.name == targetName).sorts;
       this.setState({sortPurchase})
       this.props.dispatch({type:'goodsList/getGoodsPurchaseList',payload:{
         sorts:{...sortPurchase},
@@ -248,19 +255,12 @@ export default class GoodsList extends PureComponent {
   }
 
   render() {
-    const {activeTabKey,sortSaleOptions,sortPurchaseOptions,sortSale,sortPurchase} = this.state
+    const {activeTabKey,sortSale,sortPurchase} = this.state
     const {goodsListSales,goodsListPurchases,goodsSalePagination,goodsPurchasePagination} = this.props.goodsList
     const {goodsSaleFilter,goodsPurchaseFilter} = this.props.layoutFilter
     const {getFieldDecorator} = this.props.form
     const {dispatch} = this.props;
 
-    const tabList = [{
-      key: 'sale',
-      tab: '销售'
-    },{
-      key: 'purchase',
-      tab: '进货'
-    }]
 
     const extra = (
       <Button type='primary' onClick={this.handleToGoodsCreate}>新建商品</Button>
