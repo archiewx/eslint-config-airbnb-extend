@@ -58,7 +58,7 @@ export default class PageHeader extends PureComponent {
   render() {
     const { routes, params, location, breadcrumbNameMap } = this.getBreadcrumbProps();
     const {
-      title, logo, action, content, extraContent, status,
+      title, logo, action, content, extraContent,
       breadcrumbList, tabList, className, linkElement = 'a',
       activeTabKey,
     } = this.props;
@@ -141,7 +141,6 @@ export default class PageHeader extends PureComponent {
           <div className={styles.main}>
             <div className={styles.row}>
               {title && <h1 className={styles.title}>{title}</h1>}
-              {status && <div className={styles.status}>{status}</div>}
               {action && <div className={styles.action}>{action}</div>}
             </div>
             <div className={styles.row}>

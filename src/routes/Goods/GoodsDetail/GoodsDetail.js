@@ -1,16 +1,18 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
+import moment from 'moment';
 import { Row, Col, Card, Button, message, Table,Icon,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/antd-pro/DescriptionList';
 import StandardFormRow from '../../../components/antd-pro/StandardFormRow';
-import TagSelect from '../../../components/antd-pro/TagSelect';
+import TagSelect from '../../../components/DuokeTagSelect';
 import styles from './GoodsDetail.less'
 const ButtonGroup = Button.Group;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const {Description} = DescriptionList
+const agoSevenDays = new Date((new Date).getTime() - 7*24*60*60*1000)
 const tabList = [{
   key:'message',
   tab:'信息'
@@ -122,12 +124,10 @@ const stockColumns = [{
 const customerPagination = {
   showQuickJumper:true,
   showSizeChanger:true,
-  hideOnSinglePage:true
 }
 const supplierPagination = {
   showQuickJumper:true,
   showSizeChanger:true,
-  hideOnSinglePage:true
 }
 @Form.create()
 @connect( state => ({
@@ -181,8 +181,10 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             sale_datePick: value['sale_datePick'] ? [value['sale_datePick'][0].format('YYYY-MM-DD'),value['sale_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSingleSales',payload:{
+          this.props.dispatch({type:'goodsDetail/getSingleSales',payload:this.props.goodsDetail.filterSaleServerData.length > 3 ? {
             filter:this.props.goodsDetail.filterSaleServerData,
+            id:this.props.goodsDetail.currentId.id
+          }: {
             id:this.props.goodsDetail.currentId.id
           }})
         }
@@ -208,8 +210,10 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             purchase_datePick: value['purchase_datePick'] ? [value['purchase_datePick'][0].format('YYYY-MM-DD'),value['purchase_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSinglePurchases',payload:{
+          this.props.dispatch({type:'goodsDetail/getSinglePurchases',payload:this.props.goodsDetail.filterPurchaseServerData.length > 3 ? {
             filter:this.props.goodsDetail.filterPurchaseServerData,
+            id:this.props.goodsDetail.currentId.id
+          }:{
             id:this.props.goodsDetail.currentId.id
           }})
         }
@@ -236,8 +240,11 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             customer_datePick: value['customer_datePick'] ? [value['customer_datePick'][0].format('YYYY-MM-DD'),value['customer_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSingleCustomers',payload:{
+          this.props.dispatch({type:'goodsDetail/getSingleCustomers',payload:this.props.goodsDetail.filterCustomerServerData.length > 4 ? {
             filter:this.props.goodsDetail.filterCustomerServerData,
+            id:this.props.goodsDetail.currentId.id,
+            mode:this.state.selectCustomerMode.mode
+          }: {
             id:this.props.goodsDetail.currentId.id,
             mode:this.state.selectCustomerMode.mode
           }})
@@ -277,8 +284,10 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             supplier_datePick: value['supplier_datePick'] ? [value['supplier_datePick'][0].format('YYYY-MM-DD'),value['supplier_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSingleSuppliers',payload:{
+          this.props.dispatch({type:'goodsDetail/getSingleSuppliers',payload:this.props.goodsDetail.filterStockServerData.length > 3 ? {
             filter:this.props.goodsDetail.filterStockServerData,
+            id:this.props.goodsDetail.currentId.id
+          } : {
             id:this.props.goodsDetail.currentId.id
           }})
         }
@@ -304,8 +313,10 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             stock_datePick: value['stock_datePick'] ? [value['stock_datePick'][0].format('YYYY-MM-DD'),value['stock_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSingleStocks',payload:{
+          this.props.dispatch({type:'goodsDetail/getSingleStocks',payload:this.props.goodsDetail.filterStockServerData.length > 3 ? {
             filter:this.props.goodsDetail.filterStockServerData,
+            id:this.props.goodsDetail.currentId.id
+          } : {
             id:this.props.goodsDetail.currentId.id
           }})
         }
@@ -478,7 +489,9 @@ export default class GoodsDetail extends PureComponent {
                 })              
               }
               <FormItem label='选择日期' >
-                {getFieldDecorator('sale_datePick')(
+                {getFieldDecorator('sale_datePick',{
+                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+                })(
                   <RangePicker style={{width:542}} onChange={this.handleSaleFormSubmit}/>
                 )}
               </FormItem>
@@ -511,7 +524,9 @@ export default class GoodsDetail extends PureComponent {
                 })              
               }
               <FormItem label='选择日期' >
-                {getFieldDecorator('purchase_datePick')(
+                {getFieldDecorator('purchase_datePick',{
+                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+                })(
                   <RangePicker style={{width:542}} onChange={this.handlePurchaseFormSubmit}/>
                 )}
               </FormItem>
@@ -544,7 +559,9 @@ export default class GoodsDetail extends PureComponent {
                 })              
               }
               <FormItem label='选择日期' >
-                {getFieldDecorator('customer_datePick')(
+                {getFieldDecorator('customer_datePick',{
+                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+                })(
                   <RangePicker style={{width:542}} onChange={this.handleCustomerFormSubmit}/>
                 )}
               </FormItem>
@@ -577,7 +594,9 @@ export default class GoodsDetail extends PureComponent {
                 })              
               }
               <FormItem label='选择日期' >
-                {getFieldDecorator('supplier_datePick')(
+                {getFieldDecorator('supplier_datePick',{
+                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+                })(
                   <RangePicker style={{width:542}} onChange={this.handleSupplierFormSubmit}/>
                 )}
               </FormItem>
@@ -596,7 +615,7 @@ export default class GoodsDetail extends PureComponent {
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`stock_${item.code}`)(
-                          <TagSelect expandable >
+                          <TagSelect  expandable onChange={this.handleStockFormSubmit}>
                             {
                               item.options.map( (subItem,subIndex) => {
                                 return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
@@ -610,8 +629,10 @@ export default class GoodsDetail extends PureComponent {
                 })              
               }
               <FormItem label='选择日期' >
-                {getFieldDecorator('stock_datePick')(
-                  <RangePicker style={{width:542}}/>
+                {getFieldDecorator('stock_datePick',{
+                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+                })(
+                  <RangePicker style={{width:542}} onChange={this.handleStockFormSubmit}/>
                 )}
               </FormItem>
             </Form>

@@ -47,6 +47,21 @@ export const getRouterData = (app) => {
     '/goods-detail/:id': {
       component: dynamicWrapper(app, ['goodsDetail','layoutFilter'], () => import('../routes/Goods/GoodsDetail/GoodsDetail')),
     },
+    '/relationship/customer-list': {
+      component: dynamicWrapper(app, ['customerList','layoutFilter'], () => import('../routes/Relationship/Customer/CustomerList/CustomerList'))
+    },
+    '/relationship/customer-create': {
+      component: dynamicWrapper(app, ['customerCreateOrEdit','seller','priceGrade','goodsGroup','country'], () => import('../routes/Relationship/Customer/CustomerCreateOrEdit/CustomerCreateOrEdit'))
+    },
+    '/relationship/customer-detail/:id':{
+      component: dynamicWrapper(app, ['customerDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/CustomerDetail'))
+    },
+    '/relationship/customer-detail/goods-purchase-detail/:id/:subId': {
+      component: dynamicWrapper(app ,['goodsPurchaseDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/GoodsPurchaseDetail'))
+    },
+    '/relationship/supplier-list': {
+      component: dynamicWrapper(app, ['supplierList'], () => import('../routes/Relationship/Supplier/SupplierList/SupplierList'))
+    },
     '/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },

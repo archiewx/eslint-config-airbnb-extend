@@ -7,7 +7,7 @@ import { Route, Redirect, Switch } from 'dva/router';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import { enquireScreen } from 'enquire-js';
-import GlobalHeader from '../components/antd-pro/GlobalHeader';
+import GlobalHeader from '../components/DuokeGlobalHeader';
 import GlobalFooter from '../components/antd-pro/GlobalFooter';
 import SiderMenu from '../components/antd-pro/SiderMenu';
 import NotFound from '../routes/Exception/404';

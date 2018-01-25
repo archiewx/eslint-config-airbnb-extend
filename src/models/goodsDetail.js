@@ -122,7 +122,25 @@ export default  {
       state.singleGoodsDetail.standard_price = value.standard_price;
       state.singleGoodsDetail.name = value.name;
       state.singleGoodsDetail.desc = value.desc;
+      if(usePricelelvel == 'yes') {
+        if(priceModel == '') {
+          
+        }else if(priceModel == 'shop') {
 
+        }else if(priceModel == 'unit') {
+
+        }else if(priceModel == 'quantityrange') {
+          
+        }
+      }else {
+        if(priceModel == 'shop') {
+
+        }else if(priceModel == 'unit') {
+
+        }else if(priceModel == 'quantityrange') {
+          
+        }
+      }
       state.singleGoodsDetail.units = value.units.data.map( item => (`${item.name} x ( ${item.number} )`)).join('、')
       let colors = [] , sizes = [];
       state.singleGoodsDetail.images = [];
@@ -162,6 +180,7 @@ export default  {
     },
 
     setShowCustomerMode(state,{payload}) {
+      state.singleCustomerMode = [];
       state.singleCustomerMode.push({
         name:'不分组',
         mode:'customer'
@@ -195,7 +214,13 @@ export default  {
           }
         }
       }
-      state.filterSaleServerData = current
+      let ensureCurrent = []
+      Object.values(current).forEach( item => {
+        if(!(Array.isArray(item) && item.length == 0)) {
+          ensureCurrent.push( item )
+        }
+      })
+      state.filterSaleServerData = ensureCurrent
       return {...state}
     },
 
@@ -215,7 +240,13 @@ export default  {
           }
         }
       }
-      state.filterPurchaseServerData = current
+      let ensureCurrent = []
+      Object.values(current).forEach( item => {
+        if(!(Array.isArray(item) && item.length == 0)) {
+          ensureCurrent.push( item )
+        }
+      })
+      state.filterPurchaseServerData = ensureCurrent
       return {...state}
     },
 
@@ -235,7 +266,13 @@ export default  {
           }
         }
       }
-      state.filterCustomerServerData = current
+      let ensureCurrent = []
+      Object.values(current).forEach( item => {
+        if(!(Array.isArray(item) && item.length == 0)) {
+          ensureCurrent.push( item )
+        }
+      })
+      state.filterCustomerServerData = ensureCurrent
       return {...state}
     },
 
@@ -255,7 +292,13 @@ export default  {
           }
         }
       }
-      state.filterSupplierServerData = current
+      let ensureCurrent = []
+      Object.values(current).forEach( item => {
+        if(!(Array.isArray(item) && item.length == 0)) {
+          ensureCurrent.push( item )
+        }
+      })
+      state.filterSupplierServerData = ensureCurrent
       return {...state}
     },
 
@@ -275,10 +318,15 @@ export default  {
           }
         }
       }
-      state.filterStockServerData = current
+      let ensureCurrent = []
+      Object.values(current).forEach( item => {
+        if(!(Array.isArray(item) && item.length == 0)) {
+          ensureCurrent.push( item )
+        }
+      })
+      state.filterStockServerData = ensureCurrent
       return {...state}
     },
-
 
     setShowCustomerList(state,{payload}) {
       let current = []
@@ -288,167 +336,200 @@ export default  {
     },
 
     setShowSaleList(state,{payload}) {
-      let colorCurrent = [];
-      let sizeCurrent = {};
-      let flagId = '';
-      payload.forEach( item => {
-        if(!colorCurrent.some( subItem => subItem.id == item.skuattributes[0].id)) {
-          colorCurrent.push({
-            id: item.skuattributes[0].id,
-            name: item.skuattributes[0].name,
-            childrens: [],
-            sales_quantity: '',
-            sales_amount: '',
-            profit: '',
-            stock_quantity: '',
-          })
-        }
-        if(flagId != item.skuattributes[0].id) {
-          flagId = item.skuattributes[0].id;
-          sizeCurrent[`${item.skuattributes[0].id}`] = [];
-          sizeCurrent[`${item.skuattributes[0].id}`].push({
-            id: item.skuattributes[1].id,
-            name: item.skuattributes[1].name,
-            sales_quantity: item.sales_quantity,
-            sales_amount: item.sales_amount,
-            profit: item.profit,
-            stock_quantity: item.stock_quantity
-          })
-        }else {
-          sizeCurrent[`${flagId}`].push({
-            id: item.skuattributes[1].id,
-            name: item.skuattributes[1].name,
-            sales_quantity: item.sales_quantity,
-            sales_amount: item.sales_amount,
-            profit: item.profit,
-            stock_quantity: item.stock_quantity
-          })
-        }
-      })
-      for(let key in sizeCurrent) {
-        colorCurrent[(colorCurrent.findIndex( item => item.id == key))].childrens = sizeCurrent[key]
-      }
-      colorCurrent.forEach( item => {
-        let sales_quantity = 0 ,sales_amount = 0,profit = 0,stock_quantity = 0;
-        item.childrens.forEach( subItem => {
-          sales_quantity += Number(subItem.sales_quantity );
-          sales_amount += Number(subItem.sales_amount );
-          profit += Number(subItem.profit );
-          stock_quantity += Number(subItem.stock_quantity );
+      if(payload.length === 0) {
+        state.singleGoodsSales = payload
+      }else {
+        payload.forEach( item => {
+          if(item.skuattributes.length === 0) {
+            state.singleGoodsSales.push({
+              id: item.id,
+              name:'',
+              sales_quantity:item.sales_quantity,
+              sales_amount:Number(item.sales_amount).toFixed(2),
+              profit:Number(item.profit).toFixed(2),
+              stock_quantity:item.stock_quantity
+            })
+          }else if(item.skuattributes.length === 1) {
+            state.singleGoodsSales.push({
+              id:item.id,
+              name:item.skuattributes[0].name,
+              sales_quantity:item.sales_quantity,
+              sales_amount:Number(item.sales_amount).toFixed(2),
+              profit:Number(item.profit).toFixed(2),
+              stock_quantity:item.stock_quantity
+            })
+          }else if(item.skuattributes.length === 2) {
+            if(!state.singleGoodsSales.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
+              state.singleGoodsSales.push({
+                id:item.id,
+                name:item.skuattributes[0].name,
+                sales_quantity:Number(item.sales_quantity),
+                sales_amount:Number(item.sales_amount).toFixed(2),
+                profit:Number(item.profit).toFixed(2),
+                stock_quantity:Number(item.stock_quantity),
+                colorId:item.skuattributes[0].id,
+                childrens:[{
+                  id:item.skuattributes[1].id,
+                  name:item.skuattributes[1].name,
+                  sales_quantity:item.sales_quantity,
+                  sales_amount:Number(item.sales_amount).toFixed(2),
+                  profit:Number(item.profit).toFixed(2),
+                  stock_quantity:item.stock_quantity,
+                }],
+              })
+            }else {
+              let current = state.singleGoodsSales[state.singleGoodsSales.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)]
+              current = {
+                id:item.id,
+                name:item.skuattributes[0].name,
+                sales_quantity:Number(current.sales_quantity + Number(item.sales_quantity)),
+                sales_amount:Number(Number(current.sales_amount) + Number(item.sales_amount)).toFixed(2),
+                profit:Number(Number(current.profit) + Number(item.profit)).toFixed(2),
+                stock_quantity:Number(current.stock_quantity + Number(item.stock_quantity)),
+                colorId:item.skuattributes[0].id,
+                childrens:current.childrens
+              }
+              current.childrens.push({
+                id:item.skuattributes[1].id,
+                name:item.skuattributes[1].name,
+                sales_quantity:item.sales_quantity,
+                sales_amount:Number(item.sales_amount).toFixed(2),
+                profit:Number(item.profit).toFixed(2),
+                stock_quantity:item.stock_quantity,
+              })
+              state.singleGoodsSales[state.singleGoodsSales.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
+            }
+          }
         })
-        item.sales_quantity = sales_quantity;
-        item.sales_amount = (sales_amount).toFixed(2);
-        item.profit = (profit).toFixed(2);
-        item.stock_quantity = stock_quantity;
-      })
-      state.singleGoodsSales = colorCurrent
-
+      }
       return {...state}
     },
 
     setShowPurchaseList(state,{payload}) {
-      let colorCurrent = [];
-      let sizeCurrent = {};
-      let flagId = '';
-      payload.forEach( item => {
-        if(!colorCurrent.some( subItem => subItem.id == item.skuattributes[0].id)) {
-          colorCurrent.push({
-            id: item.skuattributes[0].id,
-            name: item.skuattributes[0].name,
-            childrens: [],
-            purchase_quantity: '',
-            purchase_amount: '',
-            stock_quantity: '',
-          })
-        }
-        if(flagId != item.skuattributes[0].id) {
-          flagId = item.skuattributes[0].id;
-          sizeCurrent[`${item.skuattributes[0].id}`] = [];
-          sizeCurrent[`${item.skuattributes[0].id}`].push({
-            id: item.skuattributes[1].id,
-            name: item.skuattributes[1].name,
-            purchase_quantity: item.purchase_quantity,
-            purchase_amount: item.purchase_amount,
-            stock_quantity: item.stock_quantity
-          })
-        }else {
-          sizeCurrent[`${flagId}`].push({
-            id: item.skuattributes[1].id,
-            name: item.skuattributes[1].name,
-            purchase_quantity: item.purchase_quantity,
-            purchase_amount: item.purchase_amount,
-            stock_quantity: item.stock_quantity
-          })
-        }
-      })
-      for(let key in sizeCurrent) {
-        colorCurrent[(colorCurrent.findIndex( item => item.id == key))].childrens = sizeCurrent[key]
-      }
-      colorCurrent.forEach( item => {
-        let purchase_quantity = 0 ,purchase_amount = 0,stock_quantity = 0;
-        item.childrens.forEach( subItem => {
-          purchase_quantity += Number(subItem.purchase_quantity );
-          purchase_amount += Number(subItem.purchase_amount );
-          stock_quantity += Number(subItem.stock_quantity );
+      if(payload.length === 0) {
+        state.singleGoodsPurchases = payload
+      }else {
+        payload.forEach( item => {
+          if(item.skuattributes.length === 0) {
+            state.singleGoodsPurchases.push({
+              id: item.id,
+              name:'',
+              purchase_quantity:item.purchase_quantity,
+              purchase_amount:Number(item.purchase_amount).toFixed(2),
+              stock_quantity:item.stock_quantity
+            })
+          }else if(item.skuattributes.length === 1) {
+            state.singleGoodsPurchases.push({
+              id:item.id,
+              name:item.skuattributes[0].name,
+              purchase_quantity:item.purchase_quantity,
+              purchase_amount:Number(item.purchase_amount).toFixed(2),
+              stock_quantity:item.stock_quantity
+            })
+          }else if(item.skuattributes.length === 2) {
+            if(!state.singleGoodsPurchases.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
+              state.singleGoodsPurchases.push({
+                id:item.id,
+                name:item.skuattributes[0].name,
+                purchase_quantity:Number(item.purchase_quantity),
+                purchase_amount:Number(item.purchase_amount).toFixed(2),
+                stock_quantity:Number(item.stock_quantity),
+                colorId:item.skuattributes[0].id,
+                childrens:[{
+                  id:item.skuattributes[1].id,
+                  name:item.skuattributes[1].name,
+                  purchase_quantity:item.purchase_quantity,
+                  purchase_amount:Number(item.purchase_amount).toFixed(2),
+                  stock_quantity:item.stock_quantity,
+                }],
+              })
+            }else {
+              let current = state.singleGoodsPurchases[state.singleGoodsPurchases.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)]
+              current = {
+                id:item.id,
+                name:item.skuattributes[0].name,
+                purchase_quantity:Number(current.purchase_quantity + Number(item.purchase_quantity)),
+                purchase_amount:Number(Number(current.purchase_amount) + Number(item.purchase_amount)).toFixed(2),
+                stock_quantity:Number(current.stock_quantity + Number(item.stock_quantity)),
+                colorId:item.skuattributes[0].id,
+                childrens:current.childrens
+              }
+              current.childrens.push({
+                id:item.skuattributes[1].id,
+                name:item.skuattributes[1].name,
+                purchase_quantity:item.purchase_quantity,
+                purchase_amount:Number(item.purchase_amount).toFixed(2),
+                stock_quantity:item.stock_quantity,
+              })
+              state.singleGoodsPurchases[state.singleGoodsPurchases.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
+            }
+          }
         })
-        item.purchase_quantity = purchase_quantity;
-        item.purchase_amount = (purchase_amount).toFixed(2);
-        item.stock_quantity = stock_quantity;
-      })
-      state.singleGoodsPurchases = colorCurrent
+      }
       return {...state}
     },
 
     setShowStockList(state,{payload}) {
-      let colorCurrent = [];
-      let sizeCurrent = {};
-      let flagId = '';
-      payload.forEach( item => {
-        if(!colorCurrent.some( subItem => subItem.id == item.skuattributes[0].id)) {
-          colorCurrent.push({
-            id: item.skuattributes[0].id,
-            name: item.skuattributes[0].name,
-            childrens: [],
-            sales_quantity: '',
-            purchase_quantity: '',
-            stock_quantity: '',
-          })
-        }
-        if(flagId != item.skuattributes[0].id) {
-          flagId = item.skuattributes[0].id;
-          sizeCurrent[`${item.skuattributes[0].id}`] = [];
-          sizeCurrent[`${item.skuattributes[0].id}`].push({
-            id: item.skuattributes[1].id,
-            name: item.skuattributes[1].name,
-            sales_quantity: item.sales_quantity,
-            purchase_quantity: item.purchase_quantity,
-            stock_quantity: item.stock_quantity
-          })
-        }else {
-          sizeCurrent[`${flagId}`].push({
-            id: item.skuattributes[1].id,
-            name: item.skuattributes[1].name,
-            sales_quantity: item.sales_quantity,
-            purchase_quantity: item.purchase_quantity,
-            stock_quantity: item.stock_quantity
-          })
-        }
-      })
-      for(let key in sizeCurrent) {
-        colorCurrent[(colorCurrent.findIndex( item => item.id == key))].childrens = sizeCurrent[key]
-      }
-      colorCurrent.forEach( item => {
-        let sales_quantity = 0 ,purchase_quantity = 0,stock_quantity = 0;
-        item.childrens.forEach( subItem => {
-          sales_quantity += Number(subItem.sales_quantity );
-          purchase_quantity += Number(subItem.purchase_quantity );
-          stock_quantity += Number(subItem.stock_quantity );
+      if(payload.length === 0) {
+        state.singleGoodsStocks = payload
+      }else {
+        payload.forEach( item => {
+          if(item.skuattributes.length === 0) {
+            state.singleGoodsStocks.push({
+              id: item.id,
+              name:'',
+              sales_quantity:item.sales_quantity,
+              purchase_quantity:Number(item.purchase_quantity).toFixed(2),
+              stock_quantity:item.stock_quantity
+            })
+          }else if(item.skuattributes.length === 1) {
+            state.singleGoodsStocks.push({
+              id:item.id,
+              name:item.skuattributes[0].name,
+              sales_quantity:item.sales_quantity,
+              purchase_quantity:Number(item.purchase_quantity).toFixed(2),
+              stock_quantity:item.stock_quantity
+            })
+          }else if(item.skuattributes.length === 2) {
+            if(!state.singleGoodsStocks.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
+              state.singleGoodsStocks.push({
+                id:item.id,
+                name:item.skuattributes[0].name,
+                sales_quantity:Number(item.sales_quantity),
+                purchase_quantity:Number(item.purchase_quantity).toFixed(2),
+                stock_quantity:Number(item.stock_quantity),
+                colorId:item.skuattributes[0].id,
+                childrens:[{
+                  id:item.skuattributes[1].id,
+                  name:item.skuattributes[1].name,
+                  sales_quantity:item.sales_quantity,
+                  purchase_quantity:Number(item.purchase_quantity).toFixed(2),
+                  stock_quantity:item.stock_quantity,
+                }],
+              })
+            }else {
+              let current = state.singleGoodsStocks[state.singleGoodsStocks.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)]
+              current = {
+                id:item.id,
+                name:item.skuattributes[0].name,
+                sales_quantity:Number(current.sales_quantity + Number(item.sales_quantity)),
+                purchase_quantity:Number(Number(current.purchase_quantity) + Number(item.purchase_quantity)).toFixed(2),
+                stock_quantity:Number(current.stock_quantity + Number(item.stock_quantity)),
+                colorId:item.skuattributes[0].id,
+                childrens:current.childrens
+              }
+              current.childrens.push({
+                id:item.skuattributes[1].id,
+                name:item.skuattributes[1].name,
+                sales_quantity:item.sales_quantity,
+                purchase_quantity:Number(item.purchase_quantity).toFixed(2),
+                stock_quantity:item.stock_quantity,
+              })
+              state.singleGoodsStocks[state.singleGoodsStocks.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
+            }
+          }
         })
-        item.sales_quantity = sales_quantity;
-        item.purchase_quantity = (purchase_quantity).toFixed(2);
-        item.stock_quantity = stock_quantity;
-      })
-      state.singleGoodsStocks = colorCurrent
+      }
       return {...state}
     }
 

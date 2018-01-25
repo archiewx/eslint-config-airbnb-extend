@@ -1,14 +1,16 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
+import moment from 'moment';
 import { Row, Col, Card, Button, message, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../components/antd-pro/StandardFormRow';
-import TagSelect from '../../../components/antd-pro/TagSelect';
+import TagSelect from '../../../components/DuokeTagSelect';
 import styles from './GoodsList.less'
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
+const agoSevenDays = new Date((new Date).getTime() - 7*24*60*60*1000)
 const tabList = [{
   key: 'sale',
   tab: '销售'
@@ -189,7 +191,7 @@ export default class GoodsList extends PureComponent {
             ...value,
             sale_datePick: value['sale_datePick'] ? [value['sale_datePick'][0].format('YYYY-MM-DD'),value['sale_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsList/getGoodsSaleList',payload:this.props.goodsList.filterSaleServerData})
+          this.props.dispatch({type:'goodsList/getGoodsSaleList',payload:this.props.goodsList.filterSaleServerData.length > 3 ? this.props.goodsList.filterSaleServerData : {sorts: {created_at: 'desc'}}})
         }
       })
     }, 0)
@@ -204,7 +206,7 @@ export default class GoodsList extends PureComponent {
             ...value,
             purchase_datePick: value['purchase_datePick'] ? [value['purchase_datePick'][0].format('YYYY-MM-DD'),value['purchase_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsList/getGoodsPurchaseList',payload:this.props.goodsList.filterPurchaseServerData})
+          this.props.dispatch({type:'goodsList/getGoodsPurchaseList',payload:this.props.goodsList.filterPurchaseServerData.length > 3 ? this.props.goodsList.filterPurchaseServerData : {sorts: {created_at: 'desc'}}})
         }
       })
     }, 0)
@@ -364,6 +366,7 @@ export default class GoodsList extends PureComponent {
     }, {
       title: '操作',
       dataIndex: 'operation',
+      width:'162px', 
       render: (text,record,index) =>( this.handleMoreOperation(record) )
     }];
 
@@ -372,7 +375,6 @@ export default class GoodsList extends PureComponent {
       total:goodsSalePagination.total,
       showQuickJumper:true,
       showSizeChanger:true,
-      hideOnSinglePage:true,
       onChange( pageNumber ){
         dispatch({type:'goodsList/getGoodsSaleList',payload:{
           per_page:goodsSalePagination.per_page,
@@ -387,7 +389,6 @@ export default class GoodsList extends PureComponent {
       total:goodsPurchasePagination.total,
       showQuickJumper:true,
       showSizeChanger:true,
-      hideOnSinglePage:true,
       onChange( pageNumber ){
         dispatch({type:'goodsList/getGoodsPurchaseList',payload:{
           per_page:goodsPurchasePagination.per_page,
@@ -428,7 +429,9 @@ export default class GoodsList extends PureComponent {
                 })
               }
               <FormItem label='选择日期' >
-                {getFieldDecorator('sale_datePick')(
+                {getFieldDecorator('sale_datePick',{
+                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+                })(
                   <RangePicker style={{width:542}} onChange={this.handleSaleFormSubmit}/>
                 )}
               </FormItem>
@@ -467,7 +470,9 @@ export default class GoodsList extends PureComponent {
                 })
               }
               <FormItem label='选择日期' >
-                {getFieldDecorator('purchase_datePick')(
+                {getFieldDecorator('purchase_datePick',{
+                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+                })(
                   <RangePicker style={{width:542}} onChange={this.handlePurchaseFormSubmit}/>
                 )}
               </FormItem>

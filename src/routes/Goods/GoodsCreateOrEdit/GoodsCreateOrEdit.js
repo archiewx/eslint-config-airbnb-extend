@@ -3,7 +3,6 @@ import { connect } from 'dva';
 import { Row, Col, Card, Button, Form, Input, InputNumber ,Select ,Menu, Dropdown, Icon , Popconfirm} from 'antd';
 import { routerRedux } from 'dva/router';
 import classNames from 'classnames/bind'
-import StandardTable from '../../../components/antd-pro/StandardTable';
 import FooterToolbar from '../../../components/antd-pro/FooterToolbar';
 import PriceTable from '../../../components/PriceTable/PriceTable'
 import BarCodeTable from '../../../components/BarCodeTable/BarCodeTable'

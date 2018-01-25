@@ -14,7 +14,6 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-
       history.listen(({pathname}) => {
         const match = pathToRegexp('/goods-edit/:id').exec(location.hash.slice(1,location.hash.length))
         if(match) {

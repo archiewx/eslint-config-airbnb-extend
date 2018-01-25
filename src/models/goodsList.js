@@ -81,7 +81,13 @@ export default  {
           }
         }
       }
-      state.filterSaleServerData = current
+      let ensureCurrent = []
+      Object.values(current).forEach( item => {
+        if(!(Array.isArray(item) && item.length == 0)) {
+          ensureCurrent.push( item )
+        }
+      })
+      state.filterSaleServerData = ensureCurrent
       return {...state}
     },
 
@@ -101,7 +107,13 @@ export default  {
           }
         }
       }
-      state.filterPurchaseServerData = current
+      let ensureCurrent = []
+      Object.values(current).forEach( item => {
+        if(!(Array.isArray(item) && item.length == 0)) {
+          ensureCurrent.push( item )
+        }
+      })
+      state.filterPurchaseServerData = ensureCurrent
       return {...state}
     }
 
