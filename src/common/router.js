@@ -51,7 +51,10 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['customerList','layoutFilter'], () => import('../routes/Relationship/Customer/CustomerList/CustomerList'))
     },
     '/relationship/customer-create': {
-      component: dynamicWrapper(app, ['customerCreateOrEdit','seller','priceGrade','goodsGroup','country'], () => import('../routes/Relationship/Customer/CustomerCreateOrEdit/CustomerCreateOrEdit'))
+      component: dynamicWrapper(app, ['customerCreateOrEdit','staff','priceGrade','customerGroup','country'], () => import('../routes/Relationship/Customer/CustomerCreateOrEdit/CustomerCreateOrEdit'))
+    },
+    '/relationship/customer-edit/:id': {
+      component: dynamicWrapper(app, ['customerCreateOrEdit','staff','priceGrade','customerGroup','country'], () => import('../routes/Relationship/Customer/CustomerCreateOrEdit/CustomerCreateOrEdit'))
     },
     '/relationship/customer-detail/:id':{
       component: dynamicWrapper(app, ['customerDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/CustomerDetail'))
@@ -61,6 +64,15 @@ export const getRouterData = (app) => {
     },
     '/relationship/supplier-list': {
       component: dynamicWrapper(app, ['supplierList'], () => import('../routes/Relationship/Supplier/SupplierList/SupplierList'))
+    },
+    '/relationship/supplier-create': {
+      component: dynamicWrapper(app, ['supplierCreateOrEdit','country'], () => import('../routes/Relationship/Supplier/SupplierCreateOrEdit/SupplierCreateOrEdit'))
+    },
+    '/relationship/supplier-edit/:id': {
+      component: dynamicWrapper(app ,['supplierCreateOrEdit','country'], () => import('../routes/Relationship/Supplier/SupplierCreateOrEdit/SupplierCreateOrEdit'))
+    },
+    '/relationship/supplier-detail/:id': {
+      component: dynamicWrapper(app, ['supplierDetail'], () => import('../routes/Relationship/Supplier/SupplierDetail/SupplierDetail'))
     },
     '/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),

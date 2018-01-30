@@ -89,6 +89,20 @@ export async function getGoodsPurchaseDetail (params) {
   })
 }
 
+export async function getSalesordersNeedPay (params) {
+  return request(`${apiBase}/api/customers/${params.id}/salesorders/need_pay`,{
+    method: 'POST',
+    headers: {'Authorization': token}
+  })
+}
+
+export async function getStatementsNeedPay (params) {
+  return request(`${apiBase}/api/customers/${params.id}/statementsw/need_pay`,{
+    method: 'POST',
+    headers: {'Authorization': token}
+  })
+}
+
 export async function createSingle (params) {
   return request(`${apiBase}/api/customers` ,{
     method: 'POST',
@@ -97,12 +111,11 @@ export async function createSingle (params) {
   }) 
 }
 
-// export async function editSingle (params) {
-//   return request({
-//     url: `${apiBase}/api/customers/${params.id}`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function editSingle (params) {
+  return request(`${apiBase}/api/customers/${params.id}`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: params.serverData,
+  })
+}
 

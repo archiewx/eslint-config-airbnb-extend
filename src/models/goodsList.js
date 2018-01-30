@@ -1,5 +1,15 @@
 import * as goodsService from '../services/goods'
-
+import moment from 'moment';
+const condition = {
+  sorts: {
+    created_at: 'desc'
+  },
+  page:1,
+  per_page:10,
+  date_type:'custom',
+  sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+  eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
+}
 export default  {
 
   namespace: 'goodsList',
@@ -20,10 +30,7 @@ export default  {
 
   effects: {
     *getGoodsList({payload},{call,put,all}) {
-      const sorts = {
-        created_at: 'desc'
-      }
-      const [data1,data2] = yield all([call(goodsService.getListSales,sorts),call(goodsService.getListPurchase,sorts)])
+      const [data1,data2] = yield all([call(goodsService.getListSales,condition),call(goodsService.getListPurchase,condition)])
       yield put({type:'setState',payload:{
         goodsListSales:data1.result.data,
         goodsListPurchases:data2.result.data,
@@ -72,7 +79,7 @@ export default  {
           if(payload[key]) {
             let name = key.slice(5,key.length)
             if(name == 'datePick') {
-              current['data_type'] = 'custom'
+              current['date_type'] = 'custom'
               current['sday'] = payload[key][0]
               current['eday'] = payload[key][1]
             }else {
@@ -81,13 +88,12 @@ export default  {
           }
         }
       }
-      let ensureCurrent = []
-      Object.values(current).forEach( item => {
-        if(!(Array.isArray(item) && item.length == 0)) {
-          ensureCurrent.push( item )
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
-      })
-      state.filterSaleServerData = ensureCurrent
+      }
+      state.filterSaleServerData = current
       return {...state}
     },
 
@@ -98,7 +104,7 @@ export default  {
           if(payload[key]) {
             let name = key.slice(9,key.length)
             if(name == 'datePick') {
-              current['data_type'] = 'custom'
+              current['date_type'] = 'custom'
               current['sday'] = payload[key][0]
               current['eday'] = payload[key][1]
             }else {
@@ -107,13 +113,12 @@ export default  {
           }
         }
       }
-      let ensureCurrent = []
-      Object.values(current).forEach( item => {
-        if(!(Array.isArray(item) && item.length == 0)) {
-          ensureCurrent.push( item )
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
-      })
-      state.filterPurchaseServerData = ensureCurrent
+      }
+      state.filterPurchaseServerData = current
       return {...state}
     }
 

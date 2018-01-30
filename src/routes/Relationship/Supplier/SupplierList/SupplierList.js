@@ -86,14 +86,14 @@ export default class SupplierList extends PureComponent {
       page: 1,
     },
     filter:{
-      data_type:'custom',
+      date_type:'custom',
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     },
   }
 
   handleToSupplierCreate = () => {
-    // this.props.dispatch(routerRedux.push('/relationship/customer-create'))
+    this.props.dispatch(routerRedux.push('/relationship/supplier-create'))
   }
 
   handleDeleteSingleSupplier = (id) => {
@@ -131,7 +131,7 @@ export default class SupplierList extends PureComponent {
       form.validateFields((err,value) => {
         if(!err) {
           const filter = {
-            data_type:'custom',
+            date_type:'custom',
             sday: value['datePick'][0].format('YYYY-MM-DD'),
             eday: value['datePick'][1].format('YYYY-MM-DD'),
           }

@@ -205,7 +205,7 @@ export default  {
           if(payload[key]) {
             let name = key.slice(5,key.length)
             if(name == 'datePick') {
-              current['data_type'] = 'custom'
+              current['date_type'] = 'custom'
               current['sday'] = payload[key][0]
               current['eday'] = payload[key][1]
             }else {
@@ -214,13 +214,12 @@ export default  {
           }
         }
       }
-      let ensureCurrent = []
-      Object.values(current).forEach( item => {
-        if(!(Array.isArray(item) && item.length == 0)) {
-          ensureCurrent.push( item )
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
-      })
-      state.filterSaleServerData = ensureCurrent
+      }
+      state.filterSaleServerData = current
       return {...state}
     },
 
@@ -231,7 +230,7 @@ export default  {
           if(payload[key]) {
             let name = key.slice(9,key.length)
             if(name == 'datePick') {
-              current['data_type'] = 'custom'
+              current['date_type'] = 'custom'
               current['sday'] = payload[key][0]
               current['eday'] = payload[key][1]
             }else {
@@ -240,13 +239,12 @@ export default  {
           }
         }
       }
-      let ensureCurrent = []
-      Object.values(current).forEach( item => {
-        if(!(Array.isArray(item) && item.length == 0)) {
-          ensureCurrent.push( item )
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
-      })
-      state.filterPurchaseServerData = ensureCurrent
+      }
+      state.filterPurchaseServerData = current
       return {...state}
     },
 
@@ -257,7 +255,7 @@ export default  {
           if(payload[key]) {
             let name = key.slice(9,key.length)
             if(name == 'datePick') {
-              current['data_type'] = 'custom'
+              current['date_type'] = 'custom'
               current['sday'] = payload[key][0]
               current['eday'] = payload[key][1]
             }else {
@@ -266,13 +264,12 @@ export default  {
           }
         }
       }
-      let ensureCurrent = []
-      Object.values(current).forEach( item => {
-        if(!(Array.isArray(item) && item.length == 0)) {
-          ensureCurrent.push( item )
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
-      })
-      state.filterCustomerServerData = ensureCurrent
+      }
+      state.filterCustomerServerData = current
       return {...state}
     },
 
@@ -283,7 +280,7 @@ export default  {
           if(payload[key]) {
             let name = key.slice(9,key.length)
             if(name == 'datePick') {
-              current['data_type'] = 'custom'
+              current['date_type'] = 'custom'
               current['sday'] = payload[key][0]
               current['eday'] = payload[key][1]
             }else {
@@ -292,13 +289,12 @@ export default  {
           }
         }
       }
-      let ensureCurrent = []
-      Object.values(current).forEach( item => {
-        if(!(Array.isArray(item) && item.length == 0)) {
-          ensureCurrent.push( item )
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
-      })
-      state.filterSupplierServerData = ensureCurrent
+      }
+      state.filterSupplierServerData = current
       return {...state}
     },
 
@@ -309,7 +305,7 @@ export default  {
           if(payload[key]) {
             let name = key.slice(9,key.length)
             if(name == 'datePick') {
-              current['data_type'] = 'custom'
+              current['date_type'] = 'custom'
               current['sday'] = payload[key][0]
               current['eday'] = payload[key][1]
             }else {
@@ -318,13 +314,12 @@ export default  {
           }
         }
       }
-      let ensureCurrent = []
-      Object.values(current).forEach( item => {
-        if(!(Array.isArray(item) && item.length == 0)) {
-          ensureCurrent.push( item )
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
-      })
-      state.filterStockServerData = ensureCurrent
+      }
+      state.filterStockServerData = current
       return {...state}
     },
 
@@ -336,6 +331,7 @@ export default  {
     },
 
     setShowSaleList(state,{payload}) {
+      state.singleGoodsSales = []
       if(payload.length === 0) {
         state.singleGoodsSales = payload
       }else {
@@ -406,6 +402,7 @@ export default  {
     },
 
     setShowPurchaseList(state,{payload}) {
+      state.singleGoodsPurchases = []
       if(payload.length === 0) {
         state.singleGoodsPurchases = payload
       }else {
@@ -470,6 +467,7 @@ export default  {
     },
 
     setShowStockList(state,{payload}) {
+      state.singleGoodsStocks = []
       if(payload.length === 0) {
         state.singleGoodsStocks = payload
       }else {

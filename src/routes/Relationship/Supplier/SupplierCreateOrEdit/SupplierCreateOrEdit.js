@@ -8,20 +8,17 @@ import TagSelect from '../../../../components/antd-pro/TagSelect';
 import SelectInput from '../../../../components/SelectInput/SelectInput';
 import SelectMultiple from '../../../../components/SelectMultiple/SelectMultiple'
 import CustomerPictureModal from '../../../../components/CustomerPictureModal/CustomerPictureModal'
-import CustomerModal from './CustomerModal'
-import styles from './CustomerCreateOrEdit.less'
+import SupplierModal from './SupplierModal'
+import styles from './SupplierCreateOrEdit.less'
 const ButtonGroup = Button.Group;
 const Option = Select.Option;
 const FormItem = Form.Item;
 @Form.create()
 @connect(state => ({
-  customerCreateOrEdit: state.customerCreateOrEdit,
-  staff: state.staff,
-  priceGrade: state.priceGrade,
-  customerGroup: state.customerGroup,
+  supplierCreateOrEdit: state.supplierCreateOrEdit,
   country: state.country
 }))
-export default class CustomerCreateOrEdit extends PureComponent {
+export default class SupplierCreateOrEdit extends PureComponent {
 
   state = {
     modalVisibel: false,
@@ -32,14 +29,12 @@ export default class CustomerCreateOrEdit extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.dispatch({type:'staff/getList'})
-    this.props.dispatch({type:'priceGrade/getList'})
-    this.props.dispatch({type:'customerGroup/getCustomerGroup'})
+
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      addresses: nextProps.customerCreateOrEdit.showData.addresses || []
+      addresses: nextProps.supplierCreateOrEdit.showData.addresses || []
     })
   }
 
@@ -93,18 +88,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
     this.setState({
       addresses: [...addresses]
     })
-  }
 
-  handleDeleteAddress = (item) => {
-    let addresses = this.state.addresses;
-    if(addresses.find( n => n.uid == item.uid).default == 1) {
-      addresses[0].default = 1
-    }
-    addresses.splice(addresses.findIndex(n => n.uid == item.uid),1)
-    if(addresses.length == 1) {
-      addresses[0].default = 1
-    }
-    this.setState({addresses:[...addresses]})
   }
 
   handleSubmit = (e) => {
@@ -112,45 +96,40 @@ export default class CustomerCreateOrEdit extends PureComponent {
     e.preventDefault();
     validateFields((err,value) =>{
       if(!err){
-        this.props.dispatch({type:'customerCreateOrEdit/setServerData',payload:value})
-        if(this.props.customerCreateOrEdit.showData.id) {
-          // this.props.dispatch({type:'customerCreateOrEdit/editSingle',payload:{
-          //   serverData:this.props.customerCreateOrEdit.serverData,
-          //   id:this.props.customerCreateOrEdit.showData.id,
-          // }}).then(()=>{
-          //   this.props.dispatch(routerRedux.push('/relationship/customer-list'))
-          // })
-        }else {
-          this.props.dispatch({type:'customerCreateOrEdit/createSingle',payload:{
-            serverData:this.props.customerCreateOrEdit.serverData,
-            imageFile:this.props.customerCreateOrEdit.imageFile
-          }})
-          // .then(()=>{
-          //   this.props.dispatch(routerRedux.push('/relationship/customer-list'))
-          // })
-        }
+        this.props.dispatch({type:'supplierCreateOrEdit/setServerData',payload:value})
+        this.props.dispatch({type:'supplierCreateOrEdit/createSingle',payload:{
+          ...this.props.supplierCreateOrEdit.serverData,
+          // imageFile:this.props.supplierCreateOrEdit.imageFile
+        }})
+        // .then(()=>{
+        //   this.props.dispatch(routerRedux.push('/relationship/supplier-list'))
+        // })
       }
     })
   }
 
-  handleCustomerCancel = () => {
-    this.props.dispatch(routerRedux.push('/relationship/customer-list'))
+  handleSupplierCancel = () => {
+    this.props.dispatch(routerRedux.push('/relationship/supplier-list'))
   }
 
   render() {
     const {modalVisibel,formValue,addresses,modalType,uid} = this.state;
     const {getFieldDecorator,getFieldValue} = this.props.form;
-    const {showData} = this.props.customerCreateOrEdit;
-    const {staffs} = this.props.staff;
-    const {priceGrades} = this.props.priceGrade;
-    const {customerGroups} = this.props.customerGroup;
+    const {showData} = this.props.supplierCreateOrEdit;
     const {country} = this.props.country;
     getFieldDecorator('addresses', { initialValue: addresses });
+
+    const menu = (
+      <Menu>
+        <Menu.Item key="1">删除</Menu.Item>
+      </Menu>
+    );
+
     return (
       <PageHeaderLayout
-        title={showData.id ? '编辑客户' : '新建客户'}
+        title={showData.id ? '编辑供应商' : '新建供应商'}
         >
-        <Spin size='large' spinning={ !staffs.length || !priceGrades.length || !customerGroups.length } >
+        <Spin size='large'  spinning={false}>
           <Card bordered={false} title='基本资料' className={styles.bottomCardDivided}>
             <Form layout='vertical'>
               <Row gutter={64}>
@@ -196,36 +175,6 @@ export default class CustomerCreateOrEdit extends PureComponent {
                   </Row>
                 </Col>*/}
                 <Col span={8}>
-                  <FormItem label='专属导购'>
-                    {getFieldDecorator('seller_id',{
-                      initialValue: showData.seller_id || undefined
-                    })(
-                      <Select placeholder='请选择'>
-                        {
-                          staffs.map( item => {
-                            return <Option key={item.id}>{item.name}</Option>
-                          })
-                        }
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
-                  <FormItem label='客户等级'>
-                    {getFieldDecorator('vip_id',{
-                      initialValue: showData.vip_id || undefined
-                    })(
-                      <Select placeholder='请选择'>
-                        {
-                          priceGrades.map( item => {
-                            return <Option key={item.id}>{item.name}</Option>
-                          })
-                        }
-                      </Select>
-                    )}
-                  </FormItem>
-                </Col>
-                <Col span={8}>
                   <FormItem label='备注'>
                     {getFieldDecorator('remark1',{
                       initialValue: showData.remark1 
@@ -234,39 +183,6 @@ export default class CustomerCreateOrEdit extends PureComponent {
                     )}
                   </FormItem>
                 </Col>
-              </Row>
-              <Row gutter={64}>
-                {
-                  customerGroups.map( item => {
-                    return (
-                      <Col span={8} key={item.id}>
-                        <FormItem label={`${item.name}`}>
-                          {getFieldDecorator(`customerGroup_${item.id}`,{
-                            initialValue: (showData.customerGroup || {})[`${item.id}`] || undefined
-                          })(
-                            <Select placeholder='请选择客户分组'>
-                              {
-                                item.children.data.map( subItem => {
-                                  return (
-                                    <Option key={subItem.id}>{subItem.name}</Option>
-                                  )
-                                })
-                              }
-                            </Select>
-                          )}
-                        </FormItem>
-                      </Col>
-                    )
-                  })
-                }
-{/*                <Col span={8}>
-                  <FormItem label='备注'>
-                    {getFieldDecorator('remark1',{
-                    })(
-                      <Input placeholder="请输入" />
-                    )}
-                  </FormItem>
-                </Col>*/}
               </Row>
             </Form>
           </Card>
@@ -310,7 +226,9 @@ export default class CustomerCreateOrEdit extends PureComponent {
                       <Radio checked={item.default == 1} onChange={this.handleRadioSelect.bind(null,item.uid)}>默认地址</Radio> 
                       <ButtonGroup style={{float:'right',marginTop:-11}}>
                         <Button onClick={this.handleModalEdit.bind(null,item)}>编辑</Button>
-                        <Button onClick={this.handleDeleteAddress.bind(null,item)}>删除</Button>
+                        <Dropdown overlay={menu} placement="bottomRight">
+                          <Button><Icon type="ellipsis" /></Button>
+                        </Dropdown>
                       </ButtonGroup>
                     </div>
                   </div>
@@ -318,9 +236,9 @@ export default class CustomerCreateOrEdit extends PureComponent {
               })
             }
           </Card>
-          <CustomerModal type={modalType} visible={modalVisibel} formValue={formValue} onOk={this.handleModalOk} onCancel={this.handleModalCancel} country={country} uid={uid} addresses={addresses}/>
+          <SupplierModal type={modalType} visible={modalVisibel} formValue={formValue} onOk={this.handleModalOk} onCancel={this.handleModalCancel} country={country} uid={uid} addresses={addresses}/>
           <FooterToolbar>
-            <Popconfirm title={ showData.id ? '确认取消编辑客户':'确认取消新建客户'} onConfirm={this.handleCustomerCancel} placement='top'><Button>取消</Button></Popconfirm>
+            <Popconfirm title={ showData.id ? '确认取消编辑供应商':'确认取消新建供应商'} onConfirm={this.handleSupplierCancel}><Button>取消</Button></Popconfirm>
             <Button type="primary" onClick={this.handleSubmit}>
               确认
             </Button>

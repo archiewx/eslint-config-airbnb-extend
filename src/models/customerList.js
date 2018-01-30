@@ -6,7 +6,7 @@ const condition = {
   },
   page:1,
   per_page:10,
-  data_type:'custom',
+  date_type:'custom',
   sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
   eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
 }
@@ -55,7 +55,7 @@ export default  {
       for(let key in payload) {
         if(payload[key]) {
           if(key == 'datePick') {
-            current['data_type'] = 'custom'
+            current['date_type'] = 'custom'
             current['sday'] = payload[key][0]
             current['eday'] = payload[key][1]
           }else {

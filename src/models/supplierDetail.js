@@ -1,16 +1,14 @@
-import * as customerService from '../services/customer'
+import * as supplierService from '../services/supplier'
 import pathToRegexp from 'path-to-regexp'
 export default  {
 
-  namespace: 'customerDetail',
+  namespace: 'supplierDetail',
 
   state: {
-    singleCustomerDetail: {},
-    singleCustomerSaleHistory:[],
-    singleCustomerGoodsHistory:[],
-    singleCustomerPaymentHistory:[],
-    singleCustomerSalesorders:[],
-    singleCustomerstatements:[],
+    singleSupplierDetail: {},
+    singleSupplierSaleHistory:[],
+    singleSupplierGoodsHistory:[],
+    singleSupplierPaymentHistory:[],
     saleHistoryFilter:[],
     goodsHistoryFilter:[],
     paymentHistoryFilter:[],
@@ -23,9 +21,9 @@ export default  {
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(() => {
-        const match = pathToRegexp('/relationship/customer-detail/:id').exec(location.hash.slice(1,location.hash.length))
+        const match = pathToRegexp('/relationship/supplier-detail/:id').exec(location.hash.slice(1,location.hash.length))
         if(match) {
-          dispatch({type:'setState',payload:{singleCustomerDetail:{}}})
+          dispatch({type:'setState',payload:{singleSupplierDetail:{}}})
           dispatch({type:'getSingle',payload:{id:match[1]}})
         }
       })
@@ -40,62 +38,58 @@ export default  {
           created_at:'desc'
         }
       }
-      const [data1,data2,data3,data4,data5] = yield all([
-        call(customerService.getSingle,payload),
-        call(customerService.getCustomerSaleHistory,saleOrPaymentPayload),
-        call(customerService.getCustomerGoodsHistory,payload),
-        call(customerService.getCustomerPaymentHistory,saleOrPaymentPayload),
-        call(customerService.getSalesordersNeedPay,saleOrPaymentPayload),
-        // call(customerService.getStatementsNeedPay,saleOrPaymentPayload)
+      const [data1,data2,data3,data4] = yield all([
+        call(supplierService.getSingle,payload),
+        call(supplierService.getSupplierSaleHistory,saleOrPaymentPayload),
+        call(supplierService.getSupplierGoodsHistory,payload),
+        call(supplierService.getSupplierPaymentHistory,saleOrPaymentPayload)
       ])
 
       yield put({type:'setShowData',payload:data1.result.data})
       yield put({type:'setState',payload:{
-        singleCustomerSaleHistory:data2.result.data,
-        singleCustomerGoodsHistory:data3.result.data,
-        singleCustomerPaymentHistory:data4.result.data,
+        singleSupplierSaleHistory:data2.result.data,
+        singleSupplierGoodsHistory:data3.result.data,
+        singleSupplierPaymentHistory:data4.result.data,
         saleHistoryFilter: data2.result.meta.filter.groups,
         goodsHistoryFilter: data3.result.meta.filter.groups,
         paymentHistoryFilter: data4.result.meta.filter.groups,
-        singleCustomerSalesorders: data5.result.data,
-        // singleCustomerstatements: data6.result.data,
         currentId: payload
       }})
     },
 
     *getSingleDetail({payload},{call,put}) {
-      const data = yield call(customerService.getSingle,payload)
+      const data = yield call(supplierService.getSingle,payload)
       yield put({type:'setShowData',payload:data.result.data})
     },
 
     *getSaleHistory({payload},{call,put}) {
-      const data = yield call(customerService.getCustomerSaleHistory,payload)
+      const data = yield call(supplierService.getSupplierSaleHistory,payload)
       yield put({type:'setState',payload:{
-        singleCustomerSaleHistory: data.result.data
+        singleSupplierSaleHistory: data.result.data
       }})
     },
 
     *getGoodsHistory({payload},{call,put}) {
-      const data = yield call(customerService.getCustomerGoodsHistory,payload)
+      const data = yield call(supplierService.getSupplierGoodsHistory,payload)
       yield put({type:'setState',payload:{
-        singleCustomerGoodsHistory: data.result.data
+        singleSupplierGoodsHistory: data.result.data
       }})
     },
 
     *getPaymentHistory({payload},{call,put}) {
-      const data = yield call(customerService.getCustomerPaymentHistory,payload)
+      const data = yield call(supplierService.getSupplierPaymentHistory,payload)
       yield put({type:'setState',payload:{
-        singleCustomerPaymentHistory:data.result.data
+        singleSupplierPaymentHistory:data.result.data
       }})
     },
 
     *deleteSingle({payload},{call,put}) {
-      const data = yield call(customerService.deleteSingle,payload)
+      const data = yield call(supplierService.deleteSingle,payload)
     },
 
-    *changeCustomerStatus({payload},{call,put,select}) {
-      const data = yield call(customerService.changeCustomerStatus,payload)
-      const {currentId} = yield select(({customerDetail}) => customerDetail)
+    *changeSupplierStatus({payload},{call,put,select}) {
+      const data = yield call(supplierService.changeSupplierStatus,payload)
+      const {currentId} = yield select(({supplierDetail}) => supplierDetail)
       yield put({type:'getSingleDetail',payload:currentId})
     },
 
@@ -108,36 +102,23 @@ export default  {
     },
 
     setShowData (state,{payload}) {
-      state.singleCustomerDetail.name = payload.name;
-      state.singleCustomerDetail.phone = payload.phone;
-      state.singleCustomerDetail.vip = payload.vip && payload.vip.data.name;
-      state.singleCustomerDetail.debt = payload.debt;
-      state.singleCustomerDetail.total_points = payload.total_points;
-      state.singleCustomerDetail.basicDetail = [];
+      state.singleSupplierDetail.name = payload.name;
+      state.singleSupplierDetail.phone = payload.phone;
+      state.singleSupplierDetail.debt = payload.debt;
+      state.singleSupplierDetail.basicDetail = [];
       
-      payload.wechat ? state.singleCustomerDetail.basicDetail.push({
+      payload.wechat ? state.singleSupplierDetail.basicDetail.push({
         parentName: '微信号',
         name: payload.wechat,
       }) : ''
-      payload.seller ? state.singleCustomerDetail.basicDetail.push({
-        parentName: '专属导购',
-        name: payload.seller.data.name
-      }) : ''
-      payload.remark1  ? state.singleCustomerDetail.basicDetail.push({
+      payload.remark1  ? state.singleSupplierDetail.basicDetail.push({
         parentName: '备注',
         name: payload.remark1
       }) : ''
 
-      payload.customergroups.data.forEach( item => {
-        state.singleCustomerDetail.basicDetail.push({
-          parentName: item.parent.data[0].name,
-          name: item.name
-        })
-      })
-
-      state.singleCustomerDetail.imageFiles = payload.attachments_url.map( item => item )
-      state.singleCustomerDetail.freeze = payload.freeze;
-      state.singleCustomerDetail.addresses = payload.addresses.data;
+      state.singleSupplierDetail.imageFiles = payload.attachments_url.map( item => item )
+      state.singleSupplierDetail.freeze = payload.freeze;
+      state.singleSupplierDetail.addresses = payload.addresses.data;
       return {...state}
     },
 
@@ -156,6 +137,11 @@ export default  {
               current[`${name}_in`] = payload[key]
             }
           }
+        }
+      }
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
       }
       state.filterSaleServerData = current
@@ -178,6 +164,11 @@ export default  {
           }
         }
       }
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
+        }
+      }
       state.filterGoodsServerData = current
       return {...state}
     },
@@ -196,6 +187,11 @@ export default  {
               current[`${name}_in`] = payload[key]
             }
           }
+        }
+      }
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
       }
       state.filterPaymentServerData = current

@@ -16,41 +16,6 @@ export default class StockTable extends PureComponent {
     })
   }
 
-  // handleCreateSkuStocks({warehouses,selectColors,selectSizes,value}) {
-  //   let current = {}
-  //   if(selectColors.length === 0) {
-  //     warehouses.forEach( item => {
-  //       current[`${item.id}`] = {
-  //         warehouse_id: item.id,
-  //         store_quantity: value ? ((value[`${item.id}`] || {}).store_quantity ? value[`${item.id}`].store_quantity : null) : null
-  //       }
-  //     })
-  //   }else {
-  //     if(selectSizes.length === 0) {
-  //       warehouses.forEach( item => {
-  //         selectColors.forEach( colorItem => {
-  //           current[`${item.id}_${colorItem.id}`] = {
-  //             warehouse_id: item.id,
-  //             store_quantity: value ? ( (value[`${item.id}_${colorItem.id}`] || {}).store_quantity ? value[`${item.id}_${colorItem.id}`].store_quantity : null ) : null
-  //           }
-  //         })
-  //       })
-  //     }else {
-  //       warehouses.forEach( item => {
-  //         selectColors.forEach( colorItem => {
-  //           selectSizes.forEach( sizeItem => {
-  //             current[`${item.id}_${colorItem.id}_${sizeItem.id}`] = {
-  //               warehouse_id: item.id,
-  //               store_quantity: value ? ((value[`${item.id}_${colorItem.id}_${sizeItem.id}`] || {}).store_quantity ? value[`${item.id}_${colorItem.id}_${sizeItem.id}`].store_quantity : null) : null
-  //             }
-  //           })
-  //         })
-  //       })
-  //     }
-  //   }
-  //   return current
-  // }
-
   handleStockInput = (colorId = '',sizeId = '' ,value) => {
     const {selectColors,selectSizes,selectWarehouseId} = this.props;
     let skuStocks = this.state.skuStocks;
@@ -79,7 +44,7 @@ export default class StockTable extends PureComponent {
               <Row gutter={64}>
                 <Col span={8}>
                   <div><label className={styles.StockLabelTitle}>库存</label></div>
-                  <InputNumber value={(skuStocks[`${selectWarehouseId}`] || {}).store_quantity} formatter={value => ( value ? Math.floor(value/selecStockUnitNum).toString() : value )} parser={value =>(Number(value)*selecStockUnitNum).toString()} onChange={this.handleStockInput.bind(null,-1,-1)}  placeholder='请输入' precision={2} style={{width:'100%'}}/>
+                  <InputNumber value={(skuStocks[`${selectWarehouseId}`] || {}).store_quantity} onChange={this.handleStockInput.bind(null,-1,-1)}  placeholder='请输入' precision={2} style={{width:'100%'}}/>
                 </Col>
               </Row>
             </div>
@@ -92,7 +57,7 @@ export default class StockTable extends PureComponent {
                       return (
                         <Col key={item.id} span={8}>
                           <div><label className={styles.StockLabelTitle}>{item.name}</label></div>
-                          <InputNumber value={(skuStocks[`${selectWarehouseId}_${item.id}`] || {} ).store_quantity} formatter={value => ( value ? Math.floor(value/selecStockUnitNum).toString() : value )} parser={value =>(Number(value)*selecStockUnitNum).toString()} onChange={this.handleStockInput.bind(null,item.id,-1)} placeholder='请输入' precision={2} style={{width:'100%'}}/>
+                          <InputNumber value={(skuStocks[`${selectWarehouseId}_${item.id}`] || {} ).store_quantity} onChange={this.handleStockInput.bind(null,item.id,-1)} placeholder='请输入' precision={2} style={{width:'100%'}}/>
                         </Col>
                       )
                     })
@@ -120,7 +85,7 @@ export default class StockTable extends PureComponent {
                             <td className={styles.stockTableHead}><span className={styles.spanColTitlePostion}>{item.name}</span></td>
                             {
                               selectSizes.map( subItem => {
-                                return <td key={subItem.id}><InputNumber value={(skuStocks[`${selectWarehouseId}_${item.id}_${subItem.id}`] || {} ).store_quantity} formatter={value => ( value ? Math.floor(value/selecStockUnitNum).toString() : value )} parser={value =>(Number(value)*selecStockUnitNum).toString()} onChange={this.handleStockInput.bind(null,item.id,subItem.id)} placeholder='请输入'  precision={2} style={{width:'100%',textAlign:'right'}} className={styles.stockInput}/></td>
+                                return <td key={subItem.id}><InputNumber value={(skuStocks[`${selectWarehouseId}_${item.id}_${subItem.id}`] || {} ).store_quantity} onChange={this.handleStockInput.bind(null,item.id,subItem.id)} placeholder='请输入'  precision={2} style={{width:'100%',textAlign:'right'}} className={styles.stockInput}/></td>
                               })
                             }
                           </tr>

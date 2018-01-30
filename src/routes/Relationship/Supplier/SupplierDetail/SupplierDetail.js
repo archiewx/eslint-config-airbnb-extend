@@ -7,7 +7,7 @@ import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
 import TagSelect from '../../../../components/DuokeTagSelect';
-import styles from './CustomerDetail.less'
+import styles from './SupplierDetail.less'
 const { Description } = DescriptionList;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -17,9 +17,6 @@ const tabList = [{
   key:'detail',
   tab:'详情'
 },{
-  key:'finance',
-  tab:'欠款'
-},{
   key:'sale',
   tab:'交易历史'
 },{
@@ -28,12 +25,6 @@ const tabList = [{
 },{
   key:'payment',
   tab:'收银历史'
-},{
-  key:'salesorder',
-  tab:'未结算销售单',
-},{
-  key:'statement',
-  tab:'未付完结算单'
 }]
 const salePagination = {
   showQuickJumper: true,
@@ -47,15 +38,11 @@ const paymentPagination = {
   showQuickJumper: true,
   showSizeChanger: true,
 }
-const salesorderPagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
-}
 @Form.create()
 @connect(state => ({
-  customerDetail: state.customerDetail
+  supplierDetail: state.supplierDetail
 }))
-export default class CustomerDetail extends PureComponent {
+export default class SupplierDetail extends PureComponent {
 
   state = {
     activeTabKey : 'detail',
@@ -66,31 +53,31 @@ export default class CustomerDetail extends PureComponent {
   }
 
   handleDeleteSingleCustomer = (id) => {
-    this.props.dispatch({type:'customerDetail/deleteSingle',payload:id})
+    this.props.dispatch({type:'supplierDetail/deleteSingle',payload:id})
   }
 
   handleChangeCustomerStatus = (id,status) => {
-    this.props.dispatch({type:'customerDetail/changeCustomerStatus',payload:{
+    this.props.dispatch({type:'supplierDetail/changeSupplierStatus',payload:{
       id: id,
       freeze: status == 1 ? 0 : 1
     }})
   }
 
-  handleToCustomerEdit = () => {
-    this.props.dispatch(routerRedux.push(`/relationship/customer-edit/${this.props.customerDetail.currentId.id}`))
+  handleToSupplierEdit = () => {
+    this.props.dispatch(routerRedux.push(`/relationship/supplier-edit/${this.props.supplierDetail.currentId.id}`))
   }
 
   handleSaleHistorySort = (pagination,filter,sorter) => {
     if(!!Object.keys(sorter).length) {
       let current = {};
       current[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
-      this.props.dispatch({type:'customerDetail/getSaleHistory',payload:{
+      this.props.dispatch({type:'supplierDetail/getSaleHistory',payload:{
         sorts: current,
-        id:this.props.customerDetail.currentId.id
+        id:this.props.supplierDetail.currentId.id
       }})
     }else {
-      this.props.dispatch({type:'customerDetail/getSaleHistory',payload: {
-        id: this.props.customerDetail.currentId.id,
+      this.props.dispatch({type:'supplierDetail/getSaleHistory',payload: {
+        id: this.props.supplierDetail.currentId.id,
         sorts:{
           created_at:'desc'
         }
@@ -103,13 +90,13 @@ export default class CustomerDetail extends PureComponent {
     setTimeout(() => {
       form.validateFields((err,value) => {
         if(!err) {
-          this.props.dispatch({type:'customerDetail/setFilterSaleServerData',payload:{
+          this.props.dispatch({type:'supplierDetail/setFilterSaleServerData',payload:{
             ...value,
             sale_datePick: value['sale_datePick'] ? [value['sale_datePick'][0].format('YYYY-MM-DD'),value['sale_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'customerDetail/getSaleHistory',payload:{
-            filter:this.props.customerDetail.filterSaleServerData,
-            id:this.props.customerDetail.currentId.id,
+          this.props.dispatch({type:'supplierDetail/getSaleHistory',payload:{
+            filter:this.props.supplierDetail.filterSaleServerData,
+            id:this.props.supplierDetail.currentId.id,
           }})
         }
       })
@@ -120,13 +107,13 @@ export default class CustomerDetail extends PureComponent {
     if(!!Object.keys(sorter).length) {
       let current = {};
       current[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
-      this.props.dispatch({type:'customerDetail/getGoodsHistory',payload:{
+      this.props.dispatch({type:'supplierDetail/getGoodsHistory',payload:{
         sorts: current,
-        id:this.props.customerDetail.currentId.id
+        id:this.props.supplierDetail.currentId.id
       }})
     }else {
-      this.props.dispatch({type:'customerDetail/getGoodsHistory',payload: {
-        id: this.props.customerDetail.currentId.id,
+      this.props.dispatch({type:'supplierDetail/getGoodsHistory',payload: {
+        id: this.props.supplierDetail.currentId.id,
       }})
     }
   }
@@ -136,13 +123,13 @@ export default class CustomerDetail extends PureComponent {
     setTimeout(() => {
       form.validateFields((err,value) => {
         if(!err) {
-          this.props.dispatch({type:'customerDetail/setFilterGoodsServerData',payload:{
+          this.props.dispatch({type:'supplierDetail/setFilterGoodsServerData',payload:{
             ...value,
             goods_datePick: value['goods_datePick'] ? [value['goods_datePick'][0].format('YYYY-MM-DD'),value['goods_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'customerDetail/getGoodsHistory',payload:{
-            filter:this.props.customerDetail.filterGoodsServerData,
-            id:this.props.customerDetail.currentId.id,
+          this.props.dispatch({type:'supplierDetail/getGoodsHistory',payload:{
+            filter:this.props.supplierDetail.filterGoodsServerData,
+            id:this.props.supplierDetail.currentId.id,
           }})
         }
       })
@@ -153,13 +140,13 @@ export default class CustomerDetail extends PureComponent {
     if(!!Object.keys(sorter).length) {
       let current = {};
       current[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
-      this.props.dispatch({type:'customerDetail/getPaymentHistory',payload:{
+      this.props.dispatch({type:'supplierDetail/getPaymentHistory',payload:{
         sorts: current,
-        id:this.props.customerDetail.currentId.id
+        id:this.props.supplierDetail.currentId.id
       }})
     }else {
-      this.props.dispatch({type:'customerDetail/getPaymentHistory',payload: {
-        id: this.props.customerDetail.currentId.id,
+      this.props.dispatch({type:'supplierDetail/getPaymentHistory',payload: {
+        id: this.props.supplierDetail.currentId.id,
         sorts:{
           created_at:'desc'
         }
@@ -172,13 +159,13 @@ export default class CustomerDetail extends PureComponent {
     setTimeout(() => {
       form.validateFields((err,value) => {
         if(!err) {
-          this.props.dispatch({type:'customerDetail/setFilterPurchaseServerData',payload:{
+          this.props.dispatch({type:'supplierDetail/setFilterPurchaseServerData',payload:{
             ...value,
             payment_datePick: value['payment_datePick'] ? [value['payment_datePick'][0].format('YYYY-MM-DD'),value['payment_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'customerDetail/getPaymentHistory',payload:{
-            filter:this.props.customerDetail.filterPaymentServerData,
-            id:this.props.customerDetail.currentId.id,
+          this.props.dispatch({type:'supplierDetail/getPaymentHistory',payload:{
+            filter:this.props.supplierDetail.filterPaymentServerData,
+            id:this.props.supplierDetail.currentId.id,
           }})
         }
       })
@@ -186,15 +173,13 @@ export default class CustomerDetail extends PureComponent {
   }
 
   render() {
-    const {singleCustomerDetail,singleCustomerSaleHistory,singleCustomerGoodsHistory,singleCustomerPaymentHistory,singleCustomerSalesorders,singleCustomerstatements,saleHistoryFilter,goodsHistoryFilter,paymentHistoryFilter,currentId} = this.props.customerDetail;
+    const {singleSupplierDetail,singleSupplierSaleHistory,singleSupplierGoodsHistory,singleSupplierPaymentHistory,saleHistoryFilter,goodsHistoryFilter,paymentHistoryFilter,currentId} = this.props.supplierDetail;
     const {activeTabKey} = this.state;
     const {getFieldDecorator} = this.props.form
     const description = (
       <DescriptionList size="small" col="2" className={styles.descriptionPostion}>
-        <Description term="手机号">{`${singleCustomerDetail.phone || ''}`}</Description>
-        <Description term="客户等级">{`${singleCustomerDetail.vip || ''}`}</Description>
-        <Description term="欠款">{`${singleCustomerDetail.debt || 0}`}</Description>
-        <Description term="积分">{`${singleCustomerDetail.total_points || 0}`}</Description>
+        <Description term="手机号">{`${singleSupplierDetail.phone || ''}`}</Description>
+        <Description term="我欠他">{`${singleSupplierDetail.debt || ''}`}</Description>
       </DescriptionList>
     )
     const menu = (
@@ -206,12 +191,12 @@ export default class CustomerDetail extends PureComponent {
     const action = (
       <div>
         <ButtonGroup>
-          <Button onClick={this.handleChangeCustomerStatus.bind(null,currentId.id,singleCustomerDetail.freeze)}>{singleCustomerDetail.freeze == 1 ? '解冻' : '冻结'}</Button>
+          <Button onClick={this.handleChangeCustomerStatus.bind(null,currentId.id,singleSupplierDetail.freeze)}>{singleSupplierDetail.freeze == 1 ? '解冻' : '冻结'}</Button>
           <Dropdown overlay={menu} placement="bottomRight">
             <Button><Icon type="ellipsis" /></Button>
           </Dropdown>
         </ButtonGroup>
-        <Button type="primary" onClick={this.handleToCustomerEdit}>编辑</Button>
+        <Button type="primary" onClick={this.handleToSupplierEdit}>编辑</Button>
       </div>
     )
 
@@ -220,9 +205,9 @@ export default class CustomerDetail extends PureComponent {
       dataIndex: 'number',
       render: (text,record) => (`#${record.number}`)
     },{
-      title: '业绩归属员工',
-      dataIndex: 'seller',
-      render: (text,record) => (`${record.seller.data.name}`)
+      title: '入库仓库',
+      dataIndex: 'warehouse',
+      render: (text,record) => (`${record.warehouse.data.name}`)
     },{
       title: '商品数量',
       dataIndex: 'quantity',
@@ -245,21 +230,21 @@ export default class CustomerDetail extends PureComponent {
       title: '货号',
       dataIndex: 'item_ref',
     },{
-      title: '购买量',
+      title: '供应量',
       dataIndex: 'item_quantity',
       sorter:true,
     },{
-      title: '购买额',
+      title: '供应额',
       dataIndex: 'item_value',
       sorter:true,
     },{
-      title: '最后购买时间',
+      title: '最后供应时间',
       dataIndex: 'purchase_time',
       sorter:true,
     },{
       title: '操作',
       dataIndex: 'operation',
-      render: (text,record) => (<Link to={`/relationship/customer-detail/goods-purchase-detail/${currentId.id}/${record.id}`}>查看</Link>)
+      render: (text,record) => (<Link to={`/relationship/supplier-detail/goods-purchase-detail/${currentId.id}/${record.id}`}>查看</Link>)
     }]
 
     const paymentColumns = [{
@@ -283,48 +268,9 @@ export default class CustomerDetail extends PureComponent {
       dataIndex: 'operation',
       render: (text,record) => (<a>查看</a>)
     }]
-
-    const salesorderColumns = [{
-      title:'单号',
-      dataIndex: 'number',
-      render:(text,record) => (`#${record.number}`)
-    },{
-      title:'商品数量',
-      dataIndex:'quantity'
-    },{
-      title:'未付总款',
-      dataIndex:'due_fee'
-    },{
-      title:'创建时间',
-      dataIndex:'created_at',
-    },{
-      title:'操作',
-      dataIndex:'operation',
-      render:(text,record) => (<a>操作</a>)
-    }]
-
-    const statementColumns = [{
-      title:'单号',
-      dataIndex: 'number',
-      render:(text,record) => (`#${record.number}`)
-    },{
-      title:'单据数量',
-      dataIndex: 'quantity'
-    },{
-      title:'未付总款',
-      dataIndex: '',
-    },{
-      title:'创建时间',
-      dataIndex:'created_at'
-    },{
-      title:'操作',
-      dataIndex: 'operation',
-      render:(text,record) => (<a>查看</a>)
-    }]
-
     return (
       <PageHeaderLayout
-        title={`单号：${singleCustomerDetail.name || ''}`}
+        title={`单号：${singleSupplierDetail.name || ''}`}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         content={description}
         activeTabKey={activeTabKey}
@@ -335,10 +281,10 @@ export default class CustomerDetail extends PureComponent {
         <Card bordered={false} style={{display: activeTabKey == 'detail' ? 'block' : 'none'}}>
           <div className={styles.title}>基本资料</div>
           {
-            singleCustomerDetail.basicDetail  && !!singleCustomerDetail.basicDetail.length ? (
+            singleSupplierDetail.basicDetail  && !!singleSupplierDetail.basicDetail.length ? (
               <Row gutter={32}>
                 {
-                    singleCustomerDetail.basicDetail.map( (item,index) => {
+                    singleSupplierDetail.basicDetail.map( (item,index) => {
                     return (
                       <Col span={12} key={index} style={{marginBottom: 16}}>
                         <label className={styles.labelTitle}>{`${item.parentName}： `}</label><span>{item.name}</span>
@@ -349,15 +295,15 @@ export default class CustomerDetail extends PureComponent {
               </Row>
             ) : null
           }
-          {singleCustomerDetail.imageFiles && !!singleCustomerDetail.imageFiles.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>附件</div></div> : null}
+          {singleSupplierDetail.imageFiles && !!singleSupplierDetail.imageFiles.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>附件</div></div> : null}
           {
-            singleCustomerDetail.imageFiles && singleCustomerDetail.imageFiles.map( (item,index) => {
-              return <img src={`${item}`} key={index}  alt='无法显示' style={{width:102,height:102}}/>
+            singleSupplierDetail.imageFiles && singleSupplierDetail.imageFiles.map( (item,index) => {
+              return <img src={`${item}`} key={index}  alt='无法显示' style={{width:102,height:102,marginRight:20}}/>
             })
           }
-          { singleCustomerDetail.addresses && !!singleCustomerDetail.addresses.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>地址</div></div> : null}
+          { singleSupplierDetail.addresses && !!singleSupplierDetail.addresses.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>地址</div></div> : null}
           {
-            singleCustomerDetail.addresses  && singleCustomerDetail.addresses.map( (item,index) => {
+            singleSupplierDetail.addresses  && singleSupplierDetail.addresses.map( (item,index) => {
               return (
                 <div key={item.id}>
                   {index > 0 ? <Divider style={{marginBottom: 20}} /> : null}
@@ -379,8 +325,6 @@ export default class CustomerDetail extends PureComponent {
               )
             })
           }
-        </Card>
-        <Card bordered={false} style={{display: activeTabKey == 'finance' ? 'block' : 'none'}}>
         </Card>
         <div style={{display: activeTabKey == 'sale' ? 'block' : 'none'}}>
           <Card bordered={false} className={styles.bottomCardDivided}>
@@ -414,7 +358,7 @@ export default class CustomerDetail extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false}>
-            <Table columns={saleColumns} dataSource={singleCustomerSaleHistory} onChange={this.handleSaleHistorySort} pagination={salePagination} rowKey='id' />
+            <Table columns={saleColumns} dataSource={singleSupplierSaleHistory} onChange={this.handleSaleHistorySort} pagination={salePagination} rowKey='id' />
           </Card>
         </div>
         <div style={{display: activeTabKey == 'goods' ? 'block' : 'none'}}>
@@ -449,7 +393,7 @@ export default class CustomerDetail extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false}>
-            <Table columns={goodsColumns} dataSource={singleCustomerGoodsHistory} onChange={this.handleGoodsHistorySort} pagination={goodsPagination} rowKey='id' />
+            <Table columns={goodsColumns} dataSource={singleSupplierGoodsHistory} onChange={this.handleGoodsHistorySort} pagination={goodsPagination} rowKey='id' />
           </Card>
         </div>
         <div style={{display: activeTabKey == 'payment' ? 'block' : 'none'}}>
@@ -459,9 +403,9 @@ export default class CustomerDetail extends PureComponent {
                 paymentHistoryFilter.map( (item,index) => {
                   return (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem expandable>
+                      <FormItem expandable >
                         {getFieldDecorator(`payment_${item.code}`)(
-                          <TagSelect  onChange={this.handlePaymentFormSubmit}>
+                          <TagSelect onChange={this.handlePaymentFormSubmit}>
                             {
                               item.options.map( (subItem,subIndex) => {
                                 return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
@@ -484,17 +428,7 @@ export default class CustomerDetail extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false}>
-            <Table columns={paymentColumns} dataSource={singleCustomerPaymentHistory} onChange={this.handlePaymentHistorySort} pagination={paymentPagination} rowKey='id' />
-          </Card>
-        </div>
-        <div style={{display: activeTabKey == 'salesorder' ? 'block' : 'none'}}>
-          <Card bordered={false}> 
-            <Table columns={salesorderColumns} dataSource={singleCustomerSalesorders}  pagination={salesorderPagination} rowKey='id' />
-          </Card>
-        </div>
-        <div style={{display: activeTabKey == 'statement' ? 'block' : 'none'}}>
-          <Card bordered={false}>
-            <Table columns={statementColumns} dataSource={singleCustomerstatements}  rowKey='id' />
+            <Table columns={paymentColumns} dataSource={singleSupplierPaymentHistory} onChange={this.handlePaymentHistorySort} pagination={paymentPagination} rowKey='id' />
           </Card>
         </div>
       </PageHeaderLayout>

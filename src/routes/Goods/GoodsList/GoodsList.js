@@ -154,6 +154,24 @@ export default class GoodsList extends PureComponent {
     },
     sortPurchase: {
       created_at: 'desc'
+    },
+    pagesSale: {
+      per_page:10,
+      page:1,
+    },
+    pagesPurchase: {
+      per_page:10,
+      page:1,
+    },
+    filterSale: {
+      date_type:'custom',
+      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+    },
+    filterPurchase: {
+      date_type:'custom',
+      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     }
   }
 
@@ -182,6 +200,22 @@ export default class GoodsList extends PureComponent {
     }})
   }
 
+  handleGetSaleList = (filter,pages,sorts) => {
+    this.props.dispatch({type:'goodsList/getGoodsSaleList',payload:{
+      ...filter,
+      ...pages,
+      sorts
+    }})
+  }
+
+  handleGetPurchaseList = (filter,pages,sorts) => {
+    this.props.dispatch({type:'goodsList/getGoodsPurchaseList',payload:{
+      ...filter,
+      ...pages,
+      sorts
+    }})
+  }
+
   handleSaleFormSubmit = () => {
     const { form, dispatch } = this.props;
     setTimeout(() => {
@@ -191,7 +225,10 @@ export default class GoodsList extends PureComponent {
             ...value,
             sale_datePick: value['sale_datePick'] ? [value['sale_datePick'][0].format('YYYY-MM-DD'),value['sale_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsList/getGoodsSaleList',payload:this.props.goodsList.filterSaleServerData.length > 3 ? this.props.goodsList.filterSaleServerData : {sorts: {created_at: 'desc'}}})
+          const filterSale = {...this.props.goodsList.filterSaleServerData}
+          const pagesSale = {...this.state.pagesSale,page:1}
+          this.setState({filterSale,pagesSale})
+          this.handleGetSaleList(filterSale,pagesSale,this.state.sortSale)
         }
       })
     }, 0)
@@ -206,31 +243,25 @@ export default class GoodsList extends PureComponent {
             ...value,
             purchase_datePick: value['purchase_datePick'] ? [value['purchase_datePick'][0].format('YYYY-MM-DD'),value['purchase_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsList/getGoodsPurchaseList',payload:this.props.goodsList.filterPurchaseServerData.length > 3 ? this.props.goodsList.filterPurchaseServerData : {sorts: {created_at: 'desc'}}})
+          const filterPurchase = {...this.props.goodsList.filterPurchaseServerData}
+          const pagesPurchase = {...this.state.pagesPurchase,page:1}
+          this.setState({filterPurchase,pagesPurchase})
+          this.handleGetPurchaseList(filterPurchase,pagesPurchase,this.state.sortPurchase)
         }
       })
     }, 0)
   }
 
-  handleSelectSort = (type,value) => {
-    let targetName = value.slice(6,value.length)
-    if(type == 'sale') {
-      let sortSale = sortSaleOptions.find( item => item.name == targetName).sorts;
-      this.setState({sortSale})
-      this.props.dispatch({type:'goodsList/getGoodsSaleList',payload:{
-        sorts: {...sortSale},
-        per_page: this.props.goodsList.goodsSalePagination.per_page,
-        page: this.props.goodsList.goodsSalePagination.current_page
-      }})
-    }else if(type == 'purchase') {
-      let sortPurchase = sortPurchaseOptions.find( item => item.name == targetName).sorts;
-      this.setState({sortPurchase})
-      this.props.dispatch({type:'goodsList/getGoodsPurchaseList',payload:{
-        sorts:{...sortPurchase},
-        per_page: this.props.goodsList.goodsPurchasePagination.per_page,
-        page: this.props.goodsList.goodsPurchasePagination.current_page
-      }})
-    }
+  handleSelectSortSale = (value) => {
+    let sortSale = sortSaleOptions.find( item => item.name == value.slice(6,value.length)).sorts;
+    this.setState({sortSale})
+    this.handleGetSaleList(this.state.filterSale,this.state.pagesSale,sortSale)
+  }
+
+  handleSelectSortPurchase = (value) => {
+    let sortPurchase = sortPurchaseOptions.find( item => item.name == value.slice(6,value.length)).sorts;
+    this.setState({sortPurchase})
+    this.handleGetSaleList(this.state.filterPurchase,this.state.pagesPurchase,sortPurchase)
   }
 
   handleMoreOperation = (item) => {
@@ -242,7 +273,7 @@ export default class GoodsList extends PureComponent {
         <Divider  type='vertical' />
         <Dropdown overlay={    
           <Menu>
-            { item.not_sale === 0 ? (
+            { item.not_sale == 0 ? (
               <Menu.Item key="1"><Popconfirm title="确认停售此商品?" onConfirm={this.handleSelectGoodStatus.bind(null,item)}>停售</Popconfirm></Menu.Item>
               ) : (
                 <Menu.Item key="2"><Popconfirm title="确认解除停售此商品?" onConfirm={this.handleSelectGoodStatus.bind(null,item)}>解除停售</Popconfirm></Menu.Item>
@@ -257,11 +288,10 @@ export default class GoodsList extends PureComponent {
   }
 
   render() {
-    const {activeTabKey,sortSale,sortPurchase} = this.state
+    const {activeTabKey,sortSale,sortPurchase,pagesSale,pagesPurchase,filterSale,filterPurchase} = this.state
     const {goodsListSales,goodsListPurchases,goodsSalePagination,goodsPurchasePagination} = this.props.goodsList
     const {goodsSaleFilter,goodsPurchaseFilter} = this.props.layoutFilter
     const {getFieldDecorator} = this.props.form
-    const {dispatch} = this.props;
 
 
     const extra = (
@@ -269,7 +299,7 @@ export default class GoodsList extends PureComponent {
     )
 
     const sortSaleExtra = (
-      <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSort.bind(null,'sale')} optionLabelProp='value'>
+      <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSortSale} optionLabelProp='value'>
         {
           sortSaleOptions.map( item => {
             return <Option key={item.id} value={`排序方式: ${item.name}`}>{item.name}</Option>
@@ -279,7 +309,7 @@ export default class GoodsList extends PureComponent {
     )
 
     const sortPurchaseExtra = (
-      <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSort.bind(null,'purchase')} optionLabelProp='value'>
+      <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSortPurchase} optionLabelProp='value'>
         {
           sortPurchaseOptions.map( item => {
             return <Option key={item.id} value={`排序方式: ${item.name}`}>{item.name}</Option>
@@ -289,9 +319,6 @@ export default class GoodsList extends PureComponent {
     )
 
     const salesColumns = [{
-      title: ' ',
-      dataIndex:'image',
-    }, {
       title: '货号',
       dataIndex: 'item_ref',
     }, {
@@ -330,9 +357,6 @@ export default class GoodsList extends PureComponent {
     }]
 
     const purchaseColumns = [{
-      title: ' ',
-      dataIndex:'image',
-    },{
       title: '货号',
       dataIndex: 'item_ref',
     }, {
@@ -371,31 +395,49 @@ export default class GoodsList extends PureComponent {
     }];
 
     const salePagination = {
-      pageSize:goodsSalePagination.per_page,
+      pageSize:pagesSale.per_page,
       total:goodsSalePagination.total,
       showQuickJumper:true,
       showSizeChanger:true,
-      onChange( pageNumber ){
-        dispatch({type:'goodsList/getGoodsSaleList',payload:{
-          per_page:goodsSalePagination.per_page,
-          page:pageNumber,
-          sorts: {...sortSale}
-        }})
-       }
+      onChange: ( pageNumber ) => {
+        const pagesSale = {
+          per_page:pageSize,
+          page:page
+        }
+        this.setState({pagesSale})
+        this.handleGetSaleList(filterSale,pagesSale,sortSale)
+      },
+       onShowSizeChange: (current,size) => {
+        const pagesSale = {
+          per_page:size,
+          page:1
+        }
+        this.setState({pagesSale})
+        this.handleGetSaleList(filterSale,pagesSale,sortSale)
+      },
     }
 
     const putchasePagination = {
-      pageSize:goodsPurchasePagination.per_page,
+      pageSize:pagesPurchase.per_page,
       total:goodsPurchasePagination.total,
       showQuickJumper:true,
       showSizeChanger:true,
-      onChange( pageNumber ){
-        dispatch({type:'goodsList/getGoodsPurchaseList',payload:{
-          per_page:goodsPurchasePagination.per_page,
-          page:pageNumber,
-          sorts:{...sortPurchase}
-        }})
-       }
+      onChange: ( pageNumber ) => {
+        const pagesPurchase = {
+          per_page:pageSize,
+          page:page
+        }
+        this.setState({pagesPurchase})
+        this.handleGetPurchaseList(filterPurchase,pagesPurchase,sortPurchase)
+      },
+      onShowSizeChange: (current,size) => {
+        const pagesPurchase = {
+          per_page:size,
+          page:1
+        }
+        this.setState({pagesPurchase})
+        this.handleGetPurchaseList(filterPurchase,pagesPurchase,sortPurchase)
+      }
     }
 
     return (
@@ -437,7 +479,7 @@ export default class GoodsList extends PureComponent {
               </FormItem>
             </Form>
           </Card>
-          <Card bordered={false} title='商品' className={styles.goodsList} extra={sortSaleExtra}> 
+          <Card bordered={false} title='商品' className={styles.goodsList} extra={sortSaleExtra}>
             <Table 
               rowKey='id'
               columns={salesColumns} 
@@ -448,7 +490,7 @@ export default class GoodsList extends PureComponent {
           </Card>
         </div>  
         <div style={{display: activeTabKey == 'purchase' ? 'block' : 'none'}}>
-          <Card bordered={false} className={styles.bottomCardDivided}>
+          <Card bordered={false} className={styles.bottomCardDivided} >
             <Form layout='inline'>
               {
                 goodsPurchaseFilter.map( (item,index) => {
@@ -479,13 +521,13 @@ export default class GoodsList extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false} title='商品' className={styles.goodsList} extra={sortPurchaseExtra}>
-              <Table 
-                rowKey='id'
-                columns={purchaseColumns} 
-                dataSource={goodsListPurchases} 
-                pagination={putchasePagination}
-              >
-              </Table>
+            <Table 
+              rowKey='id'
+              columns={purchaseColumns} 
+              dataSource={goodsListPurchases} 
+              pagination={putchasePagination}
+            >
+            </Table>
           </Card>
         </div>
       </PageHeaderLayout>

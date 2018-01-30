@@ -27,23 +27,19 @@ export async function changeSupplierStatus (params) {
   })
 }
 
-// export async function createSingle (params) {
-//   return request({
-//     url: `${apiBase.duoke}/api/suppliers`,
-//     method: 'post',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function createSingle (params) {
+  return request(`${apiBase}/api/suppliers`, {
+    method: 'POST',
+    headers: { "Authorization": token },
+    body: params,
+  })
+}
 
-// export async function getSingle (params) {
-//   return request({
-//     url: `${apiBase.duoke}/api/suppliers/${params.id}`,
-//     method: 'get',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function getSingle (params) {
+  return request(`${apiBase}/api/suppliers/${params.id}`,{
+    headers: { "Authorization": token },
+  })
+}
 
 
 // export async function editSingle (params) {
@@ -55,35 +51,41 @@ export async function changeSupplierStatus (params) {
 //   })
 // }
 
-// export async function getSupplierSaleHistory (params) {
-//   let e = null;
-//   params == null ? '' : (e={sorts:params.sorts})
-//   return request({
-//     url: `${apiBase.duoke}/api/suppliers/${params.id}/purchaseorders`,
-//     method: 'post',
-//     headers: {"Authorization":token},
-//     data:e,
-//   })
-// }
+export async function getSupplierSaleHistory (params) {
+  let current = {...params};
+  delete current.id
+  if(current.filter) {
+    current = current.filter
+  }
+  return request(`${apiBase}/api/suppliers/${params.id}/purchaseorders`,{
+    method: 'POST',
+    headers: {"Authorization":token},
+    body: current
+  })
+}
 
-// export async function getSupplierGoodsHistory (params) {
-//   let e = null;
-//   params == null ? '' : (e={sorts:params.sorts})
-//   return request({
-//     url: `${apiBase.duoke}/api/suppliers/${params.id}/items`,
-//     method: 'post',
-//     headers: {"Authorization":token},
-//     data:e,
-//   })
-// }
+export async function getSupplierGoodsHistory (params) {
+  let current = {...params};
+  delete current.id
+  if(current.filter) {
+    current = current.filter
+  }
+  return request(`${apiBase}/api/suppliers/${params.id}/items`,{
+    method: 'POST',
+    headers: {"Authorization":token},
+    body: current
+  })
+}
 
-// export async function getSupplierPaymentHistory (params) {
-//   let e = null;
-//   params == null ? '' : (e={sorts:params.sorts})
-//   return request({
-//     url: `${apiBase.duoke}/api/suppliers/${params.id}/payments`,
-//     method: 'post',
-//     headers: {"Authorization":token},
-//     data:e,
-//   })
-// }
+export async function getSupplierPaymentHistory (params) {
+  let current = {...params};
+  delete current.id
+  if(current.filter) {
+    current = current.filter
+  }
+  return request(`${apiBase}/api/suppliers/${params.id}/payments`,{
+    method: 'POST',
+    headers: {"Authorization":token},
+    body: current
+  })
+}

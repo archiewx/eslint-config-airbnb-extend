@@ -141,6 +141,46 @@ export default class GoodsDetail extends PureComponent {
     selectCustomerMode: {
       name:'不分组',
       mode:'customer'
+    },
+    sortSale: {
+      sorts:{}
+    },
+    filterSale: {
+      date_type:'custom',
+      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+    },
+    sortPurchase:{
+      sorts:{}
+    },
+    filterPurchase:{
+      date_type:'custom',
+      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+    },
+    sortCustomer:{
+      sorts:{},
+    },
+    filterCustomer:{
+      date_type:'custom',
+      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+    },
+    sortSupplier: {
+      sorts:{}
+    },
+    filterSupplier:{
+      date_type:'custom',
+      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+    },
+    sortStock:{
+      sorts:{}
+    },
+    filterStock:{
+      date_type:'custom',
+      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     }
   }
 
@@ -164,11 +204,19 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleSaleSort = (pagination, filters, sorter) => {
-    let current = {};
-    current[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    let sortSale = {
+      sorts:{}
+    }
+    if(sorter.field) {
+      sortSale.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    }else {
+      sortSale.sorts = {}
+    }
+    this.setState({sortSale})
     this.props.dispatch({type:'goodsDetail/getSingleSales',payload:{
-      sorts: current,
-      id:this.props.goodsDetail.currentId.id
+      ...this.state.filterSale,
+      ...sortSale,
+      id:this.props.goodsDetail.currentId.id,
     }})
   }
 
@@ -181,11 +229,12 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             sale_datePick: value['sale_datePick'] ? [value['sale_datePick'][0].format('YYYY-MM-DD'),value['sale_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSingleSales',payload:this.props.goodsDetail.filterSaleServerData.length > 3 ? {
-            filter:this.props.goodsDetail.filterSaleServerData,
-            id:this.props.goodsDetail.currentId.id
-          }: {
-            id:this.props.goodsDetail.currentId.id
+          const filterSale = this.props.goodsDetail.filterSaleServerData
+          this.setState({filterSale})
+          this.props.dispatch({type:'goodsDetail/getSingleSales',payload:{
+            ...filterSale,
+            ...this.state.sortSale,
+            id:this.props.goodsDetail.currentId.id,
           }})
         }
       })
@@ -193,11 +242,19 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handlePurchaseSort = (pagination, filters, sorter) => {
-    let current = {};
-    current[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    let sortPurchase = {
+      sorts: {}
+    }
+    if(sorter.field) {
+      sortPurchase.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    }else {
+      sortPurchase.sorts = {}
+    }
+    this.setState({sortPurchase})
     this.props.dispatch({type:'goodsDetail/getSinglePurchases',payload:{
-      sorts: current,
-      id:this.props.goodsDetail.currentId.id
+      ...this.state.filterPurchase,
+      ...sortPurchase,
+      id:this.props.goodsDetail.currentId.id,
     }})
   }
 
@@ -210,11 +267,12 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             purchase_datePick: value['purchase_datePick'] ? [value['purchase_datePick'][0].format('YYYY-MM-DD'),value['purchase_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSinglePurchases',payload:this.props.goodsDetail.filterPurchaseServerData.length > 3 ? {
-            filter:this.props.goodsDetail.filterPurchaseServerData,
-            id:this.props.goodsDetail.currentId.id
-          }:{
-            id:this.props.goodsDetail.currentId.id
+          const filterPurchase = this.props.goodsDetail.filterPurchaseServerData
+          this.setState({filterPurchase})
+          this.props.dispatch({type:'goodsDetail/getSinglePurchases',payload:{
+            ...filterPurchase,
+            ...this.state.sortPurchase,
+            id:this.props.goodsDetail.currentId.id,
           }})
         }
       })
@@ -222,10 +280,18 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleCustomerSort = (pagination,filters,sorter) => {
-    let current = {};
-    current[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    let sortCustomer = {
+      sorts:{}
+    }
+    if(sorter.field) {
+      sortCustomer.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    }else {
+      sortCustomer.sorts = {}
+    }
+    this.setState({sortCustomer})
     this.props.dispatch({type:'goodsDetail/getSingleCustomers',payload:{
-      sorts: current,
+      ...this.state.filterCustomer,
+      ...sortCustomer,
       id:this.props.goodsDetail.currentId.id,
       mode:this.state.selectCustomerMode.mode
     }})
@@ -240,11 +306,11 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             customer_datePick: value['customer_datePick'] ? [value['customer_datePick'][0].format('YYYY-MM-DD'),value['customer_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSingleCustomers',payload:this.props.goodsDetail.filterCustomerServerData.length > 4 ? {
-            filter:this.props.goodsDetail.filterCustomerServerData,
-            id:this.props.goodsDetail.currentId.id,
-            mode:this.state.selectCustomerMode.mode
-          }: {
+          const filterCustomer = this.props.goodsDetail.filterCustomerServerData
+          this.setState({filterCustomer})
+          this.props.dispatch({type:'goodsDetail/getSingleCustomers',payload:{
+            ...filterCustomer,
+            ...this.state.sortCustomer,
             id:this.props.goodsDetail.currentId.id,
             mode:this.state.selectCustomerMode.mode
           }})
@@ -254,23 +320,32 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleCustomerModeSelect = ({item,key,keyPath}) => {
-    this.setState({
-      selectCustomerMode: {
-        name:item.props.children,
-        mode:key
-      }
-    })
+    const selectCustomerMode = {
+      name:item.props.children,
+      mode:key
+    }
+    this.setState({selectCustomerMode})
     this.props.dispatch({type:'goodsDetail/getSingleCustomers',payload:{
+      ...this.state.filterCustomer,
+      ...this.state.sortCustomer,
       id:this.props.goodsDetail.currentId.id,
       mode:key
     }})
   }
 
   handleSupplierSort = (pagination,filters,sorter) => {
-    let current = {};
-    current[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    let sortSupplier = {
+      sorts: {}
+    }
+    if(sorter.field) {
+      sortSupplier.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    }else {
+      sortSupplier.sorts = []
+    }
+    this.setState({sortSupplier})
     this.props.dispatch({type:'goodsDetail/getSingleSuppliers',payload:{
-      sorts: current,
+      ...this.state.filterSupplier,
+      ...sortSupplier,
       id:this.props.goodsDetail.currentId.id
     }})
   }
@@ -284,10 +359,11 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             supplier_datePick: value['supplier_datePick'] ? [value['supplier_datePick'][0].format('YYYY-MM-DD'),value['supplier_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSingleSuppliers',payload:this.props.goodsDetail.filterStockServerData.length > 3 ? {
-            filter:this.props.goodsDetail.filterStockServerData,
-            id:this.props.goodsDetail.currentId.id
-          } : {
+          const filterSupplier = this.props.goodsDetail.filterSupplierServerData
+          this.setState({filterSupplier})
+          this.props.dispatch({type:'goodsDetail/getSingleSuppliers',payload:{
+            ...filterSupplier,
+            ...this.state.sortSupplier,
             id:this.props.goodsDetail.currentId.id
           }})
         }
@@ -296,10 +372,18 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleStockSort = (pagination, filters, sorter) => {
-    let current = {};
-    current[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    let sortStock = {
+      sorts:{}
+    }
+    if(sorter.field) {
+      sortStock.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    }else {
+      sortStock.sorts = {}
+    }
+    this.setState({sortStock})
     this.props.dispatch({type:'goodsDetail/getSingleStocks',payload:{
-      sorts: current,
+      ...this.state.filterStock,
+      ...sortStock,
       id:this.props.goodsDetail.currentId.id
     }})
   }
@@ -313,10 +397,11 @@ export default class GoodsDetail extends PureComponent {
             ...value,
             stock_datePick: value['stock_datePick'] ? [value['stock_datePick'][0].format('YYYY-MM-DD'),value['stock_datePick'][1].format('YYYY-MM-DD')] : undefined
           }})
-          this.props.dispatch({type:'goodsDetail/getSingleStocks',payload:this.props.goodsDetail.filterStockServerData.length > 3 ? {
-            filter:this.props.goodsDetail.filterStockServerData,
-            id:this.props.goodsDetail.currentId.id
-          } : {
+          const filterStock = this.props.goodsDetail.filterStockServerData
+          this.setState({filterStock})
+          this.props.dispatch({type:'goodsDetail/getSingleStocks',payload:{
+            ...filterStock,
+            ...this.state.sortStock,
             id:this.props.goodsDetail.currentId.id
           }})
         }
@@ -341,7 +426,7 @@ export default class GoodsDetail extends PureComponent {
 
     const menu = (
       <Menu>
-        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" onConfirm={this.handleDeleteSingleGoods.bind(null,currentId)}>删除</Popconfirm></Menu.Item>
+        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement='bottom' onConfirm={this.handleDeleteSingleGoods.bind(null,currentId)}>删除</Popconfirm></Menu.Item>
       </Menu>
     );
 
@@ -349,7 +434,7 @@ export default class GoodsDetail extends PureComponent {
       <div>
         <ButtonGroup>
           <Popconfirm title={ singleGoodsDetail.not_sale === '1' ? '确认解除停售此商品' : '确认停售此商品'} onConfirm={this.handleSelectGoodStatus.bind(null,singleGoodsDetail.not_sale,currentId)}><Button>{singleGoodsDetail.not_sale === '1' ? '在售' : '停售'}</Button></Popconfirm>
-          <Dropdown overlay={menu} placement="bottomRight">
+          <Dropdown overlay={menu} >
             <Button><Icon type="ellipsis" /></Button>
           </Dropdown>
         </ButtonGroup>
@@ -603,7 +688,7 @@ export default class GoodsDetail extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false}>
-            <Table columns={supplierColumns} dataSource={singleGoodsSuppliers} onChange={this.handleSupplierAndSort} pagination={supplierPagination} rowKey='id'></Table>
+            <Table columns={supplierColumns} dataSource={singleGoodsSuppliers} onChange={this.handleSupplierSort} pagination={supplierPagination} rowKey='id'></Table>
           </Card>
         </div>
         <div style={{display: activeTabKey == 'stock' ? 'block' : 'none'}}>

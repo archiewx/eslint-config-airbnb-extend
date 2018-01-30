@@ -292,10 +292,6 @@ export default class GoodsCreateOrEdit extends PureComponent {
     units.forEach( item => {
       if(item.default == '1') {
         defaultSelectUnits.push((item.id).toString());
-        // defaultStockUnit = {
-        //   name: item.name,
-        //   number: item.number
-        // }
       }
     })
 
