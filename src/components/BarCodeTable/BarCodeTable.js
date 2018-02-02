@@ -12,35 +12,9 @@ export default class BarCodeTable extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      skuBarcodes: Object.keys(nextProps.value)[0] === Object.keys(nextProps.skuBarcodes)[0] ? nextProps.value : nextProps.skuBarcodes
+      skuBarcodes:nextProps.value
     })
   }
-
-  // handleCreateSkuBarcodes({selectColors,selectSizes,itemBarcodeLevel,value}) {
-  //   let current = {};
-  //   if(selectColors.length === 0 || itemBarcodeLevel === 0 ) {
-  //     current = {
-  //       barcode: value ? value.barcode : null
-  //     }
-  //   }else {
-  //     if(selectSizes.length === 0) {
-  //       selectColors.forEach( item => {
-  //         current[`${item.id}`] = {
-  //           barcode: value ? (value[`${item.id}`] ? value[`${item.id}`].barcode : null ): null
-  //         }
-  //       })
-  //     }else {
-  //       selectColors.forEach( item => {
-  //         selectSizes.forEach( subItem => {
-  //           current[`${item.id}_${subItem.id}`] = {
-  //             barcode: value ? (value[`${item.id}_${subItem.id}`] ? value[`${item.id}_${subItem.id}`].barcode : null) : null
-  //           }
-  //         })
-  //       })
-  //     }
-  //   }
-  //   return current
-  // }
 
   handleBarcodeInput = (colorId = '',sizeId = '' ,event)  => {
     const {selectColors,selectSizes,itemBarcodeLevel} = this.props;

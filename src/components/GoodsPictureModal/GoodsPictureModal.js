@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import classNames from 'classnames/bind'
 import { Row, Col, Upload, Modal, Icon } from 'antd';
-import styles from './PictureModal.less'
+import styles from './GoodsPictureModal.less'
 
-export default class PictureModal extends PureComponent {
+export default class GoodsPictureModal extends PureComponent {
 
   state = {
     previewVisible: false,
@@ -85,7 +85,7 @@ export default class PictureModal extends PureComponent {
           itemImageLevel === 'item' ? (
             <div className={styles.pictureModal}>
               <Row>
-                <Col span={3}><label className={styles.pictureModalTitle}>上传图片:</label></Col>
+                <Col span={2}><label className={styles.pictureModalTitle}>上传图片:</label></Col>
                 <Col span={21}>
                   <Upload
                     action = 'http://duoke3api.duoke.net/api/images'

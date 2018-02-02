@@ -1,10 +1,10 @@
-import * as priceGradeService from '../services/priceGrade'
+import * as unitService from '../services/unit'
 export default  {
 
-  namespace: 'priceGrade',
+  namespace: 'unit',
 
   state: {
-    priceGrades:[],
+    units:[],
   },
 
   subscriptions: {
@@ -14,12 +14,12 @@ export default  {
   },
 
   effects: {
-    *getList({payload},{call,put}) {
-      const data = yield call(priceGradeService.getList)
+    *getList ({payload},{call,put}) {
+      const data = yield call(unitService.getList) 
       yield put({type:'setState',payload:{
-        priceGrades:data.result.data
+        units:data.result.data
       }})
-    }
+    },
   },
 
   reducers: {
@@ -27,6 +27,7 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
+
   },
 
 };

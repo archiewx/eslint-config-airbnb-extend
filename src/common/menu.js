@@ -1,24 +1,18 @@
 const menuData = [{
   name: '商品',
-  icon: 'smile-o',
+  icon: 'dashboard',
   path: 'goods-list'
 },{
   name: '关系',
-  icon: 'smile-o',
+  icon: 'form',
   path: 'relationship',
   children: [{
     name: '客户',
-    icon: 'smile',
     path: 'customer-list',
   },{
     name: '供应商',
-    icon: 'smile',
     path: 'supplier-list'
   }]
-},{
-  name: '404',
-  icon: 'warning',
-  path: '404',
 },{
   name: 'version: 0.0.1',
   icon: 'smile-o',

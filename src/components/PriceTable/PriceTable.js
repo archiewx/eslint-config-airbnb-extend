@@ -32,84 +32,15 @@ export default class PriceTable extends React.Component {
     }else if(nextProps.priceModel === 'unit') {
       this.setState({
         tableCol: nextProps.selectUnits,
-        tableValue: Object.values(nextProps.value).length === Object.values(nextProps.priceTableValue).length ?  nextProps.value : nextProps.priceTableValue
+        tableValue: nextProps.value
       })
     }else if(nextProps.priceModel === 'quantityrange') {
       this.setState({
         tableCol: nextProps.selectQuantityStep,
-        tableValue: Object.values(nextProps.value).length === Object.values(nextProps.priceTableValue).length ?  nextProps.value : nextProps.priceTableValue
+        tableValue: nextProps.value
       })
     } 
   }
-
-  // handleCreateTableValue = (row = [],col = [],value = {}) => {
-  //   let currentTableValue = {};
-  //   const {usePricelelvel,priceModel} = this.props;
-  //   if(usePricelelvel === 'yes') {
-  //     if(priceModel === '') {
-  //       row.forEach( item => {
-  //         currentTableValue[`${item.id}`] = {
-  //           pricelevel_id: item.id,
-  //           price: null
-  //         }
-  //       })
-  //     }else if(priceModel === 'shop') {
-  //       col.forEach( item => {
-  //         row.forEach( subItem => {
-  //           currentTableValue[`${item.id}_${subItem.id}`] = {
-  //             shop_id: item.id,
-  //             pricelevel_id: subItem.id,
-  //             price: null
-  //           }
-  //         })
-  //       })
-  //     }else if(priceModel === 'unit') {
-  //       col.forEach( item => {
-  //         row.forEach( subItem => {
-  //           currentTableValue[`${item.id}_${subItem.id}`] = {
-  //             unit_id: item.id,
-  //             pricelevel_id: subItem.id,
-  //             price: null,
-  //           }
-  //         })
-  //       })
-  //     }else if(priceModel === 'quantityrange') {
-  //       col.forEach( item => {
-  //         row.forEach( subItem => {
-  //           currentTableValue[`${item.id}_${subItem.id}`] = {
-  //             quantityrange_id: item.id,
-  //             pricelevel_id: subItem.id,
-  //             price: null,
-  //           }
-  //         })
-  //       })
-  //     }
-  //   } else {
-  //     if(priceModel === 'shop') {
-  //       col.forEach( item => {
-  //         currentTableValue[`${item.id}`] = {
-  //           shop_id: item.id,
-  //           price: null
-  //         }
-  //       })
-  //     }else if(priceModel === 'unit') {
-  //       col.forEach( item => {
-  //         currentTableValue[`${item.id}`] = {
-  //           unit_id: item.id,
-  //           price: null
-  //         }
-  //       })
-  //     }else if(priceModel === 'quantityrange') {
-  //       col.forEach( item => {
-  //         currentTableValue[`${item.id}`] = {
-  //           quantityrange_id: item.id,
-  //           price: null
-  //         }
-  //       })
-  //     }
-  //   }
-  //   return currentTableValue
-  // }
 
   handleChangeInput = (id,subId,value) => {
     let current = this.state.tableValue;
@@ -184,7 +115,7 @@ export default class PriceTable extends React.Component {
                     <tr>
                       {
                         tableRow.map( item => {
-                          return <td key={item.id}><InputNumber value={(tableValue[`${item.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,-1)} precision={2} min={0} placeholder='请输入' style={{textAlign:'right'}} className={cx({priceGradeInput:true,inputColor:(tableValue[`${item.id}_${subItem.id}`] || {}).price === 0})} /></td>
+                          return <td key={item.id}><InputNumber value={(tableValue[`${item.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,-1)} precision={2} min={0} placeholder='请输入' style={{textAlign:'right'}} className={cx({priceGradeInput:true,inputColor:(tableValue[`${item.id}}`] || {}).price === 0})} /></td>
                         })
                       }
                     </tr>
@@ -201,7 +132,7 @@ export default class PriceTable extends React.Component {
                       return (
                         <Col span={8} key={item.id}>
                           <label className={styles.priceGradeLabelTitle}>{item.name}</label>
-                          <InputNumber value={(tableValue[`${item.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,-1)} placeholder='请输入' style={{width:'100%'}} min={0} precision={2} className={cx({inputColor:(tableValue[`${item.id}_${subItem.id}`] || {}).price === 0})}/>
+                          <InputNumber value={(tableValue[`${item.id}`] || {}).price} onChange={this.handleChangeInput.bind(null,item.id,-1)} placeholder='请输入' style={{width:'100%'}} min={0} precision={2} className={cx({inputColor:(tableValue[`${item.id}`] || {}).price === 0})}/>
                         </Col>
                       )
                     })

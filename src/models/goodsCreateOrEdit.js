@@ -1,8 +1,5 @@
 import * as goodsService from '../services/goods'
 import pathToRegexp from 'path-to-regexp'
-import { routerRedux } from 'dva/router';
-import {message} from 'antd'
-
 export default  {
 
   namespace: 'goodsCreateOrEdit',
@@ -14,20 +11,8 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      history.listen(({pathname}) => {
-        const match = pathToRegexp('/goods-edit/:id').exec(location.hash.slice(1,location.hash.length))
-        if(match) {
-          dispatch({type:'setState',payload:{showData:{}}})
-          //商品新建或编辑所需的关联数据
-          dispatch({type:'commonData/getGoodsCreateOrEdit'})
-          //单个商品的数据
-          dispatch({type:'getSingleGoods',payload:{id:match[1]}})
-        }else {
-          if(pathname === '/goods-create') {
-            dispatch({type:'setState',payload:{showData:{}}})
-            dispatch({type:'commonData/getGoodsCreateOrEdit'})
-          }
-        }
+      history.listen(()=>{
+        dispatch({type:'setState',payload:{showData:{}}})
       })
     },
   },
@@ -35,8 +20,7 @@ export default  {
   effects: {
     *createSingleGoods({payload},{call,put,select}) {
       const {serverData} = yield select(({goodsCreateOrEdit}) => goodsCreateOrEdit)
-      const data = yield call(goodsService.createSingle,serverData)
-      yield put(routerRedux.push('/goods-list'));
+      yield call(goodsService.createSingle,serverData)
     },
 
     *getSingleGoods({payload},{call,put,select}) {
@@ -49,6 +33,11 @@ export default  {
         itemBarcodeLevel
       }})
     },
+
+    *checkItemRef({payload},{call,put}) {
+      const data = yield call(goodsService.checkItemRef,payload)
+      return data
+    }
   },
 
   reducers: {
@@ -59,58 +48,93 @@ export default  {
 
     setShowData (state,{payload:{value,usePricelelvel,priceModel,itemBarcodeLevel}}) {
       console.log(value)
+      state.showData.id = value.id;
       state.showData.item_ref = value.item_ref;
-      state.showData.standard_price = value.standard_price;
-      state.showData.purchase_price = value.purchase_price;
+      state.showData.standard_price = (value.standard_price).toString();
+      state.showData.purchase_price = (value.purchase_price).toString();
       let priceMatrix = [...value.itemprices.data];
       priceMatrix = priceMatrix.splice(0,priceMatrix.length-1);
       state.showData.prices = {};
+      let flag = false;
       if(usePricelelvel == 'yes') {
         if(priceModel == '') {
           priceMatrix.forEach( item => {
-            state.showData.prices[`${item.pricelevel_id}`] = {
-              price:item.price
+            if(priceMatrix[0].pricelevel_id && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id == null) {
+              state.showData.prices[`${item.pricelevel_id}`] = {
+                price:item.price
+              }
+            }else {
+              flag = true;    
             }
           })
         }else if(priceModel == 'shop') {
           priceMatrix.forEach( item => {
-            state.showData.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
-              price:item.price
+            if(priceMatrix[0].pricelevel_id && priceMatrix[0].shop_id && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id == null) {
+              state.showData.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
+                price:item.price
+              }
+            }else {
+              flag = true;    
             }
           })
         }else if(priceModel == 'unit') {
           priceMatrix.forEach( item => {
-            stata.showData.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
-              price:item.price
+            if(priceMatrix[0].pricelevel_id && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id && priceMatrix[0].quantityrange_id == null) {
+              stata.showData.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
+                price:item.price
+              }
+            }else {
+              flag = true;    
             }
           })
         }else if(priceModel == 'quantityrange') {
           priceMatrix.forEach( item => {
-            state.showData.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
-              price:item.price
+            if(priceMatrix[0].pricelevel_id && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id) {
+              state.showData.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
+                price:item.price
+              }
+            }else {
+              flag = true;    
             }
           })
         }
       }else {
         if(priceModel == 'shop') {
           priceMatrix.forEach( item => {
-            state.showData.prices[`${item.shop_id}`] = {
-              price: item.price
+            if(priceMatrix[0].pricelevel_id == null && priceMatrix[0].shop_id  && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id == null) {
+              state.showData.prices[`${item.shop_id}`] = {
+                price: item.price
+              } 
+            }else {
+              flag = true;    
             }
           })
         }else if(priceModel == 'unit') {
           priceMatrix.forEach( item => {
-            state.showData.prices[`${item.unit_id}`] = {
-              price: item.price
+            if(priceMatrix[0].pricelevel_id == null && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id && priceMatrix[0].quantityrange_id == null) {
+              state.showData.prices[`${item.unit_id}`] = {
+                price: item.price
+              }
+            }else {
+              flag = true;    
             }
           })
         }else if(priceModel == 'quantityrange') {
           priceMatrix.forEach( item => {
-            state.showData.prices[`${item.quantityrange_id}`] = {
-              price: item.price
+            if(priceMatrix[0].pricelevel_id == null && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id ) {
+              state.showData.prices[`${item.quantityrange_id}`] = {
+                price: item.price
+              }
+            }else {
+              flag = true;    
             }
           })
         }
+      }
+      if(flag) {
+        state.showData.prices = {
+          price: (value.standard_price).toString()
+        }    
       }
       state.showData.units = value.units.data.map( item => {
         return (item.id).toString()
@@ -144,7 +168,7 @@ export default  {
         })
       }) 
       state.showData.stocks = {};
-      state.showData.barcode = {}
+      state.showData.barcodes = {}
       if(state.showData.colors.length == 0) {
         value.skus.data.forEach( item => {
           item.skustocks.data.forEach( subItem => {
@@ -152,8 +176,8 @@ export default  {
               store_quantity : subItem.store_quantity
             }
           })
-          state.showData.barcode = {
-            barcode: item.barcode
+          state.showData.barcodes = {
+            barcode: itemBarcodeLevel == 1 ? item.barcode : ''
           }
         })
       }else {
@@ -170,8 +194,8 @@ export default  {
                 store_quantity : subItem.store_quantity
               }
             })
-            state.showData.barcode[`${colorId}`] = {
-              barcode: item.barcode
+            state.showData.barcodes[`${colorId}`] = {
+              barcode: itemBarcodeLevel == 1 ? item.barcode : ''
             }
           })
         }else {
@@ -189,21 +213,52 @@ export default  {
                 store_quantity : subItem.store_quantity
               }
             })
-            state.showData.barcode[`${colorId}_${sizeId}`] = {
-              barcode: item.barcode
+            state.showData.barcodes[`${colorId}_${sizeId}`] = {
+              barcode: itemBarcodeLevel == 1 ? item.barcode : ''
             }
           })
         }
       }
+      itemBarcodeLevel == 0 ? state.showData.barcodes.barcode = value.barcode : ''
       console.log(state.showData)
       return {...state}
     },
 
-    setServerData (state,{payload:{value,selectUnits,warehouses,itemBarcodeLevel,itemImageLevel}}) {
+    setServerData (state,{payload:{value,selectUnits,selectQuantityStep,warehouses,priceModel,itemBarcodeLevel,itemImageLevel}}) {
       console.log(value)
       state.serverData = {}
       state.serverData.item_ref = value.item_ref;
-      state.serverData.purchase_price = value.purchase_price || '';
+      state.serverData.purchase_price = value.purchase_price || 0;
+      state.serverData.prices = [];
+      if(priceModel == '') {
+        state.serverData.prices = Object.values(value.prices_table)
+        state.serverData.prices.push({
+          price: value.standard_price
+        })
+      }else if(priceModel == 'shop') {
+        state.serverData.prices = Object.values(value.prices_table)
+        state.serverData.prices.push({
+          price: value.standard_price
+        })
+      }else if(priceModel == 'unit') {
+        Object.values(value.prices_table).forEach( item => {
+          if(value.unit_select.some( n => n == item.unit_id)) {
+            state.serverData.prices.push(item)
+          }
+        })
+        state.serverData.prices.push({
+          price: value.standard_price
+        })
+      }else if(priceModel == 'quantityrange') {
+        Object.values(value.prices_table).forEach( item => {
+          if(selectQuantityStep.some( n => n.id == item.quantityrange_id)) {
+            state.serverData.prices.push(item)
+          }
+        })
+        state.serverData.prices.push({
+          price: value.standard_price
+        })
+      }
       state.serverData.units = selectUnits.map( item => {
         return {
           id: item.id,
@@ -212,12 +267,8 @@ export default  {
       })
       state.serverData.name = value.name || '';
       state.serverData.desc = value.desc || '';
-      state.serverData.prices = Object.values(value.prices_table)
-      state.serverData.prices.push({
-        price: value.standard_price
-      })
       state.serverData.itemgroup_ids = [];
-      Object.values(value.goods_group || {}).forEach( item => {
+      Object.values(value.goods_group).forEach( item => {
         state.serverData.itemgroup_ids = state.serverData.itemgroup_ids.concat(...item)
       })
       state.serverData.skus = [];
@@ -233,7 +284,7 @@ export default  {
           warehouses.forEach( subItem => {
             item.stocks.push({
               warehouse_id: value.stock[`${subItem.id}`].warehouse_id,
-              store_quantity: value.stock[`${subItem.id}`].store_quantity
+              store_quantity: value.stock[`${subItem.id}`].store_quantity || 0
             })
           })
         })
@@ -251,15 +302,11 @@ export default  {
           })
         })
         state.serverData.skus.forEach( item => {
-          value.color_select.forEach( colorId => {
-            if(item.attributes[0].attribute_id == colorId) {
-              warehouses.forEach( subItem => {
-                item.stocks.push({
-                  warehouse_id: value.stock[`${subItem.id}_${colorId}`].warehouse_id,
-                  store_quantity: value.stock[`${subItem.id}_${colorId}`].store_quantity
-                })
-              })
-            }
+          warehouses.forEach( subItem => {
+            item.stocks.push({
+              warehouse_id: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}`].warehouse_id,
+              store_quantity: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}`].store_quantity || 0
+            })
           })
         })
       }else if(value.color_select.length !== 0 && value.size_select !== 0) {
@@ -267,7 +314,7 @@ export default  {
         value.color_select.forEach( colorId => {
           value.size_select.forEach( sizeId => {
             state.serverData.skus.push({
-              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode : '',
+              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode  : '',
               attributes: [{
                 attributetype_id: 1,
                 attribute_id: colorId
@@ -281,16 +328,10 @@ export default  {
           })
         })
         state.serverData.skus.forEach( item => {
-          value.color_select.forEach( colorId => {
-            value.size_select.forEach( sizeId => {
-              if(item.attributes[0].attribute_id == colorId && item.attributes[1].attribute_id == sizeId) {
-                warehouses.forEach( subItem => {
-                  item.stocks.push({
-                    warehouse_id: value.stock[`${subItem.id}_${colorId}_${sizeId}`].warehouse_id,
-                    store_quantity: value.stock[`${subItem.id}_${colorId}_${sizeId}`].store_quantity
-                  })
-                })
-              }
+          warehouses.forEach( subItem => {
+            item.stocks.push({
+              warehouse_id: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}_${item.attributes[1].attribute_id}`].warehouse_id,
+              store_quantity: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}_${item.attributes[1].attribute_id}`].store_quantity || 0
             })
           })
         })

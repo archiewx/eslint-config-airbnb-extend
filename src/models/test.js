@@ -1,4 +1,3 @@
-// import * as goodsService from '../services/goods'
 import * as goodsGroupService from '../services/goodsGroup'
 import * as colorService from '../services/color'
 import * as sizeLibraryService from '../services/sizeLibrary'
@@ -7,7 +6,7 @@ import * as priceGradeService from '../services/priceGrade'
 import * as priceQuantityStepService from '../services/priceQuantityStep'
 import * as shopService from '../services/shop'
 import * as warehouseService from '../services/warehouse'
-
+const delay = timeout => new Promise(resolve => setTimeout(resolve, timeout));
 export default  {
 
   namespace: 'test',
@@ -21,51 +20,16 @@ export default  {
     priceQuantitySteps:[],
     shops:[],
     warehouses:[],
+    test:[],
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
-      dispatch({type:'getTest4'})
+      // dispatch({type:'getGoodsCreateOrEdit'})
     },
   },
 
   effects: {
-    *getTest ({payload},{call,put,all}) {
-      const [data1,data2,data3] = yield all([call(colorService.getList),call(sizeLibraryService.getList),call(unitService.getList)])
-      yield put({type:'/setState',payload:{
-        colors:data1.result.data.skuattributes.data,
-        sizeLibrarys:data2.result.data.skuattributes.data,
-        units:data3.result.data
-      }})
-    },
-
-    *getTest2({payload},{call,put}) {
-      yield put({type:'getColor'})
-      yield put({type:'getSizeLibrary'})
-      yield put({type:'getUnit'})
-    },
-
-    *getTest3({payload},{call,put,take}) {
-      const color = yield call(colorService.getList)
-      const sizeLibrarys = yield call(sizeLibraryService.getList)
-      const units = yield call(unitService.getList)
-      yield put({type:'setState',payload:{
-        colors:color.result.data.skuattributes.data,
-        sizeLibrarys:sizeLibrarys.result.data.skuattributes.data,
-        units:units.result.data
-      }})
-    },
-
-    *getTest4({payload},{call,put,all,take}) {
-      const color = yield call(colorService.getList)
-      const sizeLibrarys = yield call(sizeLibraryService.getList)
-      yield take('setState')
-      yield put({type:'setState',payload:{
-        sizeLibrarys:sizeLibrarys.result.data.skuattributes.data,
-      }})
-      const units = yield call(unitService.getList)
-    },
-
 
     *getGoodsGroup ({payload},{call,put}) {
       const data = yield call(goodsGroupService.getListGroup)
@@ -157,6 +121,7 @@ export default  {
       })
       return {...state}
     },
+    
 
   },
 

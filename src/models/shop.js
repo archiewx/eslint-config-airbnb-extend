@@ -1,10 +1,10 @@
-import * as priceGradeService from '../services/priceGrade'
+import * as shopService from '../services/shop'
 export default  {
 
-  namespace: 'priceGrade',
+  namespace: 'shop',
 
   state: {
-    priceGrades:[],
+    shops:[],
   },
 
   subscriptions: {
@@ -14,12 +14,12 @@ export default  {
   },
 
   effects: {
-    *getList({payload},{call,put}) {
-      const data = yield call(priceGradeService.getList)
+    *getList ({payload},{call,put}) {
+      const data = yield call(shopService.getList)
       yield put({type:'setState',payload:{
-        priceGrades:data.result.data
+        shops:data.result.data,
       }})
-    }
+    },
   },
 
   reducers: {
@@ -27,6 +27,7 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
+
   },
 
 };

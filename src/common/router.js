@@ -39,10 +39,10 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['goodsList','layoutFilter'], () => import('../routes/Goods/GoodsList/GoodsList')),
     },
     '/goods-create': {
-      component: dynamicWrapper(app, ['goodsCreateOrEdit'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
+      component: dynamicWrapper(app, ['goodsCreateOrEdit','goodsGroup','color','sizeLibrary','unit','priceGrade','priceQuantityStep','shop','warehouse'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
     },
     '/goods-edit/:id': {
-      component: dynamicWrapper(app, ['goodsCreateOrEdit'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
+      component: dynamicWrapper(app, ['goodsCreateOrEdit','goodsGroup','color','sizeLibrary','unit','priceGrade','priceQuantityStep','shop','warehouse'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
     },
     '/goods-detail/:id': {
       component: dynamicWrapper(app, ['goodsDetail','layoutFilter'], () => import('../routes/Goods/GoodsDetail/GoodsDetail')),

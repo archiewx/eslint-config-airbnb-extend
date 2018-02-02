@@ -22,7 +22,6 @@ app.use(createLoading())
 // 3. Register global model
 app.model(require('./models/global'));
 app.model(require('./models/configSetting'))
-app.model(require('./models/commonData'))
 
 // 4. Router
 app.router(require('./router'));

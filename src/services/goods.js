@@ -17,6 +17,12 @@ export async function getListPurchase (params) {
   })
 }
 
+export async function checkItemRef (params) {
+  return request(`${apiBase}/api/items/check/item_ref?item_ref=${params}`,{
+    headers: {'Authorization':token}
+  })
+}
+
 export async function changeGoodsStatus (params) {
   let e = {};
   e.not_sale = params.not_sale;

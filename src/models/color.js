@@ -1,10 +1,10 @@
-import * as priceGradeService from '../services/priceGrade'
+import * as colorService from '../services/color'
 export default  {
 
-  namespace: 'priceGrade',
+  namespace: 'color',
 
   state: {
-    priceGrades:[],
+    colors:[],
   },
 
   subscriptions: {
@@ -14,12 +14,12 @@ export default  {
   },
 
   effects: {
-    *getList({payload},{call,put}) {
-      const data = yield call(priceGradeService.getList)
+    *getList ({payload},{call,put,take}) {
+      const data = yield call(colorService.getList)
       yield put({type:'setState',payload:{
-        priceGrades:data.result.data
+        colors:data.result.data.skuattributes.data,
       }})
-    }
+    },
   },
 
   reducers: {
@@ -27,6 +27,7 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
+
   },
 
 };

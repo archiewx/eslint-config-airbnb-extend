@@ -12,7 +12,7 @@ export default class StockTable extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      skuStocks: Object.keys(nextProps.value)[0] === Object.keys(nextProps.skuStocks)[0] ? nextProps.value : nextProps.skuStocks
+      skuStocks: nextProps.value 
     })
   }
 

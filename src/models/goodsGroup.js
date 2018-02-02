@@ -1,5 +1,4 @@
 import * as goodsGroupService from '../services/goodsGroup'
-import {message} from 'antd'
 export default  {
 
   namespace: 'goodsGroup',
@@ -15,7 +14,7 @@ export default  {
   },
 
   effects: {
-    *getGoodsGroup ({payload},{call,put}) {
+    *getList ({payload},{call,put}) {
       const data = yield call(goodsGroupService.getListGroup)
       yield put({type:'setState',payload:{
         goodsGroups:data.result.data

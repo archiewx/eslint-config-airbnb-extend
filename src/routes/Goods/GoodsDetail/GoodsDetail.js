@@ -39,19 +39,23 @@ const saleColumns = [{
 },{
   title:'销售量',
   dataIndex:'sales_quantity',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 },{
   title:'销售额',
   dataIndex:'sales_amount',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 },{
   title:'利润',
   dataIndex:'profit',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 },{
   title:'库存',
   dataIndex:'stock_quantity',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 }]
 
 const purchaseColumns = [{
@@ -60,49 +64,18 @@ const purchaseColumns = [{
 },{
   title:'进货量',
   dataIndex:'purchase_quantity',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 },{
   title:'进货额',
   dataIndex:'purchase_amount',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 },{
   title:'库存',
   dataIndex:'stock_quantity',
-  sorter:true
-}]
-
-const customerColumns = [{
-  title:'名称',
-  dataIndex:'name',
-},{
-  title:'购买量',
-  dataIndex:'sales_quantity',
-  sorter:true
-},{
-  title:'购买额',
-  dataIndex:'sales_amount',
-  sorter:true
-},{
-  title:'退货量',
-  dataIndex:'sales_return_quantity',
-  sorter:true
-},{
-  title:'利润',
-  dataIndex:'profit',
-  sorter:true
-}]
-
-const supplierColumns = [{
-  title:'名称',
-  dataIndex:'name',
-},{
-  title:'供应量',
-  dataIndex:'purchase_quantity',
-  sorter:true
-},{
-  title:'供应额',
-  dataIndex:'purchase_amount',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 }]
 
 const stockColumns = [{
@@ -111,15 +84,18 @@ const stockColumns = [{
 },{
   title:'出货量',
   dataIndex:'sales_quantity',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 },{
   title:'入货量',
   dataIndex:'purchase_quantity',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 },{
   title:'库存量',
   dataIndex:'stock_quantity',
-  sorter:true
+  sorter:true,
+  className: styles['numberRightMove'],
 }]
 const customerPagination = {
   showQuickJumper:true,
@@ -513,6 +489,51 @@ export default class GoodsDetail extends PureComponent {
         }
       </div>
     )
+
+    const customerColumns = [{
+      title:'名称',
+      dataIndex:'name',
+    },{
+      title:'购买量',
+      dataIndex:'sales_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => (Number(record.sales_quantity))
+    },{
+      title:'购买额',
+      dataIndex:'sales_amount',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => (Number(record.sales_amount).toFixed(2))
+    },{
+      title:'退货量',
+      dataIndex:'sales_return_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => (Number(record.sales_return_quantity))
+    },{
+      title:'利润',
+      dataIndex:'profit',
+      sorter:true,
+      className: styles['numberRightMove'],
+    }]
+
+    const supplierColumns = [{
+      title:'名称',
+      dataIndex:'name',
+    },{
+      title:'供应量',
+      dataIndex:'purchase_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render:(text,record) => (Number(record.purchase_quantity))
+    },{
+      title:'供应额',
+      dataIndex:'purchase_amount',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render:(text,record) => (Number(record.purchase_amount))
+    }]
 
     return (
       <PageHeaderLayout

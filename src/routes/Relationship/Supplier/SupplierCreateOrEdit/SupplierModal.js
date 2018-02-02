@@ -57,7 +57,6 @@ export default class SupplierModal extends PureComponent {
           <FormItem label='手机号' {...formItemLayout}>
             {getFieldDecorator('phone',{
               initialValue:formValue.phone,
-              rules: [{required:true,message:'手机号不能为空'}],
             })(
               <Input placeholder='请输入' />
             )}
@@ -65,7 +64,6 @@ export default class SupplierModal extends PureComponent {
           <FormItem label='所在地区' {...formItemLayout}>
             {getFieldDecorator('location',{
               initialValue:formValue.location,
-              rules: [{required:true,message:'所在地区不能为空'}],
             })(
               <Cascader options={country} placeholder='请选择' />
             )}
@@ -73,7 +71,6 @@ export default class SupplierModal extends PureComponent {
           <FormItem label='收货地址' {...specialFormItemLayout}>
             {getFieldDecorator('address',{
               initialValue:formValue.address,
-              rules: [{required:true,message:'收货地址不能为空'}],
             })(
               <TextArea placeholder='请输入' rows={4}/>
             )}

@@ -324,15 +324,23 @@ export default class GoodsList extends PureComponent {
     }, {
       title: '标准价',
       dataIndex: 'standard_price',
+      className: styles['numberRightMove'],
+      render:(text,record) => Number(record.standard_price).toFixed(2)
     }, {
       title: '销售量',
       dataIndex: 'sales_quantity',
+      className: styles.numberRightMove,
+      render:(text,record) => Number(record.sales_quantity)
     }, {
       title: '销售额',
       dataIndex: 'sales_amount',
+      className: styles.numberRightMove,
+      render:(text,record) => Number(record.sales_amount).toFixed(2)
     }, {
       title: '库存量',
       dataIndex: 'stock_quantity',
+      className: styles['numberRightMove'],
+      render:(text,record) => Number(record.stock_quantity)
     }, {
       title: '状态',
       dataIndex: 'not_sale',
@@ -362,15 +370,23 @@ export default class GoodsList extends PureComponent {
     }, {
       title: '标准价',
       dataIndex: 'standard_price',
+      className: styles['numberRightMove'],
+      render:(text,record) => Number(record.standard_price).toFixed(2)
     }, {
       title: '进货量',
       dataIndex: 'purchase_quantity',
+      className: styles['numberRightMove'],
+      render:(text,record) => Number(record.purchase_quantity)
     }, {
       title: '进货额',
       dataIndex: 'purchase_amount',
+      className: styles['numberRightMove'],
+      render:(text,record) => Number(record.purchase_amount).toFixed(2)
     }, {
       title: '库存量',
       dataIndex: 'stock_quantity',
+      className: styles['numberRightMove'],
+      render:(text,record) => Number(record.stock_quantity)
     }, {
       title: '状态',
       dataIndex: 'not_sale',

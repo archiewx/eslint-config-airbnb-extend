@@ -163,7 +163,7 @@ export default  {
             }
           }
         })
-        item.skuimages.data.forEach( subItem => {
+        item.skuimages && item.skuimages.data.forEach( subItem => {
           if(!state.singleGoodsDetail.images.some( imageItem => imageItem.name  == subItem.name)) {
             state.singleGoodsDetail.images.push({
               name: subItem.name,
@@ -340,19 +340,19 @@ export default  {
             state.singleGoodsSales.push({
               id: item.id,
               name:'',
-              sales_quantity:item.sales_quantity,
+              sales_quantity:Number(item.sales_quantity),
               sales_amount:Number(item.sales_amount).toFixed(2),
               profit:Number(item.profit).toFixed(2),
-              stock_quantity:item.stock_quantity
+              stock_quantity:Number(item.stock_quantity)
             })
           }else if(item.skuattributes.length === 1) {
             state.singleGoodsSales.push({
               id:item.id,
               name:item.skuattributes[0].name,
-              sales_quantity:item.sales_quantity,
+              sales_quantity:Number(item.sales_quantity),
               sales_amount:Number(item.sales_amount).toFixed(2),
               profit:Number(item.profit).toFixed(2),
-              stock_quantity:item.stock_quantity
+              stock_quantity:Number(item.stock_quantity)
             })
           }else if(item.skuattributes.length === 2) {
             if(!state.singleGoodsSales.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
@@ -367,10 +367,10 @@ export default  {
                 childrens:[{
                   id:item.skuattributes[1].id,
                   name:item.skuattributes[1].name,
-                  sales_quantity:item.sales_quantity,
+                  sales_quantity:Number(item.sales_quantity),
                   sales_amount:Number(item.sales_amount).toFixed(2),
                   profit:Number(item.profit).toFixed(2),
-                  stock_quantity:item.stock_quantity,
+                  stock_quantity:Number(item.stock_quantity),
                 }],
               })
             }else {
@@ -388,10 +388,10 @@ export default  {
               current.childrens.push({
                 id:item.skuattributes[1].id,
                 name:item.skuattributes[1].name,
-                sales_quantity:item.sales_quantity,
+                sales_quantity:Number(item.sales_quantity),
                 sales_amount:Number(item.sales_amount).toFixed(2),
                 profit:Number(item.profit).toFixed(2),
-                stock_quantity:item.stock_quantity,
+                stock_quantity:Number(item.stock_quantity),
               })
               state.singleGoodsSales[state.singleGoodsSales.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
             }
@@ -411,17 +411,17 @@ export default  {
             state.singleGoodsPurchases.push({
               id: item.id,
               name:'',
-              purchase_quantity:item.purchase_quantity,
+              purchase_quantity:Number(item.purchase_quantity),
               purchase_amount:Number(item.purchase_amount).toFixed(2),
-              stock_quantity:item.stock_quantity
+              stock_quantity:Number(item.stock_quantity)
             })
           }else if(item.skuattributes.length === 1) {
             state.singleGoodsPurchases.push({
               id:item.id,
               name:item.skuattributes[0].name,
-              purchase_quantity:item.purchase_quantity,
+              purchase_quantity:Number(item.purchase_quantity),
               purchase_amount:Number(item.purchase_amount).toFixed(2),
-              stock_quantity:item.stock_quantity
+              stock_quantity:Number(item.stock_quantity)
             })
           }else if(item.skuattributes.length === 2) {
             if(!state.singleGoodsPurchases.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
@@ -435,9 +435,9 @@ export default  {
                 childrens:[{
                   id:item.skuattributes[1].id,
                   name:item.skuattributes[1].name,
-                  purchase_quantity:item.purchase_quantity,
+                  purchase_quantity:Number(item.purchase_quantity),
                   purchase_amount:Number(item.purchase_amount).toFixed(2),
-                  stock_quantity:item.stock_quantity,
+                  stock_quantity:Number(item.stock_quantity),
                 }],
               })
             }else {
@@ -454,9 +454,9 @@ export default  {
               current.childrens.push({
                 id:item.skuattributes[1].id,
                 name:item.skuattributes[1].name,
-                purchase_quantity:item.purchase_quantity,
+                purchase_quantity:Number(item.purchase_quantity),
                 purchase_amount:Number(item.purchase_amount).toFixed(2),
-                stock_quantity:item.stock_quantity,
+                stock_quantity:Number(item.stock_quantity),
               })
               state.singleGoodsPurchases[state.singleGoodsPurchases.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
             }
@@ -484,9 +484,9 @@ export default  {
             state.singleGoodsStocks.push({
               id:item.id,
               name:item.skuattributes[0].name,
-              sales_quantity:item.sales_quantity,
+              sales_quantity:Number(item.sales_quantity),
               purchase_quantity:Number(item.purchase_quantity).toFixed(2),
-              stock_quantity:item.stock_quantity
+              stock_quantity:Number(item.stock_quantity)
             })
           }else if(item.skuattributes.length === 2) {
             if(!state.singleGoodsStocks.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
@@ -500,9 +500,9 @@ export default  {
                 childrens:[{
                   id:item.skuattributes[1].id,
                   name:item.skuattributes[1].name,
-                  sales_quantity:item.sales_quantity,
+                  sales_quantity:Number(item.sales_quantity),
                   purchase_quantity:Number(item.purchase_quantity).toFixed(2),
-                  stock_quantity:item.stock_quantity,
+                  stock_quantity:Number(item.stock_quantity),
                 }],
               })
             }else {
@@ -519,9 +519,9 @@ export default  {
               current.childrens.push({
                 id:item.skuattributes[1].id,
                 name:item.skuattributes[1].name,
-                sales_quantity:item.sales_quantity,
+                sales_quantity:Number(item.sales_quantity),
                 purchase_quantity:Number(item.purchase_quantity).toFixed(2),
-                stock_quantity:item.stock_quantity,
+                stock_quantity:Number(item.stock_quantity),
               })
               state.singleGoodsStocks[state.singleGoodsStocks.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
             }

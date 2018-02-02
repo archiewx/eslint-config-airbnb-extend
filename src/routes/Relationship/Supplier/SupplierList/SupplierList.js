@@ -248,7 +248,7 @@ export default class SupplierList extends PureComponent {
               </FormItem>
             </Form>
           </Card>
-          <Card bordered={false} title='客户列表' extra={this.handleTableSortExtra()}>
+          <Card bordered={false} title='供应商列表' extra={this.handleTableSortExtra()}>
             <Table 
               rowKey='id'
               columns={columns} 

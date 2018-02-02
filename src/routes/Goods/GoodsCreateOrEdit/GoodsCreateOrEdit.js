@@ -1,42 +1,421 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Row, Col, Card, Button, Form, Input, InputNumber ,Select ,Menu, Dropdown, Icon , Popconfirm} from 'antd';
+import { Row, Col, Card, Button, Form, Input, InputNumber ,Select ,Menu, Dropdown, Icon , Popconfirm,Spin} from 'antd';
 import { routerRedux } from 'dva/router';
+import pathToRegexp from 'path-to-regexp'
 import classNames from 'classnames/bind'
 import FooterToolbar from '../../../components/antd-pro/FooterToolbar';
 import PriceTable from '../../../components/PriceTable/PriceTable'
 import BarCodeTable from '../../../components/BarCodeTable/BarCodeTable'
 import StockTable from '../../../components/StockTable/StockTable'
 import SelectMultiple from '../../../components/SelectMultiple/SelectMultiple'
-import PictureModal from '../../../components/PictureModal/PictureModal'
+import GoodsPictureModal from '../../../components/GoodsPictureModal/GoodsPictureModal'
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import styles from './GoodsCreateOrEdit.less'
+import { DelayRunner } from '@crow/util';
 const FormItem = Form.Item;
 const Option = Select.Option;
 let cx = classNames.bind(styles);
-let selectUnits = [] , selectColors = [] ,selectSizes = [];
+let validateDelay = new DelayRunner();
+const formItemLayout = {
+  labelCol: {
+    span: 1
+  },
+  wrapperCol: {
+    span: 11
+  }
+}
+const pictureItemLayout = {
+  labelCol: {
+    span: 2,
+  },
+  wrapperCol: {
+    offset: 1,
+    span: 21
+  }
+}
 @Form.create()
-@connect(({configSetting,goodsCreateOrEdit,commonData}) => ({
+@connect(({configSetting,goodsCreateOrEdit,goodsGroup,color,sizeLibrary,unit,priceGrade,priceQuantityStep,shop,warehouse}) => ({
   configSetting,
   goodsCreateOrEdit,
-  commonData,
+  goodsGroup,
+  color,
+  sizeLibrary,
+  unit,
+  priceGrade,
+  priceQuantityStep,
+  shop,
+  warehouse,
 }))
 export default class GoodsCreateOrEdit extends PureComponent {
 
   state = {
+    defaultSelectUnits:[],
+    selectUnits:[],
+    selectColors:[],
+    selectSizes:[],
+    selectQuantityStep:[],
+    priceTableValue:{},
+    skuImages:{},
+    skuStocks:{},
+    skuBarcodes:{},
     selectWarehouseId:'',
     selecStockUnitNum:'',
-    selectQuantityStep:[],
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      selecStockUnitNum: this.state.selecStockUnitNum  ? this.state.selecStockUnitNum : Number(((nextProps.commonData.units).find( n => n.default == '1') || {}).number)  ,
-      selectWarehouseId: this.state.selectWarehouseId  ? this.state.selectWarehouseId : (nextProps.commonData.warehouses[0] || {}).id  
-    })
   }
 
   componentDidMount() {
+    (async () => {
+      if(this.props.history.location.pathname != '/goods-create') {
+        const match = pathToRegexp('/goods-edit/:id').exec(this.props.history.location.pathname)
+        this.props.dispatch({type:'goodsCreateOrEdit/getSingleGoods',payload:{id:match[1]}})
+      }
+    })().then(()=>{
+      this.props.dispatch({type:'color/getList'})
+      this.props.dispatch({type:'sizeLibrary/getList'})
+      this.props.dispatch({type:'priceGrade/getList'})
+      this.props.dispatch({type:'unit/getList'})
+      this.props.dispatch({type:'shop/getList'})
+      this.props.dispatch({type:'warehouse/getList'})
+      this.props.dispatch({type:'goodsGroup/getList'})
+      this.props.dispatch({type:'priceQuantityStep/getList'})
+    })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {usePricelelvel,priceModel,itemBarcodeLevel} = nextProps.configSetting;
+    const {priceGrades} = nextProps.priceGrade;
+    const {colors} = nextProps.color;
+    const {sizeLibrarys} = nextProps.sizeLibrary;
+    const {shops} = nextProps.shop;
+    const {units} = nextProps.unit;
+    const {warehouses} = nextProps.warehouse;
+    const {showData} = nextProps.goodsCreateOrEdit;
+    let priceTableValue = {};
+    if(showData.units) {
+      if(!!units.length && this.state.selectUnits.length == 1) {
+        const selectUnits = [];
+        showData.units.forEach( item => {
+          const alreadySelectUnit = units.find(n => n.id == item)
+          selectUnits.push({
+            name: `${alreadySelectUnit.name} x ( ${alreadySelectUnit.number} )`,
+            number: `${alreadySelectUnit.number}`,
+            id: alreadySelectUnit.id
+          })
+        })
+        this.setState({selectUnits})
+      }
+    }else {
+      if(!!units.length && !this.state.selectUnits.length ) {
+        const selectUnits = [],defaultSelectUnits = [];
+        const defaultUnit = units.find( n => n.default == 1) || {}
+        selectUnits.push({
+          name: `${defaultUnit.name} x ( ${defaultUnit.number} )`,
+          number: `${defaultUnit.number}`,
+          id: defaultUnit.id
+        })
+        defaultSelectUnits.push((defaultUnit.id).toString())
+        this.setState({selectUnits,defaultSelectUnits})
+      }
+    }
+    if(showData.colors && !this.state.selectColors.length &&  !!colors.length) {
+      const selectColors = [];
+      showData.colors.forEach( item => {
+        const alreadySelectColor = colors.find( n => n.id == item)
+        selectColors.push({
+          name: `${alreadySelectColor.name}`,
+          id: alreadySelectColor.id
+        })
+      })
+      this.setState({selectColors})
+    } 
+    if(showData.sizes && !this.state.selectSizes.length & !!sizeLibrarys.length) {
+      const selectSizes = [];
+      showData.sizes.forEach( item => {
+        const alreadySelectSize = sizeLibrarys.find( n => n.id == item) 
+        selectSizes.push({
+          name: `${alreadySelectSize.name}`,
+          id: alreadySelectSize.id
+        })
+      })
+      this.setState({selectSizes})
+    }
+    if(showData.prices) {
+      if( !!priceGrades.length && !!shops.length && !!units.length && (Object.values(this.state.priceTableValue).length == priceGrades.length || Object.values(this.state.priceTableValue).length == shops.length || Object.values(this.state.priceTableValue).length == (shops.length * priceGrades.length) )) {
+        if(showData.prices.price) {
+          if(usePricelelvel === 'yes') {
+            if(priceModel === '') {
+              priceGrades.forEach( item => {
+                priceTableValue[`${item.id}`] = {
+                  pricelevel_id: item.id,
+                  price: showData.prices.price
+                }
+              })
+            }else if(priceModel === 'shop') {
+              shops.forEach( item => {
+                priceGrades.forEach( subItem => {
+                  priceTableValue[`${item.id}_${subItem.id}`] = {
+                    shop_id: item.id,
+                    pricelevel_id: subItem.id,
+                    price: showData.prices.price
+                  }
+                })
+              })
+            }else if(priceModel === 'unit') {
+              let selectUnits = [].concat(units.find( n => n.default == 1))
+              selectUnits.forEach( item => {
+                priceGrades.forEach( subItem => {
+                  priceTableValue[`${item.id}_${subItem.id}`] = {
+                    unit_id: item.id,
+                    pricelevel_id: subItem.id,
+                    price: showData.prices.price
+                  }
+                })
+              })
+            }else if(priceModel === 'quantityrange') {
+
+            }
+          }else {
+            if(priceModel === '') {
+
+            }else if(priceModel === 'shop') {
+              shops.forEach( item => {
+                priceTableValue[`${item.id}`] = {
+                  shop_id: item.id,
+                  price:  showData.prices.price
+                }
+              })
+            }else if(priceModel === 'unit') {
+              let selectUnits = [].concat(units.find( n => n.default == 1))
+              selectUnits.forEach( item => {
+                priceTableValue[`${item.id}`] = {
+                  unit_id: item.id,
+                  price: showData.prices.price
+                }
+              })
+            }else if(priceModel === 'quantityrange') {
+              
+            }
+          }
+          this.setState({priceTableValue})
+        }else {
+          this.setState({priceTableValue:{...showData.prices}})
+        }
+      }
+    }else {
+      if(!!priceGrades.length && !!shops.length && !!units.length && !Object.values(this.state.priceTableValue).length) {
+        if(usePricelelvel === 'yes') {
+          if(priceModel === '') {
+            priceGrades.forEach( item => {
+              priceTableValue[`${item.id}`] = {
+                pricelevel_id: item.id,
+                price: null
+              }
+            })
+          }else if(priceModel === 'shop') {
+            shops.forEach( item => {
+              priceGrades.forEach( subItem => {
+                priceTableValue[`${item.id}_${subItem.id}`] = {
+                  shop_id: item.id,
+                  pricelevel_id: subItem.id,
+                  price: null
+                }
+              })
+            })
+          }else if(priceModel === 'unit') {
+            let selectUnits = [].concat(units.find( n => n.default == 1))
+            selectUnits.forEach( item => {
+              priceGrades.forEach( subItem => {
+                priceTableValue[`${item.id}_${subItem.id}`] = {
+                  unit_id: item.id,
+                  pricelevel_id: subItem.id,
+                  price: null
+                }
+              })
+            })
+          }else if(priceModel === 'quantityrange') {
+
+          }
+        }else {
+          if(priceModel === '') {
+
+          }else if(priceModel === 'shop') {
+            shops.forEach( item => {
+              priceTableValue[`${item.id}`] = {
+                shop_id: item.id,
+                price:  null
+              }
+            })
+          }else if(priceModel === 'unit') {
+            let selectUnits = [].concat(units.find( n => n.default == 1))
+            selectUnits.forEach( item => {
+              priceTableValue[`${item.id}`] = {
+                unit_id: item.id,
+                price: null
+              }
+            })
+          }else if(priceModel === 'quantityrange') {
+            
+          }
+        }
+        this.setState({priceTableValue})
+      }
+    }
+    if(showData.colors && showData.sizes && showData.stocks) {
+      if(!!warehouses.length && (Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length  == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length) )) {
+        let skuStocks = {};
+        if(this.state.selectColors.length == 0) {
+          warehouses.forEach( item => {
+            skuStocks[`${item.id}`] = {
+              warehouse_id: item.id,
+              store_quantity: (showData.stocks[`${item.id}`] || {}).store_quantity 
+            }
+          })
+        }else {
+          if(this.state.selectSizes.length == 0) {
+            warehouses.forEach( item => {
+              this.state.selectColors.forEach( colorItem => {
+                skuStocks[`${item.id}_${colorItem.id}`] = {
+                  warehouse_id: item.id,
+                  store_quantity: (showData.stocks[`${item.id}_${colorItem.id}`] || {}).store_quantity 
+                }
+              })
+            })
+          }else {
+            warehouses.forEach( item => {
+              this.state.selectColors.forEach( colorItem => {
+                this.state.selectSizes.forEach( sizeItem => {
+                  skuStocks[`${item.id}_${colorItem.id}_${sizeItem.id}`] = {
+                    warehouse_id: item.id,
+                    store_quantity: (showData.stocks[`${item.id}_${colorItem.id}_${sizeItem.id}`] || {}).store_quantity 
+                  }
+                })
+              })
+            })
+          }
+        }
+        this.setState({skuStocks})
+      }
+    }else {
+      if(!!warehouses.length && !Object.values(this.state.skuStocks).length) {
+        let skuStocks = {};
+        if(this.state.selectColors.length == 0) {
+          warehouses.forEach( item => {
+            skuStocks[`${item.id}`] = {
+              warehouse_id: item.id,
+              store_quantity: null
+            }
+          })
+        }else {
+          if(this.state.selectSizes.length == 0) {
+            console.log(4)
+            warehouses.forEach( item => {
+              this.state.selectColors.forEach( colorItem => {
+                skuStocks[`${item.id}_${colorItem.id}`] = {
+                  warehouse_id: item.id,
+                  store_quantity: null
+                }
+              })
+            })
+          }else {
+            warehouses.forEach( item => {
+              this.state.selectColors.forEach( colorItem => {
+                this.state.selectSizes.forEach( sizeItem => {
+                  skuStocks[`${item.id}_${colorItem.id}_${sizeItem.id}`] = {
+                    warehouse_id: item.id,
+                    store_quantity: null
+                  }
+                })
+              })
+            })
+          }
+        }
+        this.setState({skuStocks})
+      }
+    }
+    if(showData.colors && showData.sizes && showData.barcodes) {
+      if(Object.values(this.state.skuBarcodes).length == 1 || Object.values(this.state.skuBarcodes).length == this.state.selectColors.length || Object.values(this.state.skuBarcodes).length == (this.state.selectColors.length * this.state.selectSizes.length)) {
+        let skuBarcodes = {};
+        if(itemBarcodeLevel == 0) {
+          skuBarcodes = {
+            barcode: showData.barcodes.barcode || ''
+          }
+        }else {
+          if(this.state.selectColors.length == 0 || itemBarcodeLevel == 0 ) {
+            skuBarcodes = {
+              barcode: showData.barcodes.barcode || ''
+            }
+          }else {
+            if(this.state.selectSizes.length == 0) {
+              this.state.selectColors.forEach( item => {
+                skuBarcodes[`${item.id}`] = {
+                  barcode: showData.barcodes[`${item.id}`].barcode || ''
+                }
+              })
+            }else {
+              selectColors.forEach( item => {
+                selectSizes.forEach( subItem => {
+                  skuBarcodes[`${item.id}_${subItem.id}`] = {
+                    barcode : showData.barcodes[`${item.id}_${subItem.id}`].barcode || ''
+                  }
+                })
+              })
+            }
+          }
+        }
+        this.setState({skuBarcodes})
+      }
+    }else {
+      if(!Object.values(this.state.skuBarcodes).length) {
+        let skuBarcodes = {};
+        if(this.state.selectColors.length == 0 || itemBarcodeLevel == 0) {
+          skuBarcodes = {
+            barcode: ''
+          }
+        }else {
+          if(this.state.selectSizes.length == 0) {
+            this.state.selectColors.forEach( item => {
+              skuBarcodes[`${item.id}`] = {
+                barcode: ''
+              }
+            })
+          }else {
+            selectColors.forEach( item => {
+              selectSizes.forEach( subItem => {
+                skuBarcodes[`${item.id}_${subItem.id}`] = {
+                  barcode : ''
+                }
+              })
+            })
+          }
+        }
+        this.setState({skuBarcodes})
+      }
+    }
+    if(this.state.selecStockUnitNum == '' && !!units.length) {
+      this.setState({
+        selecStockUnitNum: units.find( n => n.default == '1').number 
+      })
+    }
+    if(this.state.selectWarehouseId == '' && !!warehouses.length) {
+      this.setState({
+        selectWarehouseId:warehouses[0].id 
+      })
+    }
+    if(!Object.values(this.state.skuImages).length) {
+      let skuImages = {}
+      if(this.state.selectColors.length == 0) {
+        skuImages = {
+          fileList: []
+        }
+      }else {
+        this.state.selectColors.forEach( item => {
+          skuImages[`${item.id}`] = {
+            fileList: []
+          }
+        })
+      }
+      this.setState({skuImages})
+    }
   }
 
   handleSubmit = (e) => {
@@ -46,14 +425,37 @@ export default class GoodsCreateOrEdit extends PureComponent {
       if(!err){
         this.props.dispatch({type:'goodsCreateOrEdit/setServerData',payload:{
           value,
-          selectUnits,
-          warehouses:this.props.commonData.warehouses,
+          selectUnits:this.state.selectUnits,
+          selectQuantityStep:this.state.selectQuantityStep,
+          warehouses:this.props.warehouse.warehouses,
+          priceModel:this.props.configSetting.priceModel,
           itemBarcodeLevel: this.props.configSetting.itemBarcodeLevel,
           itemImageLevel: this.props.configSetting.itemImageLevel
         }})
-        this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods'})
+        // this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods'}).then(()=>{
+        //   this.props.dispatch(routerRedux.push('/goods-list'))
+        // })
       }
     })
+  }
+
+  handleCheckItemRef = (rule,value,callback) => {
+    validateDelay.run(()=>{ 
+      if(this.props.goodsCreateOrEdit.showData.item_ref && this.props.goodsCreateOrEdit.showData.item_ref == value) {callback()}
+      else {
+        this.props.dispatch({type:'goodsCreateOrEdit/checkItemRef',payload:value}).then((result)=>{
+          if(result.request.item_ref == value) {
+            if(result.code != 0) {
+              callback('货号已存在')
+            }else {
+              callback()
+            }
+          }else {
+            callback()
+          }
+        })
+      }
+    }, 300)
   }
 
   handleCancel = () => {
@@ -61,194 +463,227 @@ export default class GoodsCreateOrEdit extends PureComponent {
     this.props.dispatch(routerRedux.push('/goods-list'))
   }
 
-  handleCalculateSelect = (arr = [],selectIds = [],type = 'unit') => {
-    let arrSelect = [];
-    arr.forEach( item => {
-      if(selectIds.some( subItem => subItem == item.id)) {
-        let current = item;
-        arrSelect.push({
-          name: type === 'unit' ? `${current.name} ( x ${current.number} )` : `${current.name}`,
-          number: type === 'unit' ? `${current.number}` : '',
-          id: current.id
-        })
+  handleCheckNumber = (oldVal,newVal) => {
+    // if(isNaN(newVal)) {
+    //   return oldVal
+    // }else {
+    //   return newVal
+    // }
+  }
+
+  handleGetStandardPrice = (e) => {
+    const { form } = this.props;
+    let priceTableValue = form.getFieldValue('prices_table')
+    let oldstandardPrice = form.getFieldValue('standard_price')
+    setTimeout(() => {
+      let standardPrice = form.getFieldValue('standard_price')
+      for(let key in priceTableValue) {
+        if(priceTableValue[key].price == oldstandardPrice || priceTableValue[key].price == null) {
+          priceTableValue[key].price = standardPrice
+        }
       }
-    })
-    return arrSelect;
+      form.setFieldsValue({prices_table:priceTableValue})
+    }, 0)
   }
 
   handleSelectQuantityStep = ({item,key,keyPath}) =>  {
-    let current = this.state.selectQuantityStep;
-    if(current.some( n => n.id === item.props.eventKey)) {
-      current.splice(current.findIndex( n => n.id === item.props.eventKey),1)
-    }else {
-      current.push({
-        name: item.props.children,
-        id: item.props.eventKey
-      })
-      let currentQuantityRange = this.props.commonData.priceQuantitySteps.find( n => n.id == item.props.eventKey)
-      current = currentQuantityRange.quantityranges.map( item => {
-        let name;
-        if(item.max == -1) {
-          name = `${item.min} ~`
-        }else {
-          name = `${item.min} ~ ${item.max - 1}`
-        }
-        return {
-          id: item.id,
-          name: name
-        }
-      })
-    }
-    this.setState({selectQuantityStep:[...current]})
-  }
-
-  handlePriceTableValue = (prices = {} ,shops,selectUnits,selectQuantityStep,priceGrades,usePricelelvel,priceModel) =>  {
-    let current = {};
-    let standardPrice = this.props.form.getFieldValue('standard_price')
-    if(usePricelelvel === 'yes') {
-      if(priceModel === '') {
-        priceGrades.forEach( item => {
-          current[`${item.id}`] = {
-            pricelevel_id: item.id,
-            price: (prices[`${item.id}`] || {}).price || standardPrice || null
-          }
-        })
-      }else if(priceModel === 'shop') {
-        shops.forEach( item => {
-          priceGrades.forEach( subItem => {
-            current[`${item.id}_${subItem.id}`] = {
-              shop_id: item.id,
-              pricelevel_id: subItem.id,
-              price: (prices[`${item.id}_${subItem.id}`] || {}).price || standardPrice  || null
-            }
-          })
-        })
-      }else if(priceModel === 'unit') {
-        selectUnits.forEach( item => {
-          priceGrades.forEach( subItem => {
-            current[`${item.id}_${subItem.id}`] = {
-              unit_id: item.id,
-              pricelevel_id: subItem.id,
-              price: (prices[`${item.id}_${subItem.id}`] || {}).price || standardPrice || null
-            }
-          })
-        })
-      }else if(priceModel === 'quantityrange') {
-        selectQuantityStep.forEach( item => {
-          priceGrades.forEach( subItem => {
-            current[`${item.id}_${subItem.id}`] = {
-              quantityrange_id: item.id,
-              pricelevel_id: subItem.id,
-              price: (prices[`${item.id}_${subItem.id}`] || {}).price || standardPrice || null
-            }
-          })
-        })
-      }
-    }else {
-      if(priceModel === 'shop') {
-        shops.forEach( item => {
-          current[`${item.id}`] = {
-            shop_id: item.id,
-            price: (prices[`${item.id}`] || {}).price || standardPrice || null
-          }
-        })
-      }else if(priceModel === 'unit') {
-        selectUnits.forEach( item => {
-          current[`${item.id}`] = {
-            unit_id: item.id,
-            price: (prices[`${item.id}`] || {}).price || standardPrice || null
-          }
-        })
-      }else if(priceModel === 'quantityrange') {
-        selectQuantityStep.forEach( item => {
-          current[`${item.id}`] = {
-            quantityrange_id: item.id,
-            price: (prices[`${item.id}`] || {}).price || standardPrice || null
-          }
-        })
-      }
-    }
-    return current
-  }
-
-  handleSkuImages = (selectColors,itemImageLevel) => {
-    let current = {};
-    if(itemImageLevel === 'item') {
-      current = {
-        fileList: []
-      }
-    }else {
-      selectColors.forEach( item => {
-        current[`${item.id}`] = {
-          fileList: []
-        }
-      })
-    }
-    return current
-  }
-
-  handleSkuStocks = (stocks = {} ,warehouses,selectColors,selectSizes) => {
-    let current = {}
-    if(selectColors.length === 0) {
-      warehouses.forEach( item => {
-        current[`${item.id}`] = {
-          warehouse_id: item.id,
-          store_quantity: (stocks[`${item.id}`] || {}).store_quantity || 0
-        }
-      })
-    }else {
-      if(selectSizes.length === 0) {
-        warehouses.forEach( item => {
-          selectColors.forEach( colorItem => {
-            current[`${item.id}_${colorItem.id}`] = {
-              warehouse_id: item.id,
-              store_quantity: (stocks[`${item.id}_${colorItem.id}`] || {}).store_quantity || 0
-            }
-          })
-        })
+    const { form } = this.props;
+    const {priceQuantitySteps} = this.props.priceQuantityStep;
+    const {priceGrades} = this.props.priceGrade;
+    let currentQuantityRange = priceQuantitySteps.find( n => n.id == item.props.eventKey)
+    let priceTableValue = form.getFieldValue('prices_table')
+    let current = currentQuantityRange.quantityranges.map( item => {
+      let name;
+      if(item.max == -1) {
+        name = `${item.min} ~`
       }else {
-        warehouses.forEach( item => {
-          selectColors.forEach( colorItem => {
-            selectSizes.forEach( sizeItem => {
-              current[`${item.id}_${colorItem.id}_${sizeItem.id}`] = {
+        name = `${item.min} ~ ${item.max - 1}`
+      }
+      return {
+        id: item.id,
+        name: name
+      }
+    })
+    this.setState({selectQuantityStep:[...current]});
+    if(this.props.configSetting.priceModel == 'quantityrange') {
+      let isOnlySame = current.every( item => {
+        return Object.values(priceTableValue).some( subItem => subItem.quantityrange_id == item.id)
+      })
+      if(this.props.configSetting.usePricelelvel === 'yes') {
+        if( !isOnlySame) {
+          current.forEach( item => {
+            priceGrades.forEach( subItem => {
+              priceTableValue[`${item.id}_${subItem.id}`] = {
+                quantityrange_id: item.id,
+                pricelevel_id: subItem.id,
+                price: form.getFieldValue('standard_price') || null
+              }
+            })
+          }) 
+          form.setFieldsValue({prices_table:priceTableValue})
+        }
+      }else {
+        if( !isOnlySame ) {
+          current.forEach( item => {
+            priceTableValue[`${item.id}`] = {
+              quantityrange_id: item.id,
+              price: form.getFieldValue('standard_price') || null
+            }
+          }) 
+          form.setFieldsValue({prices_table:priceTableValue})
+        }
+      }
+    }
+  }
+
+  handleGetUnitSelect = (arr,e) => {
+    const { form } = this.props;
+    let selectUnits = [] ,isOnlySame = false;
+    let priceTableValue = form.getFieldValue('prices_table');
+    setTimeout(() => {
+      arr.forEach( item => {
+        if(form.getFieldValue('unit_select').some( n => n == item.id)) {
+          selectUnits.push({
+            name: `${item.name} ( x ${item.number} )`,
+            number: `${item.number}`,
+            id: item.id
+          })
+        }
+      })
+      this.setState({selectUnits})
+      if(this.props.configSetting.priceModel == 'unit') {
+        let current = [].concat(form.getFieldValue('unit_select')[form.getFieldValue('unit_select').length-1])
+        isOnlySame = Object.values(priceTableValue).some( item => item.unit_id == current[0])
+        if(this.props.configSetting.usePricelelvel === 'yes' ) {
+          if(!isOnlySame) {
+            current.forEach( item => {
+              this.props.priceGrade.priceGrades.forEach( subItem => {
+                priceTableValue[`${item}_${subItem.id}`] = {
+                  unit_id: item,
+                  pricelevel_id: subItem.id,
+                  price: form.getFieldValue('standard_price') || null
+                }
+              })
+            })
+            form.setFieldsValue({prices_table:priceTableValue})
+          }
+        }else {
+          if(!isOnlySame) {
+            current.forEach( item => {
+              priceTableValue[`${item}`] = {
+                unit_id: item,
+                price: form.getFieldValue('standard_price') || null
+              }
+            })
+            form.setFieldsValue({prices_table:priceTableValue})
+          }
+        }
+      }
+    }, 0)
+  }
+
+  handleGetColorSelect = (arr,e) => {
+    const { form } = this.props;
+    let selectColors = [],isOnlySame = false,alreadySelect = [];
+    let skuStocks = form.getFieldValue('stock');
+    let skuBarcodes = form.getFieldValue('barcode')
+    let skuImages = form.getFieldValue('picture')
+    setTimeout(() => {
+      arr.forEach( item => {
+        if(form.getFieldValue('color_select').some( n => n == item.id)) {
+          selectColors.push({
+            name: `${item.name}`,
+            id: item.id
+          })
+        }
+      })
+      this.setState({selectColors})
+      let current = [].concat(form.getFieldValue('color_select')[form.getFieldValue('color_select').length-1])
+      for(let key in skuStocks) {
+        let changeKey = key.split('_')
+        if(changeKey.length == 2) {
+          alreadySelect.push(changeKey[1])
+        }
+      }
+      isOnlySame = alreadySelect.some( n => n == current[0])
+      if(!isOnlySame && current[0]) {
+        this.props.warehouse.warehouses.forEach( item => {
+          current.forEach( colorItem => {
+            skuStocks[`${item.id}_${colorItem}`] = {
+              warehouse_id: item.id,
+              store_quantity: null
+            }
+          })
+        })
+        form.setFieldsValue({stock:skuStocks})
+      }
+      if(this.props.configSetting.itemBarcodeLevel == 1 && !isOnlySame && current[0]) {
+        current.forEach( colorItem => {
+          skuBarcodes[`${colorItem}`] = {
+            barcode: ''
+          }
+        })
+        form.setFieldsValue({barcode:skuBarcodes})
+      }
+      if(!isOnlySame && current[0]) {
+        current.forEach( colorItem => {
+          skuImages[`${colorItem}`] = {
+            fileList: [] 
+          }
+        })
+        form.setFieldsValue({picture:skuImages})
+      }
+    }, 0)
+  }
+
+  handleGetSizeSelect = (arr,e) => {
+    const { form } = this.props;
+    let selectSizes = [],isOnlySame = false,alreadySelect = [];
+    let skuStocks = form.getFieldValue('stock');
+    let skuBarcodes = form.getFieldValue('barcode')
+    setTimeout(() => {
+      arr.forEach( item => {
+        if(form.getFieldValue('size_select').some( n => n == item.id)) {
+          selectSizes.push({
+            name: `${item.name}`,
+            id: item.id
+          })
+        }
+      })
+      this.setState({selectSizes})
+      let current = [].concat(form.getFieldValue('size_select')[form.getFieldValue('size_select').length-1])
+      for(let key in skuStocks) {
+        let changeKey = key.split('_')
+        if(changeKey.length == 3) {
+          alreadySelect.push(changeKey[2])
+        }
+      }
+      isOnlySame = alreadySelect.some( n => n == current[0])
+      if(!isOnlySame && current[0]) {
+        this.props.warehouse.warehouses.forEach( item => {
+          this.state.selectColors.forEach( colorItem => {
+            current.forEach( sizeItem => {
+              skuStocks[`${item.id}_${colorItem.id}_${sizeItem}`] = {
                 warehouse_id: item.id,
-                store_quantity: (stocks[`${item.id}_${colorItem.id}_${sizeItem.id}`] || {}).store_quantity || 0
+                store_quantity: null
               }
             })
           })
         })
+        form.setFieldsValue({stock:skuStocks})
       }
-    }
-    return current
-  }
-
-  handleSkuBarcodes = (selectColors,selectSizes,itemBarcodeLevel) => {
-    let current = {};
-    if(selectColors.length === 0 || itemBarcodeLevel === 0 ) {
-      current = {
-        barcode: ''
-      }
-    }else {
-      if(selectSizes.length === 0) {
-        selectColors.forEach( item => {
-          current[`${item.id}`] = {
-            barcode: ''
-          }
-        })
-      }else {
-        selectColors.forEach( item => {
-          selectSizes.forEach( subItem => {
-            current[`${item.id}_${subItem.id}`] = {
+      if(this.props.configSetting.itemBarcodeLevel == 1 && !isOnlySame && current[0]) {
+        this.state.selectColors.forEach( colorItem => {
+          current.forEach( sizeItem => {
+            skuBarcodes[`${colorItem.id}_${sizeItem}`] = {
               barcode: ''
             }
           })
         })
+        form.setFieldsValue({barcode:skuBarcodes})
       }
-    }
-    return current
+    }, 0)
   }
-
-
 
   handleUnitStockSelect = (value) => {
     this.setState({
@@ -264,46 +699,24 @@ export default class GoodsCreateOrEdit extends PureComponent {
 
   render() {
     const {getFieldDecorator,getFieldValue,setFieldsValue} = this.props.form
-    const {goodsGroups,colors,sizeLibrarys,units,priceGrades,priceQuantitySteps,shops,warehouses} = this.props.commonData
+    const {goodsGroup:{goodsGroups},color:{colors},sizeLibrary:{sizeLibrarys},unit:{units},priceGrade:{priceGrades},priceQuantityStep:{priceQuantitySteps},shop:{shops},warehouse:{warehouses}} = this.props;
     const {usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel} = this.props.configSetting
-    const {selectWarehouseId,selecStockUnitNum,selectQuantityStep} = this.state
     const {showData} = this.props.goodsCreateOrEdit
+    const {defaultSelectUnits,selectUnits,selectColors,selectSizes,selectQuantityStep,priceTableValue,skuStocks,skuBarcodes, selectWarehouseId,selecStockUnitNum,skuImages} = this.state
 
-    const formItemLayout = {
-      labelCol: {
-        span: 1
-      },
-      wrapperCol: {
-        span: 11
-      }
-    }
-
-    const pictureItemLayout = {
-      labelCol: {
-        span: 2,
-      },
-      wrapperCol: {
-        offset: 1,
-        span: 21
-      }
-    }
-
-    let defaultSelectUnits =[],defaultStockUnit = {};
-    units.forEach( item => {
-      if(item.default == '1') {
-        defaultSelectUnits.push((item.id).toString());
-      }
+    const stockTabList = warehouses.map( item => {
+      return {key:item.id,tab:item.name}
     })
 
-    selectUnits = this.handleCalculateSelect(units,getFieldValue('unit_select'))
-    selectColors = this.handleCalculateSelect(colors,getFieldValue('color_select'),'other')
-    selectSizes = this.handleCalculateSelect(sizeLibrarys,getFieldValue('size_select'),'other')
-    
-    let priceTableValue = this.handlePriceTableValue(showData.prices,shops,selectUnits,selectQuantityStep,priceGrades,usePricelelvel,priceModel) 
-    let skuImages = this.handleSkuImages(selectColors,itemImageLevel)
-    let skuStocks = this.handleSkuStocks(showData.stocks,warehouses,selectColors,selectSizes)
-    let skuBarcodes = this.handleSkuBarcodes(selectColors,selectSizes,itemBarcodeLevel)
-
+    const quantityStepMenu = (
+      <Menu onClick={this.handleSelectQuantityStep}>  
+        {
+          priceQuantitySteps.map( item => {
+            return <Menu.Item key={item.id} >{item.name}</Menu.Item>
+          })
+        }
+      </Menu>
+    );
 
     const unitStockSelect = (
       <Select style={{ width: 200 }} defaultValue={`库存单位：件 ( x 1 )`} onChange={this.handleUnitStockSelect} type='combobox' optionLabelProp='value'>
@@ -317,247 +730,241 @@ export default class GoodsCreateOrEdit extends PureComponent {
       </Select>
     )
 
-    const quantityStepMenu = (
-      <Menu onClick={this.handleSelectQuantityStep}>  
-        {
-          priceQuantitySteps.map( item => {
-            return <Menu.Item key={item.id} >{item.name}</Menu.Item>
-          })
-        }
-      </Menu>
-    );
-
-    const stockTabList = warehouses.map( item => {
-      return {key:item.id,tab:item.name}
-    })
-
     return (
       <PageHeaderLayout
         title={showData.item_ref ? '编辑商品' : '新建商品'}
       >
-        <Card title='属性' bordered={false} className={styles.bottomCardDivided}>
-          <Form layout='vertical'>
-            <Row gutter={64}>
-              <Col span={8}>
-                <FormItem label='货号' hasFeedback>
-                  {getFieldDecorator('item_ref',{
-                    initialValue: showData.item_ref || '',
-                    rules: [{required:true,message:'货号不能为空'}],
-                  })(
-                    <Input placeholder="请输入"/>
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label='标准价' hasFeedback>
-                  {getFieldDecorator('standard_price',{
-                    initialValue: showData.standard_price || '',
-                    rules: [{required:true,message:'标准价不能为空'}],
-                  })(
-                    <InputNumber placeholder="请输入" style={{width:'100%'}} precision={2} min={0}/>
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label='进货价'>
-                  {getFieldDecorator('purchase_price',{
-                    initialValue: showData.purchase_price || '',
-                  })(
-                    <InputNumber placeholder="请输入" style={{width:'100%'}} precision={2} min={0}/>
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-          </Form>
-          <Form>
-          {
-            usePricelelvel === 'yes' ? (
-              <div>
-                <div style={{paddingBottom:10}}>
-                  <label className={styles.priceGradeLabelTitle}>{`价格等级 & 价格组成:`}</label>
+        <Spin size='large' spinning={!units.length || !priceGrades.length || !shops.length || !warehouses.length }>
+          <Card title='属性' bordered={false} className={styles.bottomCardDivided}>
+            <Form layout='vertical'>
+              <Row gutter={64}>
+                <Col span={8}>
+                  <FormItem label='货号' hasFeedback>
+                    {getFieldDecorator('item_ref',{
+                      initialValue: showData.item_ref || '',
+                      rules: [{required:true,message:'货号不能为空'},{validator:this.handleCheckItemRef}],
+                    })(
+                      <Input placeholder="请输入"/>
+                    )}
+                  </FormItem>
+                </Col>
+                <Col span={8}>
+                  <FormItem label='标准价' hasFeedback>
+                    {getFieldDecorator('standard_price',{
+                      initialValue: showData.standard_price || null,
+                      rules: [{required:true,message:'标准价不能为空'}],
+                    })(
+                      <InputNumber placeholder="请输入" style={{width:'100%'}} precision={2} min={0} onChange={this.handleGetStandardPrice}/>
+                    )}
+                  </FormItem>
+                </Col>
+                <Col span={8}>
+                  <FormItem label='进货价'>
+                    {getFieldDecorator('purchase_price',{
+                      initialValue: showData.purchase_price || null,
+                    })(
+                      <InputNumber placeholder="请输入" style={{width:'100%'}} precision={2} min={0}/>
+                    )}
+                  </FormItem>
+                </Col>
+              </Row>
+            </Form>
+            <Form>
+            {
+              usePricelelvel === 'yes' ? (
+                <div>
+                  <div style={{paddingBottom:10}}>
+                    <label className={styles.priceGradeLabelTitle}>{`价格等级 & 价格组成:`}</label>
+                    {
+                      priceModel === 'quantityrange' ? (
+                        <Dropdown overlay={quantityStepMenu} >
+                          <Button className={styles.quantityStepPostion}>
+                            选择价格阶梯 <Icon type='down' />
+                          </Button>
+                        </Dropdown>
+                      ) : null
+                    }
+                  </div>
+                  <div>
+                    <FormItem>
+                      {getFieldDecorator('prices_table',{
+                        initialValue: priceTableValue
+                      })(
+                        <PriceTable  priceGrades={priceGrades} shops={shops} selectUnits={selectUnits} selectQuantityStep={selectQuantityStep} usePricelelvel={usePricelelvel} priceModel={priceModel}/>
+                      )}
+                    </FormItem>
+                  </div>
+                </div>
+              ) : (
+                <div>
                   {
-                    priceModel === 'quantityrange' ? (
-                      <Dropdown overlay={quantityStepMenu} >
-                        <Button className={styles.quantityStepPostion}>
-                          选择价格阶梯 <Icon type='down' />
-                        </Button>
-                      </Dropdown>
+                    priceModel !== '' ? (
+                      <div style={{paddingBottom:10}}>
+                        <label className={styles.priceGradeLabelTitle}>{`价格组成 (零售价):`}</label>
+                        {
+                          priceModel === 'quantityrange' ? (
+                            <Dropdown overlay={quantityStepMenu}>
+                              <Button className={styles.quantityStepPostion}>
+                                选择价格阶梯 <Icon type='down' />
+                              </Button>
+                            </Dropdown>
+                          ) : null
+                        }
+                      </div>
                     ) : null
                   }
-                </div>
-                <div>
                   <FormItem>
                     {getFieldDecorator('prices_table',{
                       initialValue: priceTableValue
                     })(
-                      <PriceTable  priceTableValue={priceTableValue} priceGrades={priceGrades} shops={shops} selectUnits={selectUnits} selectQuantityStep={selectQuantityStep} usePricelelvel={usePricelelvel} priceModel={priceModel}/>
+                      <PriceTable priceGrades={priceGrades} shops={shops} selectUnits={selectUnits} selectQuantityStep={selectQuantityStep} usePricelelvel={usePricelelvel} priceModel={priceModel}/>
                     )}
                   </FormItem>
                 </div>
-              </div>
-            ) : (
-              <div>
-                <div style={{paddingBottom:10}}>
-                  <label className={styles.priceGradeLabelTitle}>{`价格组成 (零售价):`}</label>
+              )
+            }
+            </Form>
+            <Form layout='horizontal' className={styles.leftLabelTitle}>
+              <FormItem label='单位' {...formItemLayout}> 
+                {getFieldDecorator('unit_select',{
+                  initialValue: showData.units ||  defaultSelectUnits
+                })(
+                <Select mode='multiple' placeholder='请输入单位' onChange={this.handleGetUnitSelect.bind(null,units)}>
                   {
-                    priceModel === 'quantityrange' ? (
-                      <Dropdown overlay={quantityStepMenu}>
-                        <Button className={styles.quantityStepPostion}>
-                          选择价格阶梯 <Icon type='down' />
-                        </Button>
-                      </Dropdown>
-                    ) : null
+                    units.map( item => {
+                      return (
+                        <Option key={item.id} value={(item.id).toString()} disabled={item.default == '1' ? true : false}>{`${item.name} ( x ${item.number} )`}</Option>
+                      )
+                    })
                   }
-                </div>
-                <FormItem>
-                  {getFieldDecorator('prices_table',{
-                    initialValue: priceTableValue
-                  })(
-                    <PriceTable priceTableValue={priceTableValue} priceGrades={priceGrades} shops={shops} selectUnits={selectUnits} selectQuantityStep={selectQuantityStep} usePricelelvel={usePricelelvel} priceModel={priceModel}/>
-                  )}
-                </FormItem>
-              </div>
-            )
-          }
-          </Form>
-          <Form layout='horizontal' className={styles.leftLabelTitle}>
-            <FormItem label='单位' {...formItemLayout}> 
-              {getFieldDecorator('unit_select',{
-                initialValue: showData.units ||  defaultSelectUnits
-              })(
-              <Select mode='multiple' placeholder='请输入单位'>
-                {
-                  units.map( item => {
-                    return (
-                      <Option key={item.id} value={(item.id).toString()} disabled={item.default == '1' ? true : false}>{`${item.name} ( x ${item.number} )`}</Option>
-                    )
-                  })
-                }
-              </Select>
-              )}
-            </FormItem>
-            <FormItem label='颜色' {...formItemLayout}>
-              {getFieldDecorator('color_select',{
-                initialValue: showData.colors || []
-              })(
-              <Select mode='multiple' placeholder='请选择颜色'>
-                {
-                  colors.map( item => {
-                    return (
-                      <Option key={item.id} value={(item.id).toString()}>{`${item.name}`}</Option>
-                    )
-                  })
-                }
-              </Select>
-              )}
-            </FormItem>
-            <FormItem label='尺码' {...formItemLayout}>
-              {getFieldDecorator('size_select',{
-                initialValue: showData.sizes ||  []
-              })(
-              <Select mode='multiple' placeholder={selectColors.length == 0 ? '请先选择颜色' : '请选择尺码'} disabled={selectColors.length ==  0 ? true : false }>
-                {
-                  sizeLibrarys.map( item => {
-                    return (
-                      <Option key={item.id} value={(item.id).toString()}>{`${item.name}`}</Option>
-                    )
-                  })
-                }
-              </Select>
-              )}
-            </FormItem>
-          </Form>
-        </Card>
-        <Card title='描述' bordered={false} className={styles.bottomCardDivided}>
-          <Form layout='vertical'>
-            <Row gutter={64}>
-              <Col span={8}>
-                <FormItem label='名称'>
-                  {getFieldDecorator('name',{
-                    initialValue: showData.name || ''
-                  })(
-                    <Input placeholder='请输入商品名称' />  
-                  )}
-                </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label='备注'>
-                  {getFieldDecorator('desc',{
-                    initialValue: showData.desc || ''
-                  })(
-                    <Input placeholder='请输入' />  
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-            <FormItem>
-              {getFieldDecorator('goods_group',{
-                initialValue: showData.goodsGroup || []
-              })(
-                <SelectMultiple  goodsGroups={goodsGroups}/>
-              )}
-            </FormItem>
-          </Form>
-        </Card>
-        <Card title='图片' bordered={false} className={styles.bottomCardDivided}>
-          <Form layout = 'horizontal'>
-            <FormItem>
-              {getFieldDecorator('picture',{
-                initialValue: skuImages
-              })(
-                <PictureModal selectColors={selectColors} itemImageLevel={itemImageLevel}/>
-              )}
-            </FormItem>
-          </Form>
-        </Card>
-        <Card title='库存' bordered={false} className={cx({bottomCardDivided:true,cardOuterTab:true})} extra={unitStockSelect}>
-          {
-            warehouses.length === 0 ? (
-              <Form>
-                <FormItem>
-                  {getFieldDecorator('stock',{
-                    initialValue: skuStocks
-                  })(
-                    <StockTable skuStocks={skuStocks} selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
-                  )}
-                </FormItem>
-              </Form>
-            ) : (
-              <Card tabList={stockTabList} onTabChange={this.handleStockTabChange} type="inner" bordered={false} className={styles.cardInnerTab} >
+                </Select>
+                )}
+              </FormItem>
+              <FormItem label='颜色' {...formItemLayout}>
+                {getFieldDecorator('color_select',{
+                  initialValue: showData.colors || []
+                })(
+                <Select mode='multiple' placeholder='请选择颜色' onChange={this.handleGetColorSelect.bind(null,colors)}>
+                  {
+                    colors.map( item => {
+                      return (
+                        <Option key={item.id} value={(item.id).toString()}>{`${item.name}`}</Option>
+                      )
+                    })
+                  }
+                </Select>
+                )}
+              </FormItem>
+              <FormItem label='尺码' {...formItemLayout}>
+                {getFieldDecorator('size_select',{
+                  initialValue: showData.sizes ||  []
+                })(
+                <Select mode='multiple' onChange={this.handleGetSizeSelect.bind(null,sizeLibrarys)} placeholder={selectColors.length == 0 ? '请先选择颜色' : '请选择尺码'} disabled={selectColors.length ==  0 ? true : false }>
+                  {
+                    sizeLibrarys.map( item => {
+                      return (
+                        <Option key={item.id} value={(item.id).toString()}>{`${item.name}`}</Option>
+                      )
+                    })
+                  }
+                </Select>
+                )}
+              </FormItem>
+            </Form>
+          </Card>
+          <Card title='描述' bordered={false} className={styles.bottomCardDivided}>
+            <Form layout='vertical'>
+              <Row gutter={64}>
+                <Col span={8}>
+                  <FormItem label='名称'>
+                    {getFieldDecorator('name',{
+                      initialValue: showData.name || ''
+                    })(
+                      <Input placeholder='请输入商品名称' />  
+                    )}
+                  </FormItem>
+                </Col>
+                <Col span={8}>
+                  <FormItem label='备注'>
+                    {getFieldDecorator('desc',{
+                      initialValue: showData.desc || ''
+                    })(
+                      <Input placeholder='请输入' />  
+                    )}
+                  </FormItem>
+                </Col>
+              </Row>
+              <FormItem>
+                {getFieldDecorator('goods_group',{
+                  initialValue: showData.goodsGroup || {}
+                })(
+                  <SelectMultiple  goodsGroups={goodsGroups}/>
+                )}
+              </FormItem>
+            </Form>
+          </Card>
+          <Card title='图片' bordered={false} className={styles.bottomCardDivided}>
+            <Form layout = 'horizontal'>
+              <FormItem>
+                {getFieldDecorator('picture',{
+                  initialValue: skuImages
+                })(
+                  <GoodsPictureModal itemImageLevel={itemImageLevel} selectColors={selectColors} />
+                )}
+              </FormItem>
+            </Form>
+          </Card>
+          <Card title='库存' bordered={false} className={cx({bottomCardDivided:true,cardOuterTab:true})} extra={unitStockSelect}>
+            {
+              warehouses.length === 0 ? (
                 <Form>
                   <FormItem>
                     {getFieldDecorator('stock',{
                       initialValue: skuStocks
                     })(
-                      <StockTable skuStocks={skuStocks} selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
+                      <StockTable selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
+                    )}
+                  </FormItem>
+                </Form>
+              ) : (
+                <Card tabList={stockTabList} onTabChange={this.handleStockTabChange} type="inner" bordered={false} className={styles.cardInnerTab} >
+                  <Form>
+                    <FormItem>
+                      {getFieldDecorator('stock',{
+                        initialValue: skuStocks
+                      })(
+                        <StockTable selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
+                      )}
+                    </FormItem>
+                  </Form>
+                </Card>
+              )
+            }
+          </Card>
+          {
+            itemBarcodeLevel !== -1 ? (
+              <Card title='条码' bordered={false}>
+                <Form>
+                  <FormItem>
+                    {getFieldDecorator('barcode',{
+                      initialValue: skuBarcodes
+                    })(
+                       <BarCodeTable  selectColors={selectColors} selectSizes={selectSizes} itemBarcodeLevel={itemBarcodeLevel}/>
                     )}
                   </FormItem>
                 </Form>
               </Card>
-            )
+            ) : null
           }
-        </Card>
-        {
-          itemBarcodeLevel !== -1 ? (
-            <Card title='条码' bordered={false}>
-              <Form>
-                <FormItem>
-                  {getFieldDecorator('barcode',{
-                    initialValue: showData.barcode || skuBarcodes
-                  })(
-                     <BarCodeTable skuBarcodes={skuBarcodes} selectColors={selectColors} selectSizes={selectSizes} itemBarcodeLevel={itemBarcodeLevel}/>
-                  )}
-                </FormItem>
-              </Form>
-            </Card>
-          ) : null
-        }
-        <FooterToolbar>
-          <Popconfirm title={ showData.item_ref ?  '确认放弃编辑商品' : '确认放弃新建商品'} onConfirm={this.handleCancel}><Button>取消</Button></Popconfirm>
-          <Button type="primary" onClick={this.handleSubmit}>
-            确认
-          </Button>
-        </FooterToolbar>
+          <FooterToolbar>
+            <div id="noScroll">
+              <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={ showData.item_ref ?  '确认放弃编辑商品' : '确认放弃新建商品'} onConfirm={this.handleCancel}><Button>取消</Button></Popconfirm>
+              <Button type="primary" onClick={this.handleSubmit}>
+                确认
+              </Button>
+            </div>
+          </FooterToolbar>
+        </Spin>
       </PageHeaderLayout>
     );
   }
