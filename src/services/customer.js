@@ -46,9 +46,6 @@ export async function getCustomerfinance (params) {
 export async function getCustomerSaleHistory (params) {
   let current = {...params};
   delete current.id
-  if(current.filter) {
-    current = current.filter
-  }
   return request(`${apiBase}/api/customers/${params.id}/salesorders`, {
     method: 'POST',
     headers: {"Authorization":token},
@@ -59,9 +56,6 @@ export async function getCustomerSaleHistory (params) {
 export async function getCustomerGoodsHistory (params) {
   let current = {...params};
   delete current.id
-  if(current.filter) {
-    current = current.filter
-  }
   return request(`${apiBase}/api/customers/${params.id}/items`, {
     method: 'POST',
     headers: {"Authorization":token},
@@ -72,9 +66,6 @@ export async function getCustomerGoodsHistory (params) {
 export async function getCustomerPaymentHistory (params) {
   let current = {...params};
   delete current.id
-  if(current.filter) {
-    current = current.filter
-  }
   return request(`${apiBase}/api/customers/${params.id}/payments`,{
     method: 'POST',
     headers: {"Authorization":token},
@@ -97,7 +88,7 @@ export async function getSalesordersNeedPay (params) {
 }
 
 export async function getStatementsNeedPay (params) {
-  return request(`${apiBase}/api/customers/${params.id}/statementsw/need_pay`,{
+  return request(`${apiBase}/api/customers/${params.id}/statements/need_pay`,{
     method: 'POST',
     headers: {'Authorization': token}
   })

@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import moment from 'moment';
+import classNames from 'classnames/bind'
+import currency from 'currency.js'
 import { Row, Col, Card, Button, message, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../components/antd-pro/StandardFormRow';
@@ -11,6 +13,9 @@ const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const agoSevenDays = new Date((new Date).getTime() - 7*24*60*60*1000)
+const NCNF = value => currency(value, { symbol: "", precision: 2 });
+const NCNI = value => currency(value, { symbol: "", precision: 0});
+let cx = classNames.bind(styles);
 const tabList = [{
   key: 'sale',
   tab: '销售'
@@ -325,22 +330,22 @@ export default class GoodsList extends PureComponent {
       title: '标准价',
       dataIndex: 'standard_price',
       className: styles['numberRightMove'],
-      render:(text,record) => Number(record.standard_price).toFixed(2)
+      render:(text,record) => NCNF(record.standard_price).format(true)
     }, {
       title: '销售量',
       dataIndex: 'sales_quantity',
       className: styles.numberRightMove,
-      render:(text,record) => Number(record.sales_quantity)
+      render:(text,record) => NCNI(record.sales_quantity).format(true)
     }, {
       title: '销售额',
       dataIndex: 'sales_amount',
       className: styles.numberRightMove,
-      render:(text,record) => Number(record.sales_amount).toFixed(2)
+      render:(text,record) => NCNF(record.sales_amount).format(true)
     }, {
       title: '库存量',
       dataIndex: 'stock_quantity',
       className: styles['numberRightMove'],
-      render:(text,record) => Number(record.stock_quantity)
+      render:(text,record) => NCNI(record.stock_quantity).format(true)
     }, {
       title: '状态',
       dataIndex: 'not_sale',
@@ -360,7 +365,7 @@ export default class GoodsList extends PureComponent {
     }, {
       title: '操作',
       dataIndex: 'operation',
-      width:'162px',  
+      width:'172px',  
       render: (text,record,index) =>( this.handleMoreOperation(record) )
     }]
 
@@ -371,22 +376,22 @@ export default class GoodsList extends PureComponent {
       title: '标准价',
       dataIndex: 'standard_price',
       className: styles['numberRightMove'],
-      render:(text,record) => Number(record.standard_price).toFixed(2)
+      render:(text,record) => NCNF(record.standard_price).format(true)
     }, {
       title: '进货量',
       dataIndex: 'purchase_quantity',
       className: styles['numberRightMove'],
-      render:(text,record) => Number(record.purchase_quantity)
+      render:(text,record) => NCNI(record.purchase_quantity).format(true)
     }, {
       title: '进货额',
       dataIndex: 'purchase_amount',
       className: styles['numberRightMove'],
-      render:(text,record) => Number(record.purchase_amount).toFixed(2)
+      render:(text,record) => NCNF(record.purchase_amount).format(true)
     }, {
       title: '库存量',
       dataIndex: 'stock_quantity',
       className: styles['numberRightMove'],
-      render:(text,record) => Number(record.stock_quantity)
+      render:(text,record) => NCNI(record.stock_quantity).format(true)
     }, {
       title: '状态',
       dataIndex: 'not_sale',
@@ -406,7 +411,7 @@ export default class GoodsList extends PureComponent {
     }, {
       title: '操作',
       dataIndex: 'operation',
-      width:'162px', 
+      width:'172px', 
       render: (text,record,index) =>( this.handleMoreOperation(record) )
     }];
 
@@ -464,7 +469,7 @@ export default class GoodsList extends PureComponent {
         extraContent={extra}
         onTabChange={this.handleTabChange}
       >
-        <div style={{display: activeTabKey == 'sale' ? 'block' : 'none'}} >
+        <div style={{display: activeTabKey == 'sale' ? 'block' : 'none'}} key='sale'>
           <Card bordered={false} className={styles.bottomCardDivided}>
             <Form layout='inline'>
               {
@@ -503,10 +508,13 @@ export default class GoodsList extends PureComponent {
               pagination={salePagination}
             >
             </Table>
+            <div style={{marginTop:-42,width:300}}>
+              <span>{`共 ${goodsSalePagination.total || ''} 件商品 第 ${pagesSale.page} / ${Math.ceil(Number(goodsSalePagination.total)/Number(pagesSale.per_page))} 页`}</span>
+            </div>
           </Card>
         </div>  
-        <div style={{display: activeTabKey == 'purchase' ? 'block' : 'none'}}>
-          <Card bordered={false} className={styles.bottomCardDivided} >
+        <div style={{display: activeTabKey == 'purchase' ? 'block' : 'none'}} key='purchase'>
+          <Card bordered={false} className={cx({bottomCardDivided:true,specialCardBody:true})} >
             <Form layout='inline'>
               {
                 goodsPurchaseFilter.map( (item,index) => {
@@ -536,7 +544,7 @@ export default class GoodsList extends PureComponent {
               </FormItem>
             </Form>
           </Card>
-          <Card bordered={false} title='商品' className={styles.goodsList} extra={sortPurchaseExtra}>
+          <Card bordered={false} title='商品' className={cx({goodsList:true,specialCardBody:true,specialCardHead:true})} extra={sortPurchaseExtra}>
             <Table 
               rowKey='id'
               columns={purchaseColumns} 
@@ -544,6 +552,9 @@ export default class GoodsList extends PureComponent {
               pagination={putchasePagination}
             >
             </Table>
+            <div style={{marginTop:-42,width:300}}>
+              <span>{`共 ${goodsPurchasePagination.total || ''} 件商品 第 ${pagesPurchase.page} / ${Math.ceil(Number(goodsPurchasePagination.total)/Number(pagesPurchase.per_page))} 页`}</span>
+            </div>
           </Card>
         </div>
       </PageHeaderLayout>

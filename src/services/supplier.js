@@ -41,15 +41,13 @@ export async function getSingle (params) {
   })
 }
 
-
-// export async function editSingle (params) {
-//   return request({
-//     url: `${apiBase.duoke}/api/suppliers/${params.id}`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function editSingle (params) {
+  return request(`${apiBase}/api/suppliers/${params.id}`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: params.serverData,
+  })
+}
 
 export async function getSupplierSaleHistory (params) {
   let current = {...params};

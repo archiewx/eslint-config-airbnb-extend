@@ -2,11 +2,14 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import moment from 'moment';
+import currency from 'currency.js'
 import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker,Spin} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
 import TagSelect from '../../../../components/DuokeTagSelect';
 import styles from './CustomerList.less'
+const NCNF = value => currency(value, { symbol: "", precision: 2 });
+const NCNI = value => currency(value, { symbol: "", precision: 0});
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -71,6 +74,16 @@ const sortOptions = [{
     debt: 'asc'
   }
 }]
+const condition = {
+  sorts: {
+    created_at: 'desc'
+  },
+  page:1,
+  per_page:10,
+  date_type:'custom',
+  sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+  eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
+}
 @Form.create()
 @connect(state => ({
   customerList:state.customerList,
@@ -91,6 +104,10 @@ export default class CustomerList extends PureComponent {
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     },
+  }
+
+  componentDidMount() {
+    this.props.dispatch({type:'customerList/getList',payload:{...condition}})
   }
 
   handleToCustomerCreate = () => {
@@ -195,16 +212,22 @@ export default class CustomerList extends PureComponent {
     }, {
       title: '交易笔数',
       dataIndex: 'trade_count',
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.trade_count).format(true)
     }, {
       title: '交易金额',
       dataIndex: 'trade_amount',
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNF(record.trade_amount).format(true)
     }, {
       title: '欠款金额',
       dataIndex: 'debt',
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNF(record.debt).format(true)
     }, {
       title: '操作',
       dataIndex: 'operation',
-      width:'162px', 
+      width:'172px', 
       render: (text,record,index) =>( this.handleMoreOperation(record) )
     }];
 
@@ -237,46 +260,47 @@ export default class CustomerList extends PureComponent {
         extraContent={this.handleHeaderExtra()}
         className={styles.customerListExtra}
         >
-        <Spin size='large' spinning = {!customerList.length}>
-          <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout='inline'>
-              {
-                customerFilter.map( (item,index) => {
-                  return (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`${item.code}`)(
-                          <TagSelect expandable onChange={this.handleCustomerFormSubmit}>
-                            {
-                              item.options.map( (subItem,subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  )
-                })
-              }
-              <FormItem label='选择日期' >
-                {getFieldDecorator('datePick',{
-                  initialValue:[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
-                })(
-                  <RangePicker style={{width:542}} onChange={this.handleCustomerFormSubmit}/>
-                )}
-              </FormItem>
-            </Form>
-          </Card>
-          <Card bordered={false} title='客户列表' extra={this.handleTableSortExtra()}>
-            <Table 
-              rowKey='id'
-              columns={columns} 
-              dataSource={customerList} 
-              pagination={pagination}
-            />
-          </Card>
-        </Spin>
+        <Card bordered={false} className={styles.bottomCardDivided}>
+          <Form layout='inline'>
+            {
+              customerFilter.map( (item,index) => {
+                return (
+                  <StandardFormRow key={`${index}`} title={`${item.name}`} block>
+                    <FormItem>
+                      {getFieldDecorator(`${item.code}`)(
+                        <TagSelect expandable onChange={this.handleCustomerFormSubmit}>
+                          {
+                            item.options.map( (subItem,subIndex) => {
+                              return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
+                            })
+                          }
+                        </TagSelect>
+                      )}
+                    </FormItem>
+                  </StandardFormRow>
+                )
+              })
+            }
+            <FormItem label='选择日期' >
+              {getFieldDecorator('datePick',{
+                initialValue:[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+              })(
+                <RangePicker style={{width:542}} onChange={this.handleCustomerFormSubmit}/>
+              )}
+            </FormItem>
+          </Form>
+        </Card>
+        <Card bordered={false} title='客户列表' extra={this.handleTableSortExtra()}>
+          <Table 
+            rowKey='id'
+            columns={columns} 
+            dataSource={customerList} 
+            pagination={pagination}
+          />
+          <div style={{marginTop:-42,width:300}}>
+            <span>{`共 ${customerPagination.total || ''} 位客户 第 ${pages.page} / ${Math.ceil(Number(customerPagination.total)/Number(pages.per_page))} 页`}</span>
+          </div>
+        </Card>
       </PageHeaderLayout>
     );
   }

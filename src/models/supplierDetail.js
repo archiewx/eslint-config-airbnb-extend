@@ -1,5 +1,6 @@
 import * as supplierService from '../services/supplier'
 import pathToRegexp from 'path-to-regexp'
+import moment from 'moment';
 export default  {
 
   namespace: 'supplierDetail',
@@ -22,8 +23,8 @@ export default  {
     setup({ dispatch, history }) {
       history.listen(() => {
         const match = pathToRegexp('/relationship/supplier-detail/:id').exec(location.hash.slice(1,location.hash.length))
+        dispatch({type:'setState',payload:{singleSupplierDetail:{}}})
         if(match) {
-          dispatch({type:'setState',payload:{singleSupplierDetail:{}}})
           dispatch({type:'getSingle',payload:{id:match[1]}})
         }
       })
@@ -32,17 +33,29 @@ export default  {
 
   effects: {
     *getSingle({payload},{call,put,all}) {
-      const saleOrPaymentPayload = {
-        id:payload.id,
-        sorts:{
-          created_at:'desc'
-        }
+      const condition = {
+        sorts: {
+          created_at: 'desc'
+        },
+        date_type:'custom',
+        sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+        eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+        id:payload.id
+      }
+      const conditionWTwo = {
+        sorts: {
+          purchase_time: 'desc'
+        },
+        date_type:'custom',
+        sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+        eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+        id:payload.id
       }
       const [data1,data2,data3,data4] = yield all([
         call(supplierService.getSingle,payload),
-        call(supplierService.getSupplierSaleHistory,saleOrPaymentPayload),
-        call(supplierService.getSupplierGoodsHistory,payload),
-        call(supplierService.getSupplierPaymentHistory,saleOrPaymentPayload)
+        call(supplierService.getSupplierSaleHistory,conditionWTwo),
+        call(supplierService.getSupplierGoodsHistory,conditionWTwo),
+        call(supplierService.getSupplierPaymentHistory,conditionWTwo)
       ])
 
       yield put({type:'setShowData',payload:data1.result.data})

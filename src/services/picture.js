@@ -11,10 +11,9 @@ export async function upload (params) {
   const formData = new FormData();
   formData.append('image_name',params.image_name)
   formData.append('image_file',params.image_file)
-
   fetch(`${apiBase}/api/images`,{
     method: 'POST',
-    headers: { "Authorization": token,'Content-Type':'application/x-www-form-urlencoded;charset=utf-8' },
+    headers: { "Authorization": token },
     body: formData
   })
 }

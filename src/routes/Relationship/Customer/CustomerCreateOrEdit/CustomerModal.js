@@ -29,6 +29,7 @@ export default class CustomerModal extends PureComponent {
           ...value,
           ...{create:{uid:uid},edit:{uid:formValue.uid}}[type],
           ...{create:{default:addresses.length == 0 ? 1 : 0},edit: {default:formValue.default}}[type],
+          ...{edit:{sid:formValue.sid}}[type]
         })
       }
     })

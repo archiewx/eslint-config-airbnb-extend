@@ -91,18 +91,9 @@ export default class GoodsCreateOrEdit extends PureComponent {
     const {warehouses} = nextProps.warehouse;
     const {showData} = nextProps.goodsCreateOrEdit;
     let priceTableValue = {};
-    if(showData.units) {
+    if(showData.selectUnits) {
       if(!!units.length && this.state.selectUnits.length == 1) {
-        const selectUnits = [];
-        showData.units.forEach( item => {
-          const alreadySelectUnit = units.find(n => n.id == item)
-          selectUnits.push({
-            name: `${alreadySelectUnit.name} x ( ${alreadySelectUnit.number} )`,
-            number: `${alreadySelectUnit.number}`,
-            id: alreadySelectUnit.id
-          })
-        })
-        this.setState({selectUnits})
+        this.setState({selectUnits:[...showData.selectUnits]})
       }
     }else {
       if(!!units.length && !this.state.selectUnits.length ) {
@@ -117,37 +108,21 @@ export default class GoodsCreateOrEdit extends PureComponent {
         this.setState({selectUnits,defaultSelectUnits})
       }
     }
-    if(showData.colors && !this.state.selectColors.length &&  !!colors.length) {
-      const selectColors = [];
-      showData.colors.forEach( item => {
-        const alreadySelectColor = colors.find( n => n.id == item)
-        selectColors.push({
-          name: `${alreadySelectColor.name}`,
-          id: alreadySelectColor.id
-        })
-      })
-      this.setState({selectColors})
+    if(showData.selectColors && !this.state.selectColors.length) {
+      this.setState({selectColors:[...showData.selectColors]})
     } 
-    if(showData.sizes && !this.state.selectSizes.length & !!sizeLibrarys.length) {
-      const selectSizes = [];
-      showData.sizes.forEach( item => {
-        const alreadySelectSize = sizeLibrarys.find( n => n.id == item) 
-        selectSizes.push({
-          name: `${alreadySelectSize.name}`,
-          id: alreadySelectSize.id
-        })
-      })
-      this.setState({selectSizes})
+    if(showData.selectSizes && !this.state.selectSizes.length) {
+      this.setState({selectSizes:[...showData.selectSizes]})
     }
-    if(showData.prices) {
-      if( !!priceGrades.length && !!shops.length && !!units.length && (Object.values(this.state.priceTableValue).length == priceGrades.length || Object.values(this.state.priceTableValue).length == shops.length || Object.values(this.state.priceTableValue).length == (shops.length * priceGrades.length) )) {
-        if(showData.prices.price) {
+    if(showData.prices ) {
+      if( !!priceGrades.length && !!shops.length && showData.selectUnits && showData.selectQuantityStep && (Object.values(this.state.priceTableValue).length == priceGrades.length || Object.values(this.state.priceTableValue).length == shops.length || Object.values(this.state.priceTableValue).length == (shops.length * priceGrades.length) )) {
+        if(!showData.prices.price) {
           if(usePricelelvel === 'yes') {
             if(priceModel === '') {
               priceGrades.forEach( item => {
                 priceTableValue[`${item.id}`] = {
                   pricelevel_id: item.id,
-                  price: showData.prices.price
+                  price: showData.prices[`${item.id}`].price
                 }
               })
             }else if(priceModel === 'shop') {
@@ -156,23 +131,30 @@ export default class GoodsCreateOrEdit extends PureComponent {
                   priceTableValue[`${item.id}_${subItem.id}`] = {
                     shop_id: item.id,
                     pricelevel_id: subItem.id,
-                    price: showData.prices.price
+                    price: showData.prices[`${item.id}_${subItem.id}`].price
                   }
                 })
               })
             }else if(priceModel === 'unit') {
-              let selectUnits = [].concat(units.find( n => n.default == 1))
-              selectUnits.forEach( item => {
+              showData.selectUnits.forEach( item => {
                 priceGrades.forEach( subItem => {
                   priceTableValue[`${item.id}_${subItem.id}`] = {
                     unit_id: item.id,
                     pricelevel_id: subItem.id,
-                    price: showData.prices.price
+                    price: showData.prices[`${item.id}_${subItem.id}`].price
                   }
                 })
               })
             }else if(priceModel === 'quantityrange') {
-
+              showData.selectQuantityStep.forEach( item => {
+                priceGrades.forEach( subItem => {
+                  priceTableValue[`${item.id}_${subItem.id}`] = {
+                   quantityrange_id: item.id,
+                   pricelevel_id:subItem.id,
+                   price:showData.prices[`${item.id}_${subItem.id}`].price
+                  }
+                })
+              })
             }
           }else {
             if(priceModel === '') {
@@ -181,19 +163,23 @@ export default class GoodsCreateOrEdit extends PureComponent {
               shops.forEach( item => {
                 priceTableValue[`${item.id}`] = {
                   shop_id: item.id,
-                  price:  showData.prices.price
+                  price:  showData.prices[`${item.id}`].price
                 }
               })
             }else if(priceModel === 'unit') {
-              let selectUnits = [].concat(units.find( n => n.default == 1))
-              selectUnits.forEach( item => {
+              showData.selectUnits.forEach( item => {
                 priceTableValue[`${item.id}`] = {
                   unit_id: item.id,
-                  price: showData.prices.price
+                  price: showData.prices[`${item.id}`].price
                 }
               })
             }else if(priceModel === 'quantityrange') {
-              
+              showData.selectQuantityStep.forEach( item => {
+                priceTableValue[`${item.id}`] = {
+                  quantityrange_id: item.id,
+                  price: showData.selectQuantityStep[`${item.id}`].price
+                }
+              })
             }
           }
           this.setState({priceTableValue})
@@ -260,10 +246,10 @@ export default class GoodsCreateOrEdit extends PureComponent {
         this.setState({priceTableValue})
       }
     }
-    if(showData.colors && showData.sizes && showData.stocks) {
+    if(showData.selectColors && showData.selectSizes && showData.stocks) {
       if(!!warehouses.length && (Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length  == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length) )) {
         let skuStocks = {};
-        if(this.state.selectColors.length == 0) {
+        if(showData.selectColors.length == 0) {
           warehouses.forEach( item => {
             skuStocks[`${item.id}`] = {
               warehouse_id: item.id,
@@ -271,9 +257,9 @@ export default class GoodsCreateOrEdit extends PureComponent {
             }
           })
         }else {
-          if(this.state.selectSizes.length == 0) {
+          if(showData.selectSizes.length == 0) {
             warehouses.forEach( item => {
-              this.state.selectColors.forEach( colorItem => {
+              showData.selectColors.forEach( colorItem => {
                 skuStocks[`${item.id}_${colorItem.id}`] = {
                   warehouse_id: item.id,
                   store_quantity: (showData.stocks[`${item.id}_${colorItem.id}`] || {}).store_quantity 
@@ -282,8 +268,8 @@ export default class GoodsCreateOrEdit extends PureComponent {
             })
           }else {
             warehouses.forEach( item => {
-              this.state.selectColors.forEach( colorItem => {
-                this.state.selectSizes.forEach( sizeItem => {
+              showData.selectColors.forEach( colorItem => {
+                showData.selectSizes.forEach( sizeItem => {
                   skuStocks[`${item.id}_${colorItem.id}_${sizeItem.id}`] = {
                     warehouse_id: item.id,
                     store_quantity: (showData.stocks[`${item.id}_${colorItem.id}_${sizeItem.id}`] || {}).store_quantity 
@@ -307,7 +293,6 @@ export default class GoodsCreateOrEdit extends PureComponent {
           })
         }else {
           if(this.state.selectSizes.length == 0) {
-            console.log(4)
             warehouses.forEach( item => {
               this.state.selectColors.forEach( colorItem => {
                 skuStocks[`${item.id}_${colorItem.id}`] = {
@@ -332,34 +317,28 @@ export default class GoodsCreateOrEdit extends PureComponent {
         this.setState({skuStocks})
       }
     }
-    if(showData.colors && showData.sizes && showData.barcodes) {
+    if(showData.selectColors && showData.selectSizes && showData.barcodes) {
       if(Object.values(this.state.skuBarcodes).length == 1 || Object.values(this.state.skuBarcodes).length == this.state.selectColors.length || Object.values(this.state.skuBarcodes).length == (this.state.selectColors.length * this.state.selectSizes.length)) {
         let skuBarcodes = {};
-        if(itemBarcodeLevel == 0) {
+        if(showData.selectColors.length == 0 || itemBarcodeLevel == 0 ) {
           skuBarcodes = {
             barcode: showData.barcodes.barcode || ''
           }
         }else {
-          if(this.state.selectColors.length == 0 || itemBarcodeLevel == 0 ) {
-            skuBarcodes = {
-              barcode: showData.barcodes.barcode || ''
-            }
+          if(showData.selectSizes.length == 0) {
+            showData.selectColors.forEach( item => {
+              skuBarcodes[`${item.id}`] = {
+                barcode: showData.barcodes[`${item.id}`].barcode || ''
+              }
+            })
           }else {
-            if(this.state.selectSizes.length == 0) {
-              this.state.selectColors.forEach( item => {
-                skuBarcodes[`${item.id}`] = {
-                  barcode: showData.barcodes[`${item.id}`].barcode || ''
+            showData.selectColors.forEach( item => {
+              showData.selectSizes.forEach( subItem => {
+                skuBarcodes[`${item.id}_${subItem.id}`] = {
+                  barcode : showData.barcodes[`${item.id}_${subItem.id}`].barcode || ''
                 }
               })
-            }else {
-              selectColors.forEach( item => {
-                selectSizes.forEach( subItem => {
-                  skuBarcodes[`${item.id}_${subItem.id}`] = {
-                    barcode : showData.barcodes[`${item.id}_${subItem.id}`].barcode || ''
-                  }
-                })
-              })
-            }
+            })
           }
         }
         this.setState({skuBarcodes})
@@ -393,7 +372,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     }
     if(this.state.selecStockUnitNum == '' && !!units.length) {
       this.setState({
-        selecStockUnitNum: units.find( n => n.default == '1').number 
+        selecStockUnitNum: Number(units.find( n => n.default == '1').number )
       })
     }
     if(this.state.selectWarehouseId == '' && !!warehouses.length) {
@@ -432,9 +411,9 @@ export default class GoodsCreateOrEdit extends PureComponent {
           itemBarcodeLevel: this.props.configSetting.itemBarcodeLevel,
           itemImageLevel: this.props.configSetting.itemImageLevel
         }})
-        // this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods'}).then(()=>{
-        //   this.props.dispatch(routerRedux.push('/goods-list'))
-        // })
+        this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods'}).then(()=>{
+          // this.props.dispatch(routerRedux.push('/goods-list'))
+        })
       }
     })
   }
@@ -478,8 +457,14 @@ export default class GoodsCreateOrEdit extends PureComponent {
     setTimeout(() => {
       let standardPrice = form.getFieldValue('standard_price')
       for(let key in priceTableValue) {
-        if(priceTableValue[key].price == oldstandardPrice || priceTableValue[key].price == null) {
-          priceTableValue[key].price = standardPrice
+        if(this.props.configSetting.priceModel == 'unit') {
+          if(priceTableValue[key].price == oldstandardPrice || priceTableValue[key].price == null) {
+            priceTableValue[key].price = Number(standardPrice) * Number(priceTableValue[key].unit_id)
+          }
+        }else {
+          if(priceTableValue[key].price == oldstandardPrice || priceTableValue[key].price == null) {
+            priceTableValue[key].price = standardPrice
+          }
         }
       }
       form.setFieldsValue({prices_table:priceTableValue})
@@ -561,7 +546,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                 priceTableValue[`${item}_${subItem.id}`] = {
                   unit_id: item,
                   pricelevel_id: subItem.id,
-                  price: form.getFieldValue('standard_price') || null
+                  price: Number(form.getFieldValue('standard_price')) * Number(item.number) || null
                 }
               })
             })
@@ -572,7 +557,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             current.forEach( item => {
               priceTableValue[`${item}`] = {
                 unit_id: item,
-                price: form.getFieldValue('standard_price') || null
+                price: Number(form.getFieldValue('standard_price')) * Number(item.number) || null
               }
             })
             form.setFieldsValue({prices_table:priceTableValue})
@@ -687,7 +672,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
 
   handleUnitStockSelect = (value) => {
     this.setState({
-      selecStockUnitNum:value.split('').reverse().join('').match(/\d+/)[0].split('').reverse().join('')
+      selecStockUnitNum:Number(value.split('').reverse().join('').match(/\d+/)[0].split('').reverse().join(''))
     })
   }
 

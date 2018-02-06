@@ -1,65 +1,75 @@
 import React, { PureComponent } from 'react';
+import {apiBase,token} from '../../common/index'
 import { connect } from 'dva';
-import {Table,InputNumber,Form,Card,Button} from 'antd';
+import {Table,InputNumber,Form,Card,Button,Upload, Icon, Modal} from 'antd';
 const FormItem = Form.Item;
-@connect(({test,priceGrade}) => ({
-  test,
-  priceGrade
-}))
-@Form.create()
-export default class Test extends PureComponent {
+// @connect(({test,priceGrade}) => ({
+//   test,
+//   priceGrade
+// }))
+class PicturesWall extends React.Component {
+  state = {
+    previewVisible: false,
+    previewImage: '',
+    fileList: [{
+      uid: -1,
+      name: 'xxx.png',
+      status: 'done',
+      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    }],
+  };
 
-  componentWillReceiveProps() {
+  handleCancel = () => this.setState({ previewVisible: false })
 
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true,
+    });
   }
 
-  handleChange = (value) => {
-    const {form} = this.props;
-    let oldVal = form.getFieldValue('input1')
-    console.log(oldVal,'old')
-    setTimeout(() => {
-      let val = form.getFieldValue('input1')
-      console.log(val)
-      // if(val == '') {
-      //   form.setFieldsValue({input1:undefined})
-      // }else {
-      //   form.setFieldsValue({input1:val})
-      // }
-      if(oldVal == '') {
-        form.setFieldsValue({input1:undefined})
-      }
-    }, 4)
-  }
-
-  // handleFormatter = (value) => {
-  //   return value
-  // }
-
-  // handleParser = (value) => {
-  //   return value
-  // }
+  handleChange = ({ fileList }) => this.setState({ fileList })
 
   render() {
-    const {getFieldDecorator} = this.props.form
-    return (
+    const { previewVisible, previewImage, fileList } = this.state;
+    const uploadButton = (
       <div>
-        <Form>
-          <FormItem label='测试'>
-            {getFieldDecorator('input1',{
-              rules: [{required:true}],
-              initialValue:''
-            })(
-              <InputNumber  
-                onChange={this.handleChange}
-                // formatter={this.handleFormatter}
-                // parser={this.handleParser}
-              />
-            )}
-          </FormItem>
-        </Form>
+        <Icon type="plus" />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    );
+    return (
+      <div className="clearfix">
+        <Upload
+          action="http://duoke3api.duoke.net/api/images"
+          listType="picture-card"
+          fileList={fileList}
+          onPreview={this.handlePreview}
+          onChange={this.handleChange}
+          name={'image_file'}
+          headers={ {"Authorization": token} }
+          data={(file)=>({image_name:file.name})}
+        >
+          {fileList.length >= 3 ? null : uploadButton}
+        </Upload>
+        <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+          <img alt="example" style={{ width: '100%' }} src={previewImage} />
+        </Modal>
       </div>
     );
   }
 }
+export default class Test extends PureComponent {
+
+  render() {
+    return (
+      <div>
+        <PicturesWall />
+      </div>
+    );
+  }
+}
+
+
 
 

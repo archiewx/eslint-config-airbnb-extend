@@ -2,11 +2,14 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import moment from 'moment';
+import currency from 'currency.js'
 import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker,Spin} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
 import TagSelect from '../../../../components/DuokeTagSelect';
 import styles from './SupplierList.less'
+const NCNF = value => currency(value, { symbol: "", precision: 2 });
+const NCNI = value => currency(value, { symbol: "", precision: 0});
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
@@ -71,6 +74,16 @@ const sortOptions = [{
     balance : 'asc'
   }
 }]
+const condition = {
+  sorts: {
+    created_at: 'desc'
+  },
+  page:1,
+  per_page:10,
+  date_type:'custom',
+  sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+  eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
+}
 @Form.create()
 @connect(state => ({
   supplierList:state.supplierList,
@@ -90,6 +103,10 @@ export default class SupplierList extends PureComponent {
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     },
+  }
+
+  componentDidMount() {
+    this.props.dispatch({type:'supplierList/getList',payload:{...condition}})
   }
 
   handleToSupplierCreate = () => {
@@ -194,16 +211,22 @@ export default class SupplierList extends PureComponent {
     }, {
       title: '交易笔数',
       dataIndex: 'trade_count',
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.trade_count).format(true)
     }, {
       title: '交易金额',
       dataIndex: 'trade_amount',
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNF(record.trade_amount).format(true)
     }, {
       title: '他欠我金额',
       dataIndex: 'balance',
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNF(record.balance).format(true)
     }, {
       title: '操作',
       dataIndex: 'operation',
-      width:'162px', 
+      width:'172px', 
       render: (text,record,index) =>( this.handleMoreOperation(record) )
     }];
 
@@ -236,27 +259,28 @@ export default class SupplierList extends PureComponent {
         extraContent={this.handleHeaderExtra()}
         className={styles.supplierListExtra}
         >
-        <Spin size='large' spinning = {!supplierList.length}>
-          <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout='inline'>
-              <FormItem label='选择日期' >
-                {getFieldDecorator('datePick',{
-                  initialValue:[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
-                })(
-                  <RangePicker style={{width:542}} onChange={this.handleCustomerFormSubmit}/>
-                )}
-              </FormItem>
-            </Form>
-          </Card>
-          <Card bordered={false} title='供应商列表' extra={this.handleTableSortExtra()}>
-            <Table 
-              rowKey='id'
-              columns={columns} 
-              dataSource={supplierList} 
-              pagination={pagination}
-            />
-          </Card>
-        </Spin>
+        <Card bordered={false} className={styles.bottomCardDivided}>
+          <Form layout='inline'>
+            <FormItem label='选择日期' >
+              {getFieldDecorator('datePick',{
+                initialValue:[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
+              })(
+                <RangePicker style={{width:542}} onChange={this.handleCustomerFormSubmit}/>
+              )}
+            </FormItem>
+          </Form>
+        </Card>
+        <Card bordered={false} title='供应商列表' extra={this.handleTableSortExtra()}>
+          <Table 
+            rowKey='id'
+            columns={columns} 
+            dataSource={supplierList} 
+            pagination={pagination}
+          />
+          <div style={{marginTop:-42,width:300}}>
+            <span>{`共 ${supplierPagination.total || ''} 位供应商 第 ${pages.page} / ${Math.ceil(Number(supplierPagination.total)/Number(pages.per_page))} 页`}</span>
+          </div>
+        </Card>
       </PageHeaderLayout>
     );
   }

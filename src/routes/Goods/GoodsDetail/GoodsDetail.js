@@ -2,17 +2,22 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import moment from 'moment';
+import currency from 'currency.js'
+import pathToRegexp from 'path-to-regexp'
 import { Row, Col, Card, Button, message, Table,Icon,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/antd-pro/DescriptionList';
 import StandardFormRow from '../../../components/antd-pro/StandardFormRow';
 import TagSelect from '../../../components/DuokeTagSelect';
+import PriceTextTable from '../../../components/PriceTextTable/PriceTextTable'
 import styles from './GoodsDetail.less'
 const ButtonGroup = Button.Group;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const {Description} = DescriptionList
 const agoSevenDays = new Date((new Date).getTime() - 7*24*60*60*1000)
+const NCNF = value => currency(value, { symbol: "", precision: 2 });
+const NCNI = value => currency(value, { symbol: "", precision: 0});
 const tabList = [{
   key:'message',
   tab:'信息'
@@ -32,71 +37,6 @@ const tabList = [{
   key:'stock',
   tab:'库存'
 }]
-
-const saleColumns = [{
-  title:'名称',
-  dataIndex:'name',
-},{
-  title:'销售量',
-  dataIndex:'sales_quantity',
-  sorter:true,
-  className: styles['numberRightMove'],
-},{
-  title:'销售额',
-  dataIndex:'sales_amount',
-  sorter:true,
-  className: styles['numberRightMove'],
-},{
-  title:'利润',
-  dataIndex:'profit',
-  sorter:true,
-  className: styles['numberRightMove'],
-},{
-  title:'库存',
-  dataIndex:'stock_quantity',
-  sorter:true,
-  className: styles['numberRightMove'],
-}]
-
-const purchaseColumns = [{
-  title:'名称',
-  dataIndex:'name',
-},{
-  title:'进货量',
-  dataIndex:'purchase_quantity',
-  sorter:true,
-  className: styles['numberRightMove'],
-},{
-  title:'进货额',
-  dataIndex:'purchase_amount',
-  sorter:true,
-  className: styles['numberRightMove'],
-},{
-  title:'库存',
-  dataIndex:'stock_quantity',
-  sorter:true,
-  className: styles['numberRightMove'],
-}]
-
-const stockColumns = [{
-  title:'名称',
-  dataIndex:'name',
-},{
-  title:'出货量',
-  dataIndex:'sales_quantity',
-  sorter:true,
-  className: styles['numberRightMove'],
-},{
-  title:'入货量',
-  dataIndex:'purchase_quantity',
-  sorter:true,
-  className: styles['numberRightMove'],
-},{
-  title:'库存量',
-  dataIndex:'stock_quantity',
-  sorter:true,
-  className: styles['numberRightMove'],
-}]
 const customerPagination = {
   showQuickJumper:true,
   showSizeChanger:true,
@@ -108,7 +48,8 @@ const supplierPagination = {
 @Form.create()
 @connect( state => ({
   goodsDetail: state.goodsDetail,
-  layoutFilter: state.layoutFilter
+  layoutFilter: state.layoutFilter,
+  configSetting: state.configSetting,
 }))
 export default class GoodsDetail extends PureComponent {
 
@@ -157,7 +98,19 @@ export default class GoodsDetail extends PureComponent {
       date_type:'custom',
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+    },
+  }
+
+  componentDidMount() {
+    if(this.props.history.location.pathname.indexOf('/goods-detail') > -1) {
+      const match = pathToRegexp('/goods-detail/:id').exec(this.props.history.location.pathname)
+      if(match) {
+        this.props.dispatch({type:'goodsDetail/getSingle',payload:{id:match[1]}})
+      }
     }
+  }
+
+  componentWillReceiveProps(nextProps) {
   }
 
   handleTabChange = (key) => {
@@ -390,7 +343,8 @@ export default class GoodsDetail extends PureComponent {
     const {activeTabKey,selectCustomerMode} = this.state
     const {singleGoodsDetail,singleGoodsSales,singleGoodsPurchases,singleGoodsCustomers,singleGoodsSuppliers,singleGoodsStocks,currentId,singleCustomerMode} = this.props.goodsDetail
     const {goodsDetailFilter} = this.props.layoutFilter
-    const {getFieldDecorator,getFieldValue} = this.props.form
+    const {getFieldDecorator,getFieldValue} = this.props.form;
+    const {usePricelelvel,priceModel} = this.props.configSetting;
     const description = (
       <DescriptionList col='2' size="small" className={styles.descriptionPostion} >
         <Description term='进货价'>{`${singleGoodsDetail.purchase_price || ''}`}</Description>
@@ -490,6 +444,81 @@ export default class GoodsDetail extends PureComponent {
       </div>
     )
 
+    const saleColumns = [{
+      title:'名称',
+      dataIndex:'name',
+    },{
+      title:'销售量',
+      dataIndex:'sales_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.sales_quantity).format(true)
+    },{
+      title:'销售额',
+      dataIndex:'sales_amount',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNF(record.sales_amount).format(true)
+    },{
+      title:'利润',
+      dataIndex:'profit',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNF(record.profit).format(true)
+    },{
+      title:'库存',
+      dataIndex:'stock_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.stock_quantity).format(true)
+    }]
+
+    const purchaseColumns = [{
+      title:'名称',
+      dataIndex:'name',
+    },{
+      title:'进货量',
+      dataIndex:'purchase_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.purchase_quantity).format(true)
+    },{
+      title:'进货额',
+      dataIndex:'purchase_amount',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNF(record.purchase_amount).format(true)
+    },{
+      title:'库存',
+      dataIndex:'stock_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.stock_quantity).format(true)
+    }]
+
+    const stockColumns = [{
+      title:'名称',
+      dataIndex:'name',
+    },{
+      title:'出货量',
+      dataIndex:'sales_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.sales_quantity).format(true)
+    },{
+      title:'入货量',
+      dataIndex:'purchase_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.purchase_quantity).format(true)
+    },{
+      title:'库存量',
+      dataIndex:'stock_quantity',
+      sorter:true,
+      className: styles['numberRightMove'],
+      render: (text,record) => NCNI(record.stock_quantity).format(true)
+    }]
+
     const customerColumns = [{
       title:'名称',
       dataIndex:'name',
@@ -498,24 +527,25 @@ export default class GoodsDetail extends PureComponent {
       dataIndex:'sales_quantity',
       sorter:true,
       className: styles['numberRightMove'],
-      render: (text,record) => (Number(record.sales_quantity))
+      render: (text,record) => NCNI(record.sales_quantity).format(true)
     },{
       title:'购买额',
       dataIndex:'sales_amount',
       sorter:true,
       className: styles['numberRightMove'],
-      render: (text,record) => (Number(record.sales_amount).toFixed(2))
+      render: (text,record) => NCNF(record.sales_amount).format(true)
     },{
       title:'退货量',
       dataIndex:'sales_return_quantity',
       sorter:true,
       className: styles['numberRightMove'],
-      render: (text,record) => (Number(record.sales_return_quantity))
+      render: (text,record) => NCNI(record.sales_return_quantity).format(true)
     },{
       title:'利润',
       dataIndex:'profit',
       sorter:true,
       className: styles['numberRightMove'],
+      render: (text,record) => NCNF(record.profit).format(true)
     }]
 
     const supplierColumns = [{
@@ -526,18 +556,19 @@ export default class GoodsDetail extends PureComponent {
       dataIndex:'purchase_quantity',
       sorter:true,
       className: styles['numberRightMove'],
-      render:(text,record) => (Number(record.purchase_quantity))
+      render:(text,record) => NCNI(record.purchase_quantity).format(true)
     },{
       title:'供应额',
       dataIndex:'purchase_amount',
       sorter:true,
       className: styles['numberRightMove'],
-      render:(text,record) => (Number(record.purchase_amount))
+      render:(text,record) => NCNF(record.purchase_amount).format(true)
     }]
 
     return (
       <PageHeaderLayout
         title={`货号：${singleGoodsDetail.item_ref || ''}`}
+        logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         activeTabKey={activeTabKey}
         tabList={tabList}
         content={description}
@@ -547,11 +578,15 @@ export default class GoodsDetail extends PureComponent {
       >
         <div style={{display: activeTabKey == 'message' ? 'block' : 'none'}}>
           <Card bordered={false}>
-            <DescriptionList title='价格等级&价格组成' size='large' >
-            </DescriptionList>
-            <Divider style={{ marginBottom: 32 }} />
+            {
+              singleGoodsDetail.hidePriceTable && singleGoodsDetail.hidePriceTable ? (
+                <DescriptionList title={ usePricelelvel == 'yes' ? '价格等级&价格组成' : '价格组成（零售价)'} size='large' style={{paddingBottom:32}}>
+                  <PriceTextTable tableValue={singleGoodsDetail.prices} usePricelelvel={usePricelelvel} priceModel={priceModel} priceGrades={singleGoodsDetail.priceGrades} shops={singleGoodsDetail.selectShops}  units= {singleGoodsDetail.selectUnits} quantityranges={singleGoodsDetail.selectQuantityStep} />
+                </DescriptionList>
+              ) : null
+            }
             <DescriptionList title='属性' col='2' size='large'>
-              <Description term='单位'>{singleGoodsDetail.units || ''}</Description>
+              <Description term='单位' style={{display: singleGoodsDetail.units ? 'block' : 'none'}}>{singleGoodsDetail.units || ''}</Description>
               <Description term='颜色' style={{display: singleGoodsDetail.colors ? 'block' : 'none'}}>{singleGoodsDetail.colors || ''}</Description>
               <Description term='尺码' style={{display: singleGoodsDetail.sizes ? 'block' : 'none'}}>{singleGoodsDetail.sizes || ''}</Description>
               <Description term='商品分组' style={{display: singleGoodsDetail.goodsGroup ? 'block' : 'none'}}>{singleGoodsDetail.goodsGroup || ''}</Description>
@@ -559,7 +594,6 @@ export default class GoodsDetail extends PureComponent {
             {
               (singleGoodsDetail.images || []).length === 0 ? null : (
                 <div>
-                  <Divider style={{ marginBottom: 32 }} />
                   <DescriptionList title='图片' style={{paddingBottom:32}} size='large' >
                     {
                       singleGoodsDetail.images.map( item => {
@@ -751,8 +785,6 @@ export default class GoodsDetail extends PureComponent {
     );
   }
 }
-
-
 
 
 

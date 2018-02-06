@@ -14,11 +14,10 @@ export default  {
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(() => {
+        dispatch({type:'setState',payload:{showData:{}}})
         const match = pathToRegexp('/relationship/customer-edit/:id').exec(location.hash.slice(1,location.hash.length))
         if(match) {
           dispatch({type:'getSingle',payload:{id:match[1]}})
-        }else {
-          dispatch({type:'setState',payload:{showData:{}}})
         }
       })
     },
@@ -26,14 +25,17 @@ export default  {
 
   effects: {
     *createSingle({payload},{call,put,all}) {
-      console.error(payload.imageFile[0])
-      // yield all([call(customerService.createSingle,payload.serverData),call(pictureService.upload,payload.imageFile[0])])
-      yield call(pictureService.upload,payload.imageFile[0])
-      // yield call(customerService.createSingle,payload.serverData)
+      yield call(customerService.createSingle,payload.serverData)
+      for(let i=0;i<payload.imageFile.length;i++) {
+        yield call(pictureService.upload,payload.imageFile[i])
+      }
     },
 
     *editSingle({payload},{call,put}) {
-      yield call(customerService.editSingle,payload)
+      yield call(customerService.editSingle,{serverData:payload.serverData,id:payload.id})
+      for(let i=0;i<payload.imageFile.length;i++) {
+        yield call(pictureService.upload,payload.imageFile[i])
+      }
     },
 
     *getSingle({payload},{call,put,all}) {
@@ -72,12 +74,20 @@ export default  {
           address: item.address
         }
       })
+      state.showData.imageFile = []
+      payload.attachments.forEach( (item,index) => {
+        state.showData.imageFile.push({
+          uid: Number('-' + window.crypto.getRandomValues(new Uint32Array(1))[0].toString()),
+          url: payload.attachments_url[index],
+          name: item,
+          status: 'done'
+        })
+      })
       return {...state}
     },
 
     setServerData (state,{payload}) {
       console.log(payload)
-      console.error(state.showData.addresses)
       state.serverData.name = payload.name;
       state.serverData.phone = payload.phone;
       state.serverData.wechat = payload.wechat;
@@ -89,34 +99,41 @@ export default  {
           state.serverData.customergroups.push(payload[key])
         }
       }
-      state.serverData.addresses = JSON.parse(JSON.stringify(payload.addresses)).map( item => {
+      state.serverData.addresses = [];
+      state.serverData.addresses = (payload.addresses || []).map( item => {
         return {
           ...{sid:{id: item.sid}}[((item.uid).toString()).indexOf('_') > -1 ? 'sid' : ''],
           name: item.name,
-          address: item.address,
-          province_id: item.location[0],
-          city_id: item.location[1],
-          phone: item.phone,
+          address: item.address || '',
+          province_id: (item.location || [])[0] || '',
+          city_id: (item.location || [])[1] || '',
+          phone: item.phone || '',
           default: item.default,
         }
       })
-      // state.showData.addresses && state.showData.addresses.forEach( n => {
-      //   if(!state.serverData.addresses.some( item => item.id == n.id)) {
-      //     state.serverData.addresses.push({
-      //       id:n.sid,
-      //       delete:true,
-      //     })
-      //   }
-      // })
+      if(state.showData.addresses) {
+        state.showData.addresses.forEach( item => {
+          if(!state.serverData.addresses.some( n => n.id == item.sid)) {
+            state.serverData.addresses.push({
+              id: item.sid,
+              delete:true
+            })
+          }
+        })
+      }
       state.serverData.attachments = [];
       payload.filelist && payload.filelist.forEach( (item,index) => {
         delete item.url;
-        let current = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (item.type).slice(6,(item.type).length)
-        state.serverData.attachments.push( current )
-        state.imageFile.push({
-          image_name: current,
-          image_file: item
-        })
+        if(item.type) {
+          let current = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (item.type).slice(6,(item.type).length)
+          state.serverData.attachments.push( current )
+          state.imageFile.push({
+            image_name: current,
+            image_file: item
+          })
+        }else {
+          state.serverData.attachments.push( item.name )      
+        }
       })
       console.log(state.serverData)
       return {...state}

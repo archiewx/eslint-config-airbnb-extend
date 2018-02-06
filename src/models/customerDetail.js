@@ -1,11 +1,13 @@
 import * as customerService from '../services/customer'
 import pathToRegexp from 'path-to-regexp'
+import moment from 'moment';
 export default  {
 
   namespace: 'customerDetail',
 
   state: {
     singleCustomerDetail: {},
+    singleCustomerFinance: {},
     singleCustomerSaleHistory:[],
     singleCustomerGoodsHistory:[],
     singleCustomerPaymentHistory:[],
@@ -24,8 +26,8 @@ export default  {
     setup({ dispatch, history }) {
       history.listen(() => {
         const match = pathToRegexp('/relationship/customer-detail/:id').exec(location.hash.slice(1,location.hash.length))
+        dispatch({type:'setState',payload:{singleCustomerDetail:{}}})
         if(match) {
-          dispatch({type:'setState',payload:{singleCustomerDetail:{}}})
           dispatch({type:'getSingle',payload:{id:match[1]}})
         }
       })
@@ -34,19 +36,38 @@ export default  {
 
   effects: {
     *getSingle({payload},{call,put,all}) {
-      const saleOrPaymentPayload = {
-        id:payload.id,
-        sorts:{
-          created_at:'desc'
-        }
+      const condition = {
+        sorts: {
+          created_at: 'desc'
+        },
+        date_type:'custom',
+        sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+        eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+        id:payload.id
       }
-      const [data1,data2,data3,data4,data5] = yield all([
+      const conditionWTwo = {
+        sorts: {
+          purchase_time: 'desc'
+        },
+        date_type:'custom',
+        sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+        eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+        id:payload.id
+      }
+      const conditionWThree = {
+        sorts: {
+          created_at: 'desc'
+        },
+        id:payload.id
+      }
+      const [data1,data2,data3,data4,data5,data6,data7] = yield all([
         call(customerService.getSingle,payload),
-        call(customerService.getCustomerSaleHistory,saleOrPaymentPayload),
-        call(customerService.getCustomerGoodsHistory,payload),
-        call(customerService.getCustomerPaymentHistory,saleOrPaymentPayload),
-        call(customerService.getSalesordersNeedPay,saleOrPaymentPayload),
-        // call(customerService.getStatementsNeedPay,saleOrPaymentPayload)
+        call(customerService.getCustomerSaleHistory,condition),
+        call(customerService.getCustomerGoodsHistory,conditionWTwo),
+        call(customerService.getCustomerPaymentHistory,condition),
+        call(customerService.getSalesordersNeedPay,conditionWThree),
+        call(customerService.getStatementsNeedPay,conditionWThree),
+        call(customerService.getCustomerfinance,payload)
       ])
 
       yield put({type:'setShowData',payload:data1.result.data})
@@ -58,8 +79,9 @@ export default  {
         goodsHistoryFilter: data3.result.meta.filter.groups,
         paymentHistoryFilter: data4.result.meta.filter.groups,
         singleCustomerSalesorders: data5.result.data,
-        // singleCustomerstatements: data6.result.data,
-        currentId: payload
+        singleCustomerstatements: data6.result.data,
+        currentId: payload,
+        singleCustomerFinance:data7.result.data
       }})
     },
 
@@ -158,6 +180,11 @@ export default  {
           }
         }
       }
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
+        }
+      }
       state.filterSaleServerData = current
       return {...state}
     },
@@ -178,6 +205,11 @@ export default  {
           }
         }
       }
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
+        }
+      }
       state.filterGoodsServerData = current
       return {...state}
     },
@@ -196,6 +228,11 @@ export default  {
               current[`${name}_in`] = payload[key]
             }
           }
+        }
+      }
+      for(let key in current) {
+        if(Array.isArray(current[key]) && !current[key].length) {
+          delete current[key]
         }
       }
       state.filterPaymentServerData = current

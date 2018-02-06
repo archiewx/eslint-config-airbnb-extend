@@ -19,22 +19,26 @@ export default class GoodsPictureModal extends PureComponent {
   }
 
   handleBeforeUpload = (id,file) => {
-    file.url = URL.createObjectURL(file)
-    let current = this.state.imageFileList;
-    if(this.props.itemImageLevel === 'item') {
-      current.fileList.push(file)
-      this.setState({
-        imageFileList: {...current}
-      })
+    if(file.type.indexOf('image') > -1) {
+      file.url = URL.createObjectURL(file)
+      let current = this.state.imageFileList;
+      if(this.props.itemImageLevel === 'item') {
+        current.fileList.push(file)
+        this.setState({
+          imageFileList: {...current}
+        })
+      }else {
+        current[`${id}`].fileList.push(file)
+        this.setState({
+          imageFileList: {...current}
+        })
+      }
+      URL.revokeObjectURL(file.src)
+      this.props.onChange(current)
+      return false
     }else {
-      current[`${id}`].fileList.push(file)
-      this.setState({
-        imageFileList: {...current}
-      })
+      return false;
     }
-    URL.revokeObjectURL(file.src)
-    this.props.onChange(current)
-    return false
   }
 
   handlePreview = (file) => {
@@ -108,11 +112,11 @@ export default class GoodsPictureModal extends PureComponent {
             <div>
               <Row>
                 {
-                  selectColors.map( item => {
+                  selectColors.map( (item,index) => {
                     return (
                       <div key={item.id}>
-                        <Col span={3}><label className={styles.pictureModalTitle}>{`${item.name}:`}</label></Col>
-                        <Col span={9}>
+                        <Col span={2}><label className={styles.pictureModalTitle}>{`${item.name}:`}</label></Col>
+                        <Col span={10} style={{paddingTop: index > 1 ? 20 : 0}}>
                           <Upload
                             action = 'http://duoke3api.duoke.net/api/images'
                             listType='picture-card'

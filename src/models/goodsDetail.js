@@ -1,8 +1,5 @@
 import * as goodsService from '../services/goods'
 import * as customerGroupService from '../services/customerGroup'
-import pathToRegexp from 'path-to-regexp'
-import { routerRedux } from 'dva/router';
-
 export default  {
 
   namespace: 'goodsDetail',
@@ -25,18 +22,11 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      history.listen(() => {
-        const match = pathToRegexp('/goods-detail/:id').exec(location.hash.slice(1,location.hash.length))
-        if(match) {
-          dispatch({type:'getSingle',payload:{id:match[1]}})
-        }
-      })
     },
   },
 
   effects: {
     *getSingle({payload},{call,put,select,all}) {  
-      const {usePricelelvel,priceModel} = yield select(({configSetting}) => (configSetting))
       const [data1,data2,data3,data4,data5,data6,data7] = yield all([
         call(goodsService.getSingle,payload),
         call(goodsService.getSingleSales,payload),
@@ -46,7 +36,8 @@ export default  {
         call(goodsService.getSingleStocks,payload),
         call(customerGroupService.getListGroup),
       ])
-      yield put({type:'setShowData',payload:{
+      const {usePricelelvel,priceModel} = yield select(({configSetting}) => (configSetting))
+      yield put({type:'setsingleGoodsDetail',payload:{
         value: data1.result.data,
         usePricelelvel,
         priceModel,
@@ -74,7 +65,7 @@ export default  {
 
     *getSingleMessage({payload},{call,put}) {
       const data = yield call(goodsService.getSingle,payload)
-      yield put({type:'setShowData',payload:{
+      yield put({type:'setsingleGoodsDetail',payload:{
         value:data.result.data
       }})
     },
@@ -113,7 +104,7 @@ export default  {
       return { ...state, ...action.payload }
     },
 
-    setShowData (state,{payload:{value,usePricelelvel,priceModel}}) {
+    setsingleGoodsDetail (state,{payload:{value,usePricelelvel,priceModel}}) {
       console.log(value)
       state.singleGoodsDetail = {}
       state.singleGoodsDetail.item_ref = value.item_ref;
@@ -122,23 +113,144 @@ export default  {
       state.singleGoodsDetail.standard_price = value.standard_price;
       state.singleGoodsDetail.name = value.name;
       state.singleGoodsDetail.desc = value.desc;
+
+      let priceMatrix = [...value.itemprices.data];
+      state.singleGoodsDetail.prices = {};
+      let flag = false;
       if(usePricelelvel == 'yes') {
         if(priceModel == '') {
-          
+          priceMatrix.forEach( item => {
+            if(item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+              state.singleGoodsDetail.prices[`${item.pricelevel_id}`] = {
+                price:item.price
+              }
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
+              flag = true;    
+            }
+          })
         }else if(priceModel == 'shop') {
-
+          priceMatrix.forEach( item => {
+            if(item.pricelevel_id && item.shop_id && item.unit_id == null && item.quantityrange_id == null) {
+              state.singleGoodsDetail.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
+                price:item.price
+              }
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
+              flag = true;    
+            }
+          })
         }else if(priceModel == 'unit') {
-
+          priceMatrix.forEach( item => {
+            if(item.pricelevel_id && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
+              stata.singleGoodsDetail.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
+                price:item.price
+              }
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
+              flag = true;    
+            }
+          })
         }else if(priceModel == 'quantityrange') {
-          
+          priceMatrix.forEach( item => {
+            if(item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id) {
+              state.singleGoodsDetail.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
+                price:item.price
+              }
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
+              flag = true;    
+            }
+          })
         }
       }else {
         if(priceModel == 'shop') {
-
+          priceMatrix.forEach( item => {
+            if(item.pricelevel_id == null && item.shop_id  && item.unit_id == null && item.quantityrange_id == null) {
+              state.singleGoodsDetail.prices[`${item.shop_id}`] = {
+                price: item.price
+              } 
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
+              flag = true;    
+            }
+          })
         }else if(priceModel == 'unit') {
-
+          priceMatrix.forEach( item => {
+            if(item.pricelevel_id == null && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
+              state.singleGoodsDetail.prices[`${item.unit_id}`] = {
+                price: item.price
+              }
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
+              flag = true;    
+            }
+          })
         }else if(priceModel == 'quantityrange') {
-          
+          priceMatrix.forEach( item => {
+            if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id ) {
+              state.singleGoodsDetail.prices[`${item.quantityrange_id}`] = {
+                price: item.price
+              }
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
+              flag = true;    
+            }
+          })
+        }
+      }
+      if(flag) {
+        state.singleGoodsDetail.hidePriceTable = false;
+      }else {
+        state.singleGoodsDetail.hidePriceTable = true;
+        state.singleGoodsDetail.priceGrades = [];
+        state.singleGoodsDetail.selectShops = [];
+        state.singleGoodsDetail.selectUnits = [];
+        state.singleGoodsDetail.selectQuantityStep = [];
+        value.itemprices.data.forEach( item => {
+          if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+          else {
+            if(!state.singleGoodsDetail.priceGrades.some( n => n.id == item.pricelevel.data.id)) {
+              state.singleGoodsDetail.priceGrades.push({
+                id:item.pricelevel.data.id,
+                name:item.pricelevel.data.name
+              })
+            }
+          }
+        })
+        if(priceModel == 'quantityrange') {
+          state.singleGoodsDetail.selectQuantityStep = value.quantityrangegroup.data.quantityranges.data.map( (item,index) =>  {
+            let name;
+            if(item.max == -1) {
+              name = `${item.min} ~`
+            }else {
+              name = `${item.min} ~ ${item.max - 1}`
+            }
+            return {
+              id: item.id,
+              name: name
+            }
+          })
+        }else if(priceModel == 'unit') {
+          state.singleGoodsDetail.selectUnits = value.units.data.map( item => {
+            return {
+              id: item.id,
+              name: `${item.name} x ( ${item.number} )`,
+              number: item.number
+            }
+          })
+        }else if(priceModel == 'shop') {
+          value.itemprices.data.forEach( item => {
+            if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
+              if(!state.singleGoodsDetail.selectShops.some( n => n.id == item.shop.data.id)) {
+                state.singleGoodsDetail.selectShops.push({
+                  id:item.shop.data.id,
+                  name:item.shop.data.name
+                })
+              }
+            }
+          })
         }
       }
       state.singleGoodsDetail.units = value.units.data.map( item => (`${item.name} x ( ${item.number} )`)).join('、')
@@ -176,6 +288,7 @@ export default  {
       state.singleGoodsDetail.colors = colors.map( item => item.name).join('、')
       state.singleGoodsDetail.sizes = sizes.map( item => item.name).join('、')
       state.singleGoodsDetail.goodsGroup = value.itemgroups.data.map( item => item.name ).join('、')
+      console.log(state.singleGoodsDetail)
       return {...state}
     },
 

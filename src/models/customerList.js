@@ -1,15 +1,4 @@
 import * as customerService from '../services/customer'
-import moment from 'moment';
-const condition = {
-  sorts: {
-    created_at: 'desc'
-  },
-  page:1,
-  per_page:10,
-  date_type:'custom',
-  sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-  eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
-}
 export default  {
 
   namespace: 'customerList',
@@ -22,7 +11,7 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      dispatch({type:'getList',payload:{...condition}})
+     
     },
   },
 

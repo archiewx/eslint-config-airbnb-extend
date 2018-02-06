@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import classNames from 'classnames/bind'
 import { Row, Col, Upload, Modal, Icon } from 'antd';
-import styles from './CustomerPictureModal.less'
+import styles from './RelationPictureModal.less'
 
-export default class CustomerPictureModal extends PureComponent {
+export default class RelationPictureModal extends PureComponent {
 
   state = {
     previewVisible: false,
@@ -13,20 +13,24 @@ export default class CustomerPictureModal extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    // this.setState({
-    //   imageFileList:nextProps.value
-    // })
+    if(nextProps.value && !this.state.imageFileList.length) {
+      this.setState({
+        imageFileList:nextProps.value
+      })
+    }
   }
 
   handleBeforeUpload = (file) => {
-    file.url = URL.createObjectURL(file)
-    let current = this.state.imageFileList;
-    current.push(file)
-    this.setState({
-      imageFileList: [...current]
-    })
-    URL.revokeObjectURL(file.src)
-    this.props.onChange(current)
+    if(file.type.indexOf('image') > -1) {
+      file.url = URL.createObjectURL(file)
+      let current = this.state.imageFileList;
+      current.push(file)
+      this.setState({
+        imageFileList: [...current]
+      })
+      URL.revokeObjectURL(file.src)
+      this.props.onChange(current)
+    }
     return false
   }
 

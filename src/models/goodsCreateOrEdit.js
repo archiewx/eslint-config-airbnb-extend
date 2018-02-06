@@ -1,5 +1,6 @@
 import * as goodsService from '../services/goods'
 import pathToRegexp from 'path-to-regexp'
+import * as pictureService from '../services/picture'
 export default  {
 
   namespace: 'goodsCreateOrEdit',
@@ -7,6 +8,7 @@ export default  {
   state: {
     serverData: {},
     showData: {},
+    imageFile:[]
   },
 
   subscriptions: {
@@ -19,8 +21,12 @@ export default  {
 
   effects: {
     *createSingleGoods({payload},{call,put,select}) {
-      const {serverData} = yield select(({goodsCreateOrEdit}) => goodsCreateOrEdit)
-      yield call(goodsService.createSingle,serverData)
+      const {serverData,imageFile} = yield select(({goodsCreateOrEdit}) => goodsCreateOrEdit)
+      console.log(imageFile)
+      // yield call(goodsService.createSingle,serverData)
+      for(let i=0;i<imageFile.length;i++) {
+        yield call(pictureService.upload,imageFile[i])
+      }
     },
 
     *getSingleGoods({payload},{call,put,select}) {
@@ -59,41 +65,45 @@ export default  {
       if(usePricelelvel == 'yes') {
         if(priceModel == '') {
           priceMatrix.forEach( item => {
-            if(priceMatrix[0].pricelevel_id && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id == null) {
+            if(item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
               state.showData.prices[`${item.pricelevel_id}`] = {
                 price:item.price
               }
-            }else {
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
               flag = true;    
             }
           })
         }else if(priceModel == 'shop') {
           priceMatrix.forEach( item => {
-            if(priceMatrix[0].pricelevel_id && priceMatrix[0].shop_id && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id == null) {
+            if(item.pricelevel_id && item.shop_id && item.unit_id == null && item.quantityrange_id == null) {
               state.showData.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
                 price:item.price
               }
-            }else {
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
               flag = true;    
             }
           })
         }else if(priceModel == 'unit') {
           priceMatrix.forEach( item => {
-            if(priceMatrix[0].pricelevel_id && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id && priceMatrix[0].quantityrange_id == null) {
+            if(item.pricelevel_id && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
               stata.showData.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
                 price:item.price
               }
-            }else {
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
               flag = true;    
             }
           })
         }else if(priceModel == 'quantityrange') {
           priceMatrix.forEach( item => {
-            if(priceMatrix[0].pricelevel_id && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id) {
+            if(item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id) {
               state.showData.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
                 price:item.price
               }
-            }else {
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
               flag = true;    
             }
           })
@@ -101,31 +111,34 @@ export default  {
       }else {
         if(priceModel == 'shop') {
           priceMatrix.forEach( item => {
-            if(priceMatrix[0].pricelevel_id == null && priceMatrix[0].shop_id  && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id == null) {
+            if(item.pricelevel_id == null && item.shop_id  && item.unit_id == null && item.quantityrange_id == null) {
               state.showData.prices[`${item.shop_id}`] = {
                 price: item.price
               } 
-            }else {
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
               flag = true;    
             }
           })
         }else if(priceModel == 'unit') {
           priceMatrix.forEach( item => {
-            if(priceMatrix[0].pricelevel_id == null && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id && priceMatrix[0].quantityrange_id == null) {
+            if(item.pricelevel_id == null && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
               state.showData.prices[`${item.unit_id}`] = {
                 price: item.price
               }
-            }else {
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
               flag = true;    
             }
           })
         }else if(priceModel == 'quantityrange') {
           priceMatrix.forEach( item => {
-            if(priceMatrix[0].pricelevel_id == null && priceMatrix[0].shop_id == null && priceMatrix[0].unit_id == null && priceMatrix[0].quantityrange_id ) {
+            if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id ) {
               state.showData.prices[`${item.quantityrange_id}`] = {
                 price: item.price
               }
-            }else {
+            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+            else {
               flag = true;    
             }
           })
@@ -136,6 +149,27 @@ export default  {
           price: (value.standard_price).toString()
         }    
       }
+      if(priceModel == 'quantityrange') {
+        state.showData.selectQuantityStep = value.quantityrangegroup.data.quantityranges.data.map( (item,index) =>  {
+          let name;
+          if(item.max == -1) {
+            name = `${item.min} ~`
+          }else {
+            name = `${item.min} ~ ${item.max - 1}`
+          }
+          return {
+            id: item.id,
+            name: name
+          }
+        })
+      }
+      state.showData.selectUnits = value.units.data.map( item => {
+        return {
+          id: item.id,
+          name: `${item.name} x ( ${item.number} )`,
+          number: item.number
+        }
+      })
       state.showData.units = value.units.data.map( item => {
         return (item.id).toString()
       })
@@ -154,15 +188,25 @@ export default  {
       })
       state.showData.colors = [];
       state.showData.sizes = [];
+      state.showData.selectColors = [];
+      state.showData.selectSizes = [];
       value.skus.data.forEach( item => {
         item.skuattributes.data.forEach( subItem => {
           if(subItem.skuattributetype_id == '1') {
             if(!state.showData.colors.some( n => n == subItem.id)) {
               state.showData.colors.push((subItem.id).toString())
+              state.showData.selectColors.push({
+                id:subItem.id,
+                name:subItem.name
+              })
             }
           }else if(subItem.skuattributetype_id == '2') {
             if(!state.showData.sizes.some( n => n == subItem.id)) {
               state.showData.sizes.push((subItem.id).toString())
+              state.showData.selectSizes.push({
+                id:subItem.id,
+                name:subItem.name
+              })
             }
           }
         })
@@ -224,8 +268,44 @@ export default  {
       return {...state}
     },
 
+
     setServerData (state,{payload:{value,selectUnits,selectQuantityStep,warehouses,priceModel,itemBarcodeLevel,itemImageLevel}}) {
       console.log(value)
+      /*
+        新建商品传给服务端数据结构如下：
+        serverDate = {
+          item_ref || 货号 : String, 
+          purchase_price || 进货价 : String || Number, 
+          prices || 价格组成&价格矩阵 && 最后一个为标准价 : Array : [{
+            pricelevel_id || 价格等级Id : String || Number, 
+            shop_id || 店铺Id : String || Number,  
+            unit_id || 单位Id : String || Number,
+            quantityrange_id || 价格阶梯Id : String || Number, 
+            price || 价格 : String || Number, 
+          },{
+            price || 价格 : String || Number, 
+          }], 
+          units || 单位 : Array : [{
+            id || 单位id : String || Number ,
+            number || 单位数量 : String || Number,
+          }],
+          name || 名称 : String,
+          desc || 备注 : String,
+          itemgroup_ids || 商品分组下的子分类Id : Array,
+          skus || sku数组, 包含库存 ，条码, 图片 : Array : [{
+            barcode || 条码 : String,
+            attributes || sku属相 , 包含颜色, 尺码 : Array : [{
+              attributetype_id || 颜色, 尺码属性Id : String,
+              attribute_id || 颜色, 尺码Id : String || Number,
+            }],
+            images || 图片 : Array,
+            stocks || 库存 : Array : [{
+              warehouse_id || 仓库Id : String || Number,
+              store_quantity || 库存数量 : String || Number,
+            }]
+          }]
+        }
+      */
       state.serverData = {}
       state.serverData.item_ref = value.item_ref;
       state.serverData.purchase_price = value.purchase_price || 0;
@@ -271,6 +351,34 @@ export default  {
       Object.values(value.goods_group).forEach( item => {
         state.serverData.itemgroup_ids = state.serverData.itemgroup_ids.concat(...item)
       })
+      let picture = {}
+      if(itemImageLevel == 'item') {
+        picture.fileName = [];
+        value.picture.fileList.forEach( item => {
+          delete item.url;
+          let fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (item.type).slice(6,(item.type).length)
+          picture.fileName.push(fileName)
+          state.imageFile.push({
+            image_name: fileName,
+            image_file: item
+          })
+        })
+      }else {
+        for(let key in value.picture) {
+          if(!!value.picture[key].fileList.length) {
+            picture[key].fileName = [];
+            value.picture[key].fileList.forEach( item => {
+              delete item.url;
+              let fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (item.type).slice(6,(item.type).length)
+              picture[key].fileName.push( fileName)
+              state.imageFile.push({
+                image_name: fileName,
+                image_file: item
+              })
+            })
+          }
+        }
+      }
       state.serverData.skus = [];
       if(value.color_select.length === 0 && value.size_select.length === 0 ) {
         state.serverData.dimension = []
@@ -336,7 +444,7 @@ export default  {
           })
         })
       }
-      // itemImageLevel === 'item' ? state.serverData.image
+      itemImageLevel === 'item' ? state.serverData.itemimages = picture.fileName : null
       itemBarcodeLevel === 0 ? state.serverData.barcode = value.barcode.barcode : null
       console.log(state.serverData)
       return {...state}

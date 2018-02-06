@@ -7,7 +7,7 @@ import FooterToolbar from '../../../../components/antd-pro/FooterToolbar';
 import TagSelect from '../../../../components/antd-pro/TagSelect';
 import SelectInput from '../../../../components/SelectInput/SelectInput';
 import SelectMultiple from '../../../../components/SelectMultiple/SelectMultiple'
-import CustomerPictureModal from '../../../../components/CustomerPictureModal/CustomerPictureModal'
+import SupplierPictureModal from '../../../../components/RelationPictureModal/RelationPictureModal'
 import SupplierModal from './SupplierModal'
 import styles from './SupplierCreateOrEdit.less'
 const ButtonGroup = Button.Group;
@@ -33,9 +33,11 @@ export default class SupplierCreateOrEdit extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      addresses: nextProps.supplierCreateOrEdit.showData.addresses || []
-    })
+    if(!this.state.addresses.length && nextProps.supplierCreateOrEdit.showData.addresses) {
+      this.setState({
+        addresses: JSON.parse(JSON.stringify(nextProps.supplierCreateOrEdit.showData.addresses)) || []
+      })
+    }
   }
 
   handleModalCreate = () => {
@@ -77,6 +79,7 @@ export default class SupplierCreateOrEdit extends PureComponent {
         uid: uid
       })
     }
+    this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
   }
 
   handleRadioSelect = (uid,e) => {
@@ -88,22 +91,46 @@ export default class SupplierCreateOrEdit extends PureComponent {
     this.setState({
       addresses: [...addresses]
     })
+    this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
+  }
 
+  handleDeleteAddress = (item) => {
+    let addresses = this.state.addresses;
+    if(addresses.find( n => n.uid == item.uid).default == 1) {
+      addresses[0].default = 1
+    }
+    addresses.splice(addresses.findIndex(n => n.uid == item.uid),1)
+    if(addresses.length == 1) {
+      addresses[0].default = 1
+    }
+    this.setState({addresses:[...addresses]})
+    this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
   }
 
   handleSubmit = (e) => {
-    const {validateFields} = this.props.form
+    const {validateFields,getFieldDecorator,getFieldsValue} = this.props.form
     e.preventDefault();
+    if(!getFieldsValue().addresses) getFieldDecorator('addresses',{initialValue:this.state.addresses})
     validateFields((err,value) =>{
       if(!err){
-        this.props.dispatch({type:'supplierCreateOrEdit/setServerData',payload:value})
-        this.props.dispatch({type:'supplierCreateOrEdit/createSingle',payload:{
-          ...this.props.supplierCreateOrEdit.serverData,
-          // imageFile:this.props.supplierCreateOrEdit.imageFile
-        }})
-        // .then(()=>{
-        //   this.props.dispatch(routerRedux.push('/relationship/supplier-list'))
-        // })
+        if(this.props.supplierCreateOrEdit.showData.id) {
+          this.props.dispatch({type:'supplierCreateOrEdit/setServerData',payload:value})
+          this.props.dispatch({type:'supplierCreateOrEdit/editSingle',payload:{
+            serverData:this.props.supplierCreateOrEdit.serverData,
+            imageFile:this.props.supplierCreateOrEdit.imageFile,
+            id:this.props.supplierCreateOrEdit.showData.id
+          }}).then(()=>{
+            this.props.dispatch(routerRedux.push('/relationship/supplier-list'))
+          })
+        }else {
+          this.props.dispatch({type:'supplierCreateOrEdit/setServerData',payload:value})
+          this.props.dispatch({type:'supplierCreateOrEdit/createSingle',payload:{
+            serverData:this.props.supplierCreateOrEdit.serverData,
+            imageFile:this.props.supplierCreateOrEdit.imageFile
+          }}).then(()=>{
+            this.props.dispatch(routerRedux.push('/relationship/supplier-list'))
+          })
+        }
       }
     })
   }
@@ -117,7 +144,6 @@ export default class SupplierCreateOrEdit extends PureComponent {
     const {getFieldDecorator,getFieldValue} = this.props.form;
     const {showData} = this.props.supplierCreateOrEdit;
     const {country} = this.props.country;
-    getFieldDecorator('addresses', { initialValue: addresses });
 
     const menu = (
       <Menu>
@@ -189,8 +215,10 @@ export default class SupplierCreateOrEdit extends PureComponent {
           <Card bordered={false} title='附件' className={styles.bottomCardDivided}>
             <Form layout='horizontal'>
               <FormItem>
-                {getFieldDecorator('filelist')(
-                  <CustomerPictureModal />
+                {getFieldDecorator('filelist',{
+                  initialValue: (showData.imageFile && showData.imageFile.length == 0 ? null : showData.imageFile)
+                })(
+                  <SupplierPictureModal />
                 )}
               </FormItem>
             </Form>
@@ -226,9 +254,7 @@ export default class SupplierCreateOrEdit extends PureComponent {
                       <Radio checked={item.default == 1} onChange={this.handleRadioSelect.bind(null,item.uid)}>默认地址</Radio> 
                       <ButtonGroup style={{float:'right',marginTop:-11}}>
                         <Button onClick={this.handleModalEdit.bind(null,item)}>编辑</Button>
-                        <Dropdown overlay={menu} placement="bottomRight">
-                          <Button><Icon type="ellipsis" /></Button>
-                        </Dropdown>
+                        <Button onClick={this.handleDeleteAddress.bind(null,item)}>删除</Button>
                       </ButtonGroup>
                     </div>
                   </div>
@@ -238,10 +264,12 @@ export default class SupplierCreateOrEdit extends PureComponent {
           </Card>
           <SupplierModal type={modalType} visible={modalVisibel} formValue={formValue} onOk={this.handleModalOk} onCancel={this.handleModalCancel} country={country} uid={uid} addresses={addresses}/>
           <FooterToolbar>
-            <Popconfirm title={ showData.id ? '确认取消编辑供应商':'确认取消新建供应商'} onConfirm={this.handleSupplierCancel}><Button>取消</Button></Popconfirm>
-            <Button type="primary" onClick={this.handleSubmit}>
-              确认
-            </Button>
+            <div id="noScroll">
+              <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={ showData.id ? '确认取消编辑供应商':'确认取消新建供应商'} onConfirm={this.handleSupplierCancel}><Button>取消</Button></Popconfirm>
+              <Button type="primary" onClick={this.handleSubmit}>
+                确认
+              </Button>
+            </div>
           </FooterToolbar>
         </Spin>
       </PageHeaderLayout>

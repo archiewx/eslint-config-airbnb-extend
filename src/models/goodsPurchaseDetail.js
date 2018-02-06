@@ -25,9 +25,7 @@ export default  {
   effects: {
     *getList({payload},{call,put}) {
       const data = yield call(customerService.getGoodsPurchaseDetail,payload)
-      // yield put({type:'setState',payload:{
-
-      // }})
+      yield put({type:'setState',payload:data.result.skus})
     }
   },
 
@@ -36,6 +34,13 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
+
+    setGoodsPurchaseList (state,{payload}) {
+      // payload.forEach( item => {
+        
+      // })
+      return {...state}
+    }
   },
 
 };
