@@ -129,7 +129,7 @@ export default  {
         name: payload.remark1
       }) : ''
 
-      state.singleSupplierDetail.imageFiles = payload.attachments_url.map( item => item )
+      state.singleSupplierDetail.imageFiles = (payload.attachments_url || []).map( item => item )
       state.singleSupplierDetail.freeze = payload.freeze;
       state.singleSupplierDetail.addresses = payload.addresses.data;
       return {...state}

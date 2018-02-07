@@ -597,7 +597,7 @@ export default class GoodsDetail extends PureComponent {
                   <DescriptionList title='图片' style={{paddingBottom:32}} size='large' >
                     {
                       singleGoodsDetail.images.map( item => {
-                        return <img src={`${item.url}`} alt = {item.name} style={{height:104}} key={item.id}/>
+                        return <img src={`${item.url}`} alt = {item.name} style={{height:104,width:104}} key={item.id}/>
                       })
                     }
                   </DescriptionList>

@@ -69,7 +69,7 @@ export default  {
         }
       })
       state.showData.imageFile = [];
-      payload.attachments.forEach( (item,index) => {
+      (payload.attachments || []).forEach( (item,index) => {
         state.showData.imageFile.push({
           uid: Number('-' + window.crypto.getRandomValues(new Uint32Array(1))[0].toString()),
           url: payload.attachments_url[index],

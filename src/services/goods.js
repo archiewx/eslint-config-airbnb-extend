@@ -52,7 +52,7 @@ export async function editSingle (params) {
   return request(`${apiBase}/api/items/${params.id}`, {
     method: 'PUT',
     headers: { 'Authorization': token},
-    body: params
+    body: params.serverData
   })
 }
 

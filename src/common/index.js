@@ -1,7 +1,7 @@
 import qs from 'qs'
 
 const apiBase = 'http://duoke3api-beta.duoke.net'
-
+const imageApiBase = 'http://duoke3-image.oss-cn-hangzhou.aliyuncs.com'
 // http://duoke3api-beta.duoke.net
 //'http://api3.duoke.net' 
 
@@ -10,6 +10,7 @@ const token = qs.parse(location.hash.slice(location.hash.indexOf('?token')+1)).t
 module.exports = {
   
   apiBase,
-  token
+  token,
+  imageApiBase
 
 }

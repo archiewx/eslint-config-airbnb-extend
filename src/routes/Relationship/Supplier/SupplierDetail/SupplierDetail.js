@@ -86,7 +86,9 @@ export default class SupplierDetail extends PureComponent {
   }
 
   handleDeleteSingleSupplier = (id) => {
-    this.props.dispatch({type:'supplierDetail/deleteSingle',payload:id})
+    this.props.dispatch({type:'supplierDetail/deleteSingle',payload:id}).then(()=>{
+      this.props.dispatch(routerRedux.push('/relationship/supplier-list'))
+    })
   }
 
   handleChangeSupplierStatus = (id,status) => {
@@ -233,7 +235,9 @@ export default class SupplierDetail extends PureComponent {
     )
     const menu = (
       <Menu>
-        <Menu.Item key='1'>删除</Menu.Item>
+        <Menu.Item key='1'>
+          <Popconfirm title="确认删除此供应商?" placement='bottom' onConfirm={this.handleDeleteSingleSupplier.bind(null,currentId.id)}>删除</Popconfirm>
+        </Menu.Item>
       </Menu>
     )
 

@@ -75,6 +75,28 @@ export async function getSupplierGoodsHistory (params) {
   })
 }
 
+export async function getGoodsPurchaseDetail (params) {
+  const condition = {
+    sorts:params.sorts
+  }
+  return request(`${apiBase}/api/suppliers/${params.id}/item/${params.subId}/statistics`,{
+    method: 'POST',
+    headers: {"Authorization":token},
+    body:condition
+  })
+}
+
+export async function getSkusPurchaseDetail (params) {
+  const condition = {
+    sorts:params.sorts
+  }
+  return request(`${apiBase}/api/suppliers/${params.id}/sku/${params.subId}/statistics`,{
+    method: 'POST',
+    headers:{'Authorization':token},
+    body: condition
+  })
+}
+
 export async function getSupplierPaymentHistory (params) {
   let current = {...params};
   delete current.id

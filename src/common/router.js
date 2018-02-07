@@ -60,7 +60,10 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['customerDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/CustomerDetail'))
     },
     '/relationship/customer-detail/goods-purchase-detail/:id/:subId': {
-      component: dynamicWrapper(app ,['goodsPurchaseDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/GoodsPurchaseDetail'))
+      component: dynamicWrapper(app ,['customerGoodsPurchaseDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/GoodsPurchaseDetail'))
+    },
+    '/relationship/customer-detail/skus-purchase-detail/:id/:subId': {
+      component: dynamicWrapper(app ,['customerSkusPurchaseDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/SkusPurchaseDetail'))
     },
     '/relationship/supplier-list': {
       component: dynamicWrapper(app, ['supplierList'], () => import('../routes/Relationship/Supplier/SupplierList/SupplierList'))
@@ -73,6 +76,12 @@ export const getRouterData = (app) => {
     },
     '/relationship/supplier-detail/:id': {
       component: dynamicWrapper(app, ['supplierDetail'], () => import('../routes/Relationship/Supplier/SupplierDetail/SupplierDetail'))
+    },
+    '/relationship/supplier-detail/goods-purchase-detail/:id/:subId': {
+      component: dynamicWrapper(app ,['supplierGoodsPurchaseDetail'], () => import('../routes/Relationship/Supplier/SupplierDetail/GoodsPurchaseDetail'))
+    },
+    '/relationship/supplier-detail/skus-purchase-detail/:id/:subId': {
+      component: dynamicWrapper(app ,['supplierSkusPurchaseDetail'], () => import('../routes/Relationship/Supplier/SupplierDetail/SkusPurchaseDetail'))
     },
     '/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),

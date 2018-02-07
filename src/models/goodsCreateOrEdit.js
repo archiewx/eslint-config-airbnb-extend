@@ -21,11 +21,9 @@ export default  {
 
   effects: {
     *createSingleGoods({payload},{call,put,select}) {
-      const {serverData,imageFile} = yield select(({goodsCreateOrEdit}) => goodsCreateOrEdit)
-      console.log(imageFile)
-      // yield call(goodsService.createSingle,serverData)
-      for(let i=0;i<imageFile.length;i++) {
-        yield call(pictureService.upload,imageFile[i])
+      yield call(goodsService.createSingle,payload.serverData)
+      for(let i=0;i<payload.imageFile.length;i++) {
+        yield call(pictureService.upload,payload.imageFile[i])
       }
     },
 
@@ -308,6 +306,7 @@ export default  {
       */
       state.serverData = {}
       state.serverData.item_ref = value.item_ref;
+      state.serverData.standard_price = value.standard_price;
       state.serverData.purchase_price = value.purchase_price || 0;
       state.serverData.prices = [];
       if(priceModel == '') {

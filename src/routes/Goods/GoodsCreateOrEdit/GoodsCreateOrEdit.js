@@ -61,6 +61,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     skuBarcodes:{},
     selectWarehouseId:'',
     selecStockUnitNum:'',
+    isNeedIcon: false,
   }
 
   componentDidMount() {
@@ -402,6 +403,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     e.preventDefault();
     validateFields((err,value) =>{
       if(!err){
+        value.stock = this.state.skuStocks;
         this.props.dispatch({type:'goodsCreateOrEdit/setServerData',payload:{
           value,
           selectUnits:this.state.selectUnits,
@@ -411,31 +413,62 @@ export default class GoodsCreateOrEdit extends PureComponent {
           itemBarcodeLevel: this.props.configSetting.itemBarcodeLevel,
           itemImageLevel: this.props.configSetting.itemImageLevel
         }})
-        this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods'}).then(()=>{
-          // this.props.dispatch(routerRedux.push('/goods-list'))
-        })
+        if(this.props.goodsCreateOrEdit.showData.id) {
+
+        }else {
+          this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods',payload:{
+            serverData:this.props.goodsCreateOrEdit.serverData,
+            imageFile:this.props.goodsCreateOrEdit.imageFile
+          }}).then(()=>{
+            this.props.dispatch(routerRedux.push('/goods-list'))
+          })
+        }
       }
     })
   }
 
   handleCheckItemRef = (rule,value,callback) => {
     validateDelay.run(()=>{ 
-      if(this.props.goodsCreateOrEdit.showData.item_ref && this.props.goodsCreateOrEdit.showData.item_ref == value) {callback()}
-      else {
-        this.props.dispatch({type:'goodsCreateOrEdit/checkItemRef',payload:value}).then((result)=>{
-          if(result.request.item_ref == value) {
-            if(result.code != 0) {
-              callback('货号已存在')
+      if(value) {
+        if(this.props.goodsCreateOrEdit.showData.item_ref && this.props.goodsCreateOrEdit.showData.item_ref == value) {callback()}
+        else {
+          this.props.dispatch({type:'goodsCreateOrEdit/checkItemRef',payload:value}).then((result)=>{
+            if(result.request.item_ref == value) {
+              if(result.code != 0) {
+                callback('货号已存在')
+                this.setState({
+                  isNeedIcon:true
+                })
+              }else {
+                callback()
+                this.setState({
+                  isNeedIcon:false
+                })
+              }
             }else {
               callback()
             }
-          }else {
-            callback()
-          }
+          })
+        }
+      }else {
+        callback()
+        this.setState({
+          isNeedIcon:true
         })
       }
     }, 300)
   }
+
+  // handleGetItemRef = (e) => {
+  //   const {form} = this.props;
+  //   setTimeout(() => {
+  //     if(!form.getFieldValue('item_ref')) {
+  //       this.setState({
+  //         isNeedIcon: true
+  //       })
+  //     }
+  //   }, 4)
+  // }
 
   handleCancel = () => {
     this.props.form.resetFields()
@@ -670,10 +703,30 @@ export default class GoodsCreateOrEdit extends PureComponent {
     }, 0)
   }
 
+  handleGetStocks = (e) => {
+    const {form} = this.props;
+    setTimeout(() => {
+      if(this.state.selecStockUnitNum == '1') {
+        this.setState({
+          skuStocks:form.getFieldValue('stock')
+        })
+      }
+    }, 0)
+  }
+
   handleUnitStockSelect = (value) => {
+    const {form} = this.props;
+    let numUnit = Number(value.split('').reverse().join('').match(/\d+/)[0].split('').reverse().join(''))
     this.setState({
-      selecStockUnitNum:Number(value.split('').reverse().join('').match(/\d+/)[0].split('').reverse().join(''))
+      selecStockUnitNum:numUnit
     })
+    let stock = JSON.parse(JSON.stringify(this.state.skuStocks));
+    for(let key in stock) {
+      if(stock[key].store_quantity) {
+        stock[key].store_quantity = Math.floor(Number(stock[key].store_quantity)/Number(numUnit))
+      }
+    }
+    form.setFieldsValue({stock:stock})
   }
 
   handleStockTabChange = (key) => {
@@ -687,7 +740,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     const {goodsGroup:{goodsGroups},color:{colors},sizeLibrary:{sizeLibrarys},unit:{units},priceGrade:{priceGrades},priceQuantityStep:{priceQuantitySteps},shop:{shops},warehouse:{warehouses}} = this.props;
     const {usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel} = this.props.configSetting
     const {showData} = this.props.goodsCreateOrEdit
-    const {defaultSelectUnits,selectUnits,selectColors,selectSizes,selectQuantityStep,priceTableValue,skuStocks,skuBarcodes, selectWarehouseId,selecStockUnitNum,skuImages} = this.state
+    const {isNeedIcon,defaultSelectUnits,selectUnits,selectColors,selectSizes,selectQuantityStep,priceTableValue,skuStocks,skuBarcodes, selectWarehouseId,selecStockUnitNum,skuImages} = this.state
 
     const stockTabList = warehouses.map( item => {
       return {key:item.id,tab:item.name}
@@ -724,7 +777,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             <Form layout='vertical'>
               <Row gutter={64}>
                 <Col span={8}>
-                  <FormItem label='货号' hasFeedback>
+                  <FormItem label='货号' hasFeedback = {isNeedIcon} >
                     {getFieldDecorator('item_ref',{
                       initialValue: showData.item_ref || '',
                       rules: [{required:true,message:'货号不能为空'},{validator:this.handleCheckItemRef}],
@@ -734,7 +787,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                   </FormItem>
                 </Col>
                 <Col span={8}>
-                  <FormItem label='标准价' hasFeedback>
+                  <FormItem label='标准价' hasFeedback = {getFieldValue('standard_price') ? false : true} >
                     {getFieldDecorator('standard_price',{
                       initialValue: showData.standard_price || null,
                       rules: [{required:true,message:'标准价不能为空'}],
@@ -918,7 +971,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                       {getFieldDecorator('stock',{
                         initialValue: skuStocks
                       })(
-                        <StockTable selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
+                        <StockTable onChange={this.handleGetStocks} selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
                       )}
                     </FormItem>
                   </Form>

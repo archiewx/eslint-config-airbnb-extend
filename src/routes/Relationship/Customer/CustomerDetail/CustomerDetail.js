@@ -112,7 +112,9 @@ export default class CustomerDetail extends PureComponent {
   }
 
   handleDeleteSingleCustomer = (id) => {
-    this.props.dispatch({type:'customerDetail/deleteSingle',payload:id})
+    this.props.dispatch({type:'customerDetail/deleteSingle',payload:id}).then(()=>{
+      this.props.dispatch(routerRedux.push('/relationship/customer-list'))
+    })
   }
 
   handleChangeCustomerStatus = (id,status) => {
@@ -260,7 +262,9 @@ export default class CustomerDetail extends PureComponent {
     )
     const menu = (
       <Menu>
-        <Menu.Item key='1'>删除</Menu.Item>
+        <Menu.Item key='1'>
+          <Popconfirm title="确认删除此客户?" placement='bottom' onConfirm={this.handleDeleteSingleCustomer.bind(null,currentId.id)}>删除</Popconfirm>
+        </Menu.Item>
       </Menu>
     )
 
@@ -441,7 +445,7 @@ export default class CustomerDetail extends PureComponent {
           {singleCustomerDetail.imageFiles && !!singleCustomerDetail.imageFiles.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>附件</div></div> : null}
           {
             singleCustomerDetail.imageFiles && singleCustomerDetail.imageFiles.map( (item,index) => {
-              return <img src={`${item}`} key={index}  alt='无法显示' style={{width:102,height:102}}/>
+              return <img src={`${item}`} key={index}  alt='无法显示' style={{width:102,height:102,marginRight:20}}/>
             })
           }
           { singleCustomerDetail.addresses && !!singleCustomerDetail.addresses.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>地址</div></div> : null}
@@ -485,6 +489,7 @@ export default class CustomerDetail extends PureComponent {
           </Card>
           <Card bordered={false} tabList={tabListNoTitle} onTabChange={this.handleBlanceTabChange}>
             <div style={{display: activeBlanceTabKey == 'balance' ? 'block' : 'none'}}>
+             {`emmmm………`}
             </div>
             <div style={{display: activeBlanceTabKey == 'sale' ? 'block' : 'none'}}>
               <Table columns={salesorderColumns} dataSource={singleCustomerSalesorders}  pagination={salesorderPagination} rowKey='id' />

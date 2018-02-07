@@ -4,11 +4,11 @@ import { routerRedux,Link } from 'dva/router';
 import currency from 'currency.js'
 import { Row, Col, Card, Button,Icon,Table} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
-import styles from './CustomerDetail.less'
+import styles from './SupplierDetail.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
 const NCNI = value => currency(value, { symbol: "", precision: 0});
 @connect(state => ({
-  customerGoodsPurchaseDetail: state.customerGoodsPurchaseDetail
+  supplierGoodsPurchaseDetail: state.supplierGoodsPurchaseDetail
 }))
 export default class GoodsPurchaseDetail extends PureComponent {
 
@@ -21,16 +21,16 @@ export default class GoodsPurchaseDetail extends PureComponent {
         last_purchase_time:'desc'
       }
     }
-    this.props.dispatch({type:'customerGoodsPurchaseDetail/getList',payload:{
-      id:this.props.customerGoodsPurchaseDetail.customerId,
-      subId:this.props.customerGoodsPurchaseDetail.itemId,
+    this.props.dispatch({type:'supplierGoodsPurchaseDetail/getList',payload:{
+      id:this.props.supplierGoodsPurchaseDetail.customerId,
+      subId:this.props.supplierGoodsPurchaseDetail.itemId,
       sorts:sorts,
     }})
   }
 
   render() {
 
-    const {goodsPurchaseList,customerId} = this.props.customerGoodsPurchaseDetail
+    const {goodsPurchaseList,customerId} = this.props.supplierGoodsPurchaseDetail
 
     const columns = [{
       title: '名称',
@@ -57,8 +57,8 @@ export default class GoodsPurchaseDetail extends PureComponent {
       render: (text,record) => (
         record.name ? (
           record.children ? (
-            ((record.id).toString()).indexOf('_') > -1 ? <Link to={`/relationship/customer-detail/skus-purchase-detail/${customerId}/${record.skuId}`}>查看</Link> : null
-          ) :  <Link to={`/relationship/customer-detail/skus-purchase-detail/${customerId}/${record.skuId}`}>查看</Link>
+            ((record.id).toString()).indexOf('_') > -1 ? <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}`}>查看</Link> : null
+          ) :  <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}`}>查看</Link>
         ) : null
       )
     }]

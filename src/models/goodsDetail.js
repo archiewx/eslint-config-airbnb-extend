@@ -1,5 +1,6 @@
 import * as goodsService from '../services/goods'
 import * as customerGroupService from '../services/customerGroup'
+import {imageApiBase} from '../common/index.js'
 export default  {
 
   namespace: 'goodsDetail',
@@ -36,11 +37,13 @@ export default  {
         call(goodsService.getSingleStocks,payload),
         call(customerGroupService.getListGroup),
       ])
-      const {usePricelelvel,priceModel} = yield select(({configSetting}) => (configSetting))
+      const {usePricelelvel,priceModel,itemImageLevel} = yield select(({configSetting}) => (configSetting))
       yield put({type:'setsingleGoodsDetail',payload:{
         value: data1.result.data,
+        itemimage: data1.result.itemimage_names,
         usePricelelvel,
         priceModel,
+        itemImageLevel,
       }})
       yield put({type:'setShowSaleList',payload:data2.result.data.list})
       yield put({type:'setShowPurchaseList',payload:data3.result.data.list})
@@ -66,7 +69,7 @@ export default  {
     *getSingleMessage({payload},{call,put}) {
       const data = yield call(goodsService.getSingle,payload)
       yield put({type:'setsingleGoodsDetail',payload:{
-        value:data.result.data
+        value:data.result.data,
       }})
     },
 
@@ -104,7 +107,7 @@ export default  {
       return { ...state, ...action.payload }
     },
 
-    setsingleGoodsDetail (state,{payload:{value,usePricelelvel,priceModel}}) {
+    setsingleGoodsDetail (state,{payload:{value,itemimage,usePricelelvel,priceModel,itemImageLevel}}) {
       console.log(value)
       state.singleGoodsDetail = {}
       state.singleGoodsDetail.item_ref = value.item_ref;
@@ -285,6 +288,15 @@ export default  {
           }
         })
       })
+      if(itemImageLevel == 'item') {
+        state.singleGoodsDetail.images = itemimage.map( (item,index) => {
+          return {
+            url:`${imageApiBase}/${item}`,
+            name:item,
+            id:index
+          }
+        })
+      }
       state.singleGoodsDetail.colors = colors.map( item => item.name).join('、')
       state.singleGoodsDetail.sizes = sizes.map( item => item.name).join('、')
       state.singleGoodsDetail.goodsGroup = value.itemgroups.data.map( item => item.name ).join('、')

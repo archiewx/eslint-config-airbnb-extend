@@ -74,9 +74,24 @@ export async function getCustomerPaymentHistory (params) {
 }
 
 export async function getGoodsPurchaseDetail (params) {
+  const condition = {
+    sorts:params.sorts
+  }
   return request(`${apiBase}/api/customers/${params.id}/item/${params.subId}/statistics`,{
     method: 'POST',
     headers: {"Authorization":token},
+    body:condition
+  })
+}
+
+export async function getSkusPurchaseDetail (params) {
+  const condition = {
+    sorts:params.sorts
+  }
+  return request(`${apiBase}/api/customers/${params.id}/sku/${params.subId}/statistics`,{
+    method: 'POST',
+    headers:{'Authorization':token},
+    body: condition
   })
 }
 
