@@ -326,24 +326,29 @@ export default class GoodsList extends PureComponent {
     const salesColumns = [{
       title: '货号',
       dataIndex: 'item_ref',
+      width:'10%'
     }, {
       title: '标准价',
       dataIndex: 'standard_price',
+      width:'15%',
       className: styles['numberRightMove'],
       render:(text,record) => NCNF(record.standard_price).format(true)
     }, {
       title: '销售量',
       dataIndex: 'sales_quantity',
+      width:'15%',
       className: styles.numberRightMove,
       render:(text,record) => NCNI(record.sales_quantity).format(true)
     }, {
       title: '销售额',
       dataIndex: 'sales_amount',
+      width:'15%',
       className: styles.numberRightMove,
       render:(text,record) => NCNF(record.sales_amount).format(true)
     }, {
       title: '库存量',
       dataIndex: 'stock_quantity',
+      width:'15%',
       className: styles['numberRightMove'],
       render:(text,record) => NCNI(record.stock_quantity).format(true)
     }, {
@@ -372,23 +377,28 @@ export default class GoodsList extends PureComponent {
     const purchaseColumns = [{
       title: '货号',
       dataIndex: 'item_ref',
+      width:'10%'
     }, {
       title: '标准价',
       dataIndex: 'standard_price',
+      width:'15%',
       className: styles['numberRightMove'],
       render:(text,record) => NCNF(record.standard_price).format(true)
     }, {
       title: '进货量',
+      width:'15%',
       dataIndex: 'purchase_quantity',
       className: styles['numberRightMove'],
       render:(text,record) => NCNI(record.purchase_quantity).format(true)
     }, {
       title: '进货额',
+      width:'15%',
       dataIndex: 'purchase_amount',
       className: styles['numberRightMove'],
       render:(text,record) => NCNF(record.purchase_amount).format(true)
     }, {
       title: '库存量',
+      width:'15%',
       dataIndex: 'stock_quantity',
       className: styles['numberRightMove'],
       render:(text,record) => NCNI(record.stock_quantity).format(true)
@@ -420,10 +430,10 @@ export default class GoodsList extends PureComponent {
       total:goodsSalePagination.total,
       showQuickJumper:true,
       showSizeChanger:true,
-      onChange: ( pageNumber ) => {
+      onChange: ( pageNumber,pageSize ) => {
         const pagesSale = {
           per_page:pageSize,
-          page:page
+          page:pageNumber
         }
         this.setState({pagesSale})
         this.handleGetSaleList(filterSale,pagesSale,sortSale)
@@ -443,10 +453,10 @@ export default class GoodsList extends PureComponent {
       total:goodsPurchasePagination.total,
       showQuickJumper:true,
       showSizeChanger:true,
-      onChange: ( pageNumber ) => {
+      onChange: ( pageNumber,pageSize ) => {
         const pagesPurchase = {
           per_page:pageSize,
-          page:page
+          page:pageNumber
         }
         this.setState({pagesPurchase})
         this.handleGetPurchaseList(filterPurchase,pagesPurchase,sortPurchase)
@@ -508,7 +518,7 @@ export default class GoodsList extends PureComponent {
               pagination={salePagination}
             >
             </Table>
-            <div style={{marginTop:-42,width:300}}>
+            <div style={{marginTop:-43,width:300}}>
               <span>{`共 ${goodsSalePagination.total || ''} 件商品 第 ${pagesSale.page} / ${Math.ceil(Number(goodsSalePagination.total)/Number(pagesSale.per_page))} 页`}</span>
             </div>
           </Card>
@@ -552,7 +562,7 @@ export default class GoodsList extends PureComponent {
               pagination={putchasePagination}
             >
             </Table>
-            <div style={{marginTop:-42,width:300}}>
+            <div style={{marginTop:-43,width:300}}>
               <span>{`共 ${goodsPurchasePagination.total || ''} 件商品 第 ${pagesPurchase.page} / ${Math.ceil(Number(goodsPurchasePagination.total)/Number(pagesPurchase.per_page))} 页`}</span>
             </div>
           </Card>

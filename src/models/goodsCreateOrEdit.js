@@ -1,6 +1,7 @@
 import * as goodsService from '../services/goods'
-import pathToRegexp from 'path-to-regexp'
 import * as pictureService from '../services/picture'
+import {imageApiBase} from '../common/index'
+import pathToRegexp from 'path-to-regexp'
 export default  {
 
   namespace: 'goodsCreateOrEdit',
@@ -29,13 +30,22 @@ export default  {
 
     *getSingleGoods({payload},{call,put,select}) {
       const data = yield call(goodsService.getSingle,payload)
-      const {usePricelelvel,priceModel,itemBarcodeLevel} = yield select(({configSetting}) => configSetting)
+      const {usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel} = yield select(({configSetting}) => configSetting)
       yield put({type:'setShowData',payload:{
         value:data.result.data,
+        itemimage:data.result.itemimage_names,
         usePricelelvel,
         priceModel,
-        itemBarcodeLevel
+        itemBarcodeLevel,
+        itemImageLevel,
       }})
+    },
+
+    *editSingleGoods({payload},{call,put}) {
+      yield call(goodsService.editSingle,{serverData:payload.serverData,id:payload.id})
+      for(let i=0;i<payload.imageFile.length;i++) {
+        yield call(pictureService.upload,payload.imageFile[i])
+      }
     },
 
     *checkItemRef({payload},{call,put}) {
@@ -50,7 +60,7 @@ export default  {
       return { ...state, ...action.payload }
     },
 
-    setShowData (state,{payload:{value,usePricelelvel,priceModel,itemBarcodeLevel}}) {
+    setShowData (state,{payload:{value,itemimage,usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel}}) {
       console.log(value)
       state.showData.id = value.id;
       state.showData.item_ref = value.item_ref;
@@ -209,8 +219,10 @@ export default  {
           }
         })
       }) 
+      state.showData.imageFile = {};
       state.showData.stocks = {};
       state.showData.barcodes = {}
+      state.showData.barcodeId = {}
       if(state.showData.colors.length == 0) {
         value.skus.data.forEach( item => {
           item.skustocks.data.forEach( subItem => {
@@ -219,7 +231,10 @@ export default  {
             }
           })
           state.showData.barcodes = {
-            barcode: itemBarcodeLevel == 1 ? item.barcode : ''
+            barcode: itemBarcodeLevel == 1 ? item.barcode : '',
+          }
+          state.showData.barcodeId = {
+            id: item.id
           }
         })
       }else {
@@ -237,7 +252,10 @@ export default  {
               }
             })
             state.showData.barcodes[`${colorId}`] = {
-              barcode: itemBarcodeLevel == 1 ? item.barcode : ''
+              barcode: itemBarcodeLevel == 1 ? item.barcode : '',
+            }
+            state.showData.barcodeId[`${colorId}`] = {
+              id: item.id
             }
           })
         }else {
@@ -256,12 +274,26 @@ export default  {
               }
             })
             state.showData.barcodes[`${colorId}_${sizeId}`] = {
-              barcode: itemBarcodeLevel == 1 ? item.barcode : ''
+              barcode: itemBarcodeLevel == 1 ? item.barcode : '',
+            }
+            state.showData.barcodeId[`${colorId}_${sizeId}`] = {
+              id: item.id
             }
           })
         }
       }
       itemBarcodeLevel == 0 ? state.showData.barcodes.barcode = value.barcode : ''
+      if(itemImageLevel == 'item') {
+        state.showData.imageFile = [];
+        itemimage.forEach( item => {
+          state.showData.imageFile.push({
+            uid: Number('-' + window.crypto.getRandomValues(new Uint32Array(1))[0].toString()),
+            url: `${imageApiBase}/${item}`,
+            name: item,
+            status: 'done'
+          })
+        })
+      }
       console.log(state.showData)
       return {...state}
     },
@@ -269,41 +301,6 @@ export default  {
 
     setServerData (state,{payload:{value,selectUnits,selectQuantityStep,warehouses,priceModel,itemBarcodeLevel,itemImageLevel}}) {
       console.log(value)
-      /*
-        新建商品传给服务端数据结构如下：
-        serverDate = {
-          item_ref || 货号 : String, 
-          purchase_price || 进货价 : String || Number, 
-          prices || 价格组成&价格矩阵 && 最后一个为标准价 : Array : [{
-            pricelevel_id || 价格等级Id : String || Number, 
-            shop_id || 店铺Id : String || Number,  
-            unit_id || 单位Id : String || Number,
-            quantityrange_id || 价格阶梯Id : String || Number, 
-            price || 价格 : String || Number, 
-          },{
-            price || 价格 : String || Number, 
-          }], 
-          units || 单位 : Array : [{
-            id || 单位id : String || Number ,
-            number || 单位数量 : String || Number,
-          }],
-          name || 名称 : String,
-          desc || 备注 : String,
-          itemgroup_ids || 商品分组下的子分类Id : Array,
-          skus || sku数组, 包含库存 ，条码, 图片 : Array : [{
-            barcode || 条码 : String,
-            attributes || sku属相 , 包含颜色, 尺码 : Array : [{
-              attributetype_id || 颜色, 尺码属性Id : String,
-              attribute_id || 颜色, 尺码Id : String || Number,
-            }],
-            images || 图片 : Array,
-            stocks || 库存 : Array : [{
-              warehouse_id || 仓库Id : String || Number,
-              store_quantity || 库存数量 : String || Number,
-            }]
-          }]
-        }
-      */
       state.serverData = {}
       state.serverData.item_ref = value.item_ref;
       state.serverData.standard_price = value.standard_price;
@@ -355,12 +352,16 @@ export default  {
         picture.fileName = [];
         value.picture.fileList.forEach( item => {
           delete item.url;
-          let fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (item.type).slice(6,(item.type).length)
-          picture.fileName.push(fileName)
-          state.imageFile.push({
-            image_name: fileName,
-            image_file: item
-          })
+          if(item.type) {
+            let fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (item.type).slice(6,(item.type).length)
+            picture.fileName.push(fileName)
+            state.imageFile.push({
+              image_name: fileName,
+              image_file: item
+            })
+          }else {
+            picture.fileName.push(item.name)
+          }
         })
       }else {
         for(let key in value.picture) {
@@ -381,12 +382,22 @@ export default  {
       state.serverData.skus = [];
       if(value.color_select.length === 0 && value.size_select.length === 0 ) {
         state.serverData.dimension = []
-        state.serverData.skus.push({
-          barcode: itemBarcodeLevel === 1 ? value.barcode.barcode : '' ,
-          attributes: [],
-          images: [],
-          stocks: []
-        })
+        if(state.showData.barcodeId) {
+          state.serverData.skus.push({
+            id: state.showData.barcodeId.id,
+            barcode: itemBarcodeLevel === 1 ? value.barcode.barcode : '' ,
+            attributes: [],
+            images: [],
+            stocks: []
+          })
+        }else {
+          state.serverData.skus.push({
+            barcode: itemBarcodeLevel === 1 ? value.barcode.barcode : '' ,
+            attributes: [],
+            images: [],
+            stocks: []
+          })
+        }
         state.serverData.skus.forEach( item => {
           warehouses.forEach( subItem => {
             item.stocks.push({
@@ -398,15 +409,28 @@ export default  {
       }else if(value.color_select.length !== 0 && value.size_select.length === 0) {
         state.serverData.dimension = [1]
         value.color_select.forEach( colorId => {
-          state.serverData.skus.push({
-            barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}`].barcode : '',
-            attributes: [{
-              attributetype_id: 1,
-              attribute_id: colorId
-            }],
-            images: [],
-            stocks: []
-          })
+          if(state.showData.barcodeId && Object.keys(state.showData.barcodeId).some(n => n == colorId)) {
+            state.serverData.skus.push({
+              id: state.showData.barcodeId[`${colorId}`].id,
+              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}`].barcode : '',
+              attributes: [{
+                attributetype_id: 1,
+                attribute_id: colorId
+              }],
+              images: [],
+              stocks: []
+            })
+          }else {
+            state.serverData.skus.push({
+              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}`].barcode : '',
+              attributes: [{
+                attributetype_id: 1,
+                attribute_id: colorId
+              }],
+              images: [],
+              stocks: []
+            })
+          }
         })
         state.serverData.skus.forEach( item => {
           warehouses.forEach( subItem => {
@@ -420,18 +444,34 @@ export default  {
         state.serverData.dimension = [1,2]
         value.color_select.forEach( colorId => {
           value.size_select.forEach( sizeId => {
-            state.serverData.skus.push({
-              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode  : '',
-              attributes: [{
-                attributetype_id: 1,
-                attribute_id: colorId
-              },{
-                attributetype_id: 2,
-                attribute_id: sizeId
-              }],
-              images: [],
-              stocks: []
-            })
+            if(state.showData.barcodeId && Object.keys(state.showData.barcodeId).some( n => n == `${colorId}_${sizeId}`)) {
+              state.serverData.skus.push({
+                id:state.showData.barcodeId[`${colorId}_${sizeId}`].id,
+                barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode  : '',
+                attributes: [{
+                  attributetype_id: 1,
+                  attribute_id: colorId
+                },{
+                  attributetype_id: 2,
+                  attribute_id: sizeId
+                }],
+                images: [],
+                stocks: []
+              })
+            }else {
+              state.serverData.skus.push({
+                barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode  : '',
+                attributes: [{
+                  attributetype_id: 1,
+                  attribute_id: colorId
+                },{
+                  attributetype_id: 2,
+                  attribute_id: sizeId
+                }],
+                images: [],
+                stocks: []
+              })
+            }
           })
         })
         state.serverData.skus.forEach( item => {

@@ -40,7 +40,7 @@ const tabListNoTitle = [{
   tab: '未结算销售单',
 }, {
   key: 'settle',
-  tab: '未付款的结算单',
+  tab: '未付款结算单',
 }];
 const salePagination = {
   showQuickJumper: true,
@@ -81,6 +81,10 @@ export default class CustomerDetail extends PureComponent {
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     },
+    pageSaleHistory: {
+      page:1,
+      per_page:10
+    },
     sortGoodsHistory: {
       sorts:{
         purchase_time: 'desc'
@@ -90,6 +94,10 @@ export default class CustomerDetail extends PureComponent {
       date_type:'custom',
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+    },
+    pageGoodsHistory: {
+      page:1,
+      per_page:10
     },
     sortPaymentHistory: {
       sorts:{
@@ -101,6 +109,18 @@ export default class CustomerDetail extends PureComponent {
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     },
+    pagePaymentHistory: {
+      page:1,
+      per_page:10
+    },
+    pageSalesorder: {
+      page:1,
+      per_page:10
+    },
+    pageStatement: {
+      page:1,
+      per_page:10
+    }
   }
 
   handleTabChange = (key) => {
@@ -129,6 +149,11 @@ export default class CustomerDetail extends PureComponent {
   }
 
   handleSaleHistorySort = (pagination,filter,sorter) => {
+    let pageSaleHistory = {
+      page:pagination.current,
+      per_page:pagination.pageSize
+    }
+    this.setState({pageSaleHistory})
     let sortSaleHistory = {
       sorts:{}
     }
@@ -169,6 +194,11 @@ export default class CustomerDetail extends PureComponent {
   }
 
   handleGoodsHistorySort = (pagination,filter,sorter) => {
+    let pageGoodsHistory = {
+      page:pagination.current,
+      per_page:pagination.pageSize
+    }
+    this.setState({pageGoodsHistory})
     let sortGoodsHistory = {
       sorts:{}
     }
@@ -209,6 +239,11 @@ export default class CustomerDetail extends PureComponent {
   }
 
   handlePaymentHistorySort = (pagination,filter,sorter) => {
+    let pagePaymentHistory = {
+      page:pagination.current,
+      per_page:pagination.pageSize
+    }
+    this.setState({pagePaymentHistory})
     let sortPaymentHistory = {
       sorts:{}
     }
@@ -248,9 +283,53 @@ export default class CustomerDetail extends PureComponent {
     }, 0)
   }
 
+  handleSalesorderSort = (pagination,filter,sorter) => {
+    let pageSalesorder = {
+      page:pagination.current,
+      per_page:pagination.pageSize
+    }
+    this.setState({pageSalesorder})
+    let salesorderSort = {
+      sorts:{}
+    }
+    if(sorter.field) {
+      salesorderSort.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    }else {
+      salesorderSort.sorts = {
+        created_at: 'desc'
+      }
+    }
+    this.props.dispatch({type:'customerDetail/getSalesorder',payload:{
+      ...salesorderSort,
+      id:this.props.customerDetail.currentId.id,
+    }})
+  }
+
+  handleStatementSort = (pagination,filter,sorter) => {
+    let pageStatement = {
+      page:pagination.current,
+      per_page:pagination.pageSize
+    }
+    this.setState({pageStatement})
+    let statementSort = {
+      sorts: {}
+    }
+    if(sorter.field) {
+      statementSort.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    }else {
+      statementSort.sorts = {
+        created_at: 'desc'
+      }
+    }
+    this.props.dispatch({type:'customerDetail/getStatement',payload:{
+      ...statementSort,
+      id:this.props.customerDetail.currentId.id,
+    }})
+  }
+
   render() {
-    const {singleCustomerDetail,singleCustomerFinance,singleCustomerSaleHistory,singleCustomerGoodsHistory,singleCustomerPaymentHistory,singleCustomerSalesorders,singleCustomerstatements,saleHistoryFilter,goodsHistoryFilter,paymentHistoryFilter,currentId} = this.props.customerDetail;
-    const {activeTabKey,activeBlanceTabKey} = this.state;
+    const {singleCustomerDetail,singleCustomerFinance,singleCustomerSaleHistory,singleCustomerGoodsHistory,singleCustomerPaymentHistory,singleCustomerSalesorders,singleCustomerStatements,saleHistoryFilter,goodsHistoryFilter,paymentHistoryFilter,currentId} = this.props.customerDetail;
+    const {activeTabKey,activeBlanceTabKey,pageSaleHistory,pageGoodsHistory,pagePaymentHistory,pageSalesorder,pageStatement} = this.state;
     const {getFieldDecorator} = this.props.form
     const description = (
       <DescriptionList size="small" col="2" className={styles.descriptionPostion}>
@@ -271,7 +350,7 @@ export default class CustomerDetail extends PureComponent {
     const action = (
       <div>
         <ButtonGroup>
-          <Button onClick={this.handleChangeCustomerStatus.bind(null,currentId.id,singleCustomerDetail.freeze)}>{singleCustomerDetail.freeze == 1 ? '解冻' : '冻结'}</Button>
+            <Popconfirm title={singleCustomerDetail.freeze == 1 ? '确定解冻此客户' : '确定冻结此客户'} placement='bottom' onConfirm={this.handleChangeCustomerStatus.bind(null,currentId.id,singleCustomerDetail.freeze)}><Button >{singleCustomerDetail.freeze == 1 ? '解冻' : '冻结'}</Button></Popconfirm>
           <Dropdown overlay={menu} placement="bottomRight">
             <Button><Icon type="ellipsis" /></Button>
           </Dropdown>
@@ -283,54 +362,65 @@ export default class CustomerDetail extends PureComponent {
     const saleColumns = [{
       title: '单号',
       dataIndex: 'number',
+      width:'15%',
       render: (text,record) => (`#${record.number}`)
     },{
       title: '业绩归属员工',
       dataIndex: 'seller',
+      width:'15%',
       render: (text,record) => (`${record.seller.data.name}`)
     },{
       title: '商品数量',
       dataIndex: 'quantity',
       className: styles['numberRightMove'],
+      width:'15%',
       sorter:true,
       render: (text,record) => NCNI(record.quantity).format(true)
     },{
       title: '总额',
       dataIndex: 'due_fee',
       className: styles['numberRightMove'],
+      width:'20%',
       sorter:true,
       render: (text,record) => NCNF(record.due_fee).format(true)
     },{
       title: '创建时间',
       dataIndex: 'created_at',
+      width:'25%',
       sorter:true,
     },{
       title: '操作',
       dataIndex: 'operation',
+      width:'10%',
       render: (text,record) => (<a>查看</a>)
     }]
 
     const goodsColumns = [{
       title: '货号',
       dataIndex: 'item_ref',
+      width:'15%',
     },{
       title: '购买量',
       dataIndex: 'item_quantity',
+      width:'20%',
       className: styles['numberRightMove'],
       sorter:true,
       render: (text,record) => NCNI(record.item_quantity).format(true)
     },{
       title: '购买额',
       dataIndex: 'item_value',
+      width:'30%',
       className: styles['numberRightMove'],
       sorter:true,
       render: (text,record) => NCNF(record.item_value).format(true)
     },{
       title: '最后购买时间',
+      width:'25%',
       dataIndex: 'purchase_time',
       sorter:true,
     },{
       title: '操作',
+      width:'10%',
       dataIndex: 'operation',
       render: (text,record) => (<Link to={`/relationship/customer-detail/goods-purchase-detail/${currentId.id}/${record.id}`}>查看</Link>)
     }]
@@ -338,46 +428,59 @@ export default class CustomerDetail extends PureComponent {
     const paymentColumns = [{
       title: '流水号',
       dataIndex: 'number',
+      width:'25',
       render:(text,record) => (`#${record.number}`)
     },{
       title: '收银方式',
       dataIndex: 'paymentmethod',
+      width:'20%',
       render:(text,record) => (`${record.paymentmethod.name}`)
     },{
       title: '金额',
       dataIndex: 'value',
       sorter:true,
+      width:'20%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.value).format(true)
     },{
       title: '创建时间',
+      width:'25%',
       dataIndex: 'created_at',
       sorter:true,
     },{
       title: '操作',
       dataIndex: 'operation',
+      width:'10%',
       render: (text,record) => (<a>查看</a>)
     }]
 
     const salesorderColumns = [{
       title:'单号',
       dataIndex: 'number',
+      width:'15%',
       render:(text,record) => (`#${record.number}`)
     },{
       title:'商品数量',
       dataIndex:'quantity',
+      width:'20%',
+      sorter:true,
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.quantity).format(true)
     },{
       title:'未付总款',
       dataIndex:'due_fee',
+      width:'30%',
       className: styles['numberRightMove'],
+      sorter:true,
       render: (text,record) => NCNF(record.due_fee).format(true)
     },{
       title:'创建时间',
+      width:'25%',
       dataIndex:'created_at',
+      sorter:true,
     },{
       title:'操作',
+      width:'10%',
       dataIndex:'operation',
       render:(text,record) => (<a>查看</a>)
     }]
@@ -385,22 +488,30 @@ export default class CustomerDetail extends PureComponent {
     const statementColumns = [{
       title:'单号',
       dataIndex: 'number',
+      width:'15%',
       render:(text,record) => (`#${record.number}`)
     },{
       title:'单据数量',
       dataIndex: 'order_quantity',
+      width:'20%',
       className: styles['numberRightMove'],
+      sorter:true,
       render: (text,record) => NCNI(record.order_quantity).format(true)
     },{
       title:'未付总款',
       dataIndex: 'need_pay',
+      width:'30%',
       className: styles['numberRightMove'],
+      sorter:true,
       render: (text,record) => NCNF(record.need_pay).format(true)
     },{
       title:'创建时间',
-      dataIndex:'created_at'
+      width:'25%',
+      dataIndex:'created_at',
+      sorter:true,
     },{
       title:'操作',
+      width:'10%',
       dataIndex: 'operation',
       render:(text,record) => (<a>查看</a>)
     }]
@@ -477,13 +588,13 @@ export default class CustomerDetail extends PureComponent {
           <Card bordered={false} className={styles.bottomCardDivided}>
             <Row>
               <Col span={8}>
-                <Info title="当前余额" value={singleCustomerFinance.balance || ''} bordered />
+                <Info title="当前余额" value={singleCustomerFinance.balance || '0.00'} bordered />
               </Col>
               <Col span={8}>
-                <Info title="未结算销售单" value={singleCustomerFinance.salesorder_unpaid || ''} bordered />
+                <Info title="未结算销售单" value={singleCustomerFinance.salesorder_unpaid || '0.00'} bordered />
               </Col>
               <Col span={8}>
-                <Info title="未付款结算单" value={singleCustomerFinance.statement_unpaid || ''} />
+                <Info title="未付款结算单" value={singleCustomerFinance.statement_unpaid || '0.00'} />
               </Col>
             </Row>
           </Card>
@@ -492,10 +603,16 @@ export default class CustomerDetail extends PureComponent {
              {`emmmm………`}
             </div>
             <div style={{display: activeBlanceTabKey == 'sale' ? 'block' : 'none'}}>
-              <Table columns={salesorderColumns} dataSource={singleCustomerSalesorders}  pagination={salesorderPagination} rowKey='id' />
+              <Table columns={salesorderColumns} dataSource={singleCustomerSalesorders} onChange={this.handleSalesorderSort} pagination={salesorderPagination} rowKey='id' />
+              <div style={{marginTop:-43,width:300}}>
+                <span>{`共 ${singleCustomerSalesorders.length || ''} 条销售单 第 ${pageSalesorder.page} / ${Math.ceil(Number(singleCustomerSalesorders.length)/Number(pageSalesorder.per_page))} 页`}</span>
+              </div>
             </div>
             <div style={{display: activeBlanceTabKey == 'settle' ? 'block' : 'none'}}>
-              <Table columns={statementColumns} dataSource={singleCustomerstatements}  pagination={settlesorderPagination} rowKey='id' />
+              <Table columns={statementColumns} dataSource={singleCustomerStatements} onChange={this.handleStatementSort} pagination={settlesorderPagination} rowKey='id' />
+              <div style={{marginTop:-43,width:300}}>
+                <span>{`共 ${singleCustomerStatements.length || ''} 条结算单 第 ${pageStatement.page} / ${Math.ceil(Number(singleCustomerStatements.length)/Number(pageStatement.per_page))} 页`}</span>
+              </div>
             </div>
           </Card>
         </div>
@@ -532,6 +649,9 @@ export default class CustomerDetail extends PureComponent {
           </Card>
           <Card bordered={false}>
             <Table columns={saleColumns} dataSource={singleCustomerSaleHistory} onChange={this.handleSaleHistorySort} pagination={salePagination} rowKey='id' />
+            <div style={{marginTop:-43,width:300}}>
+              <span>{`共 ${singleCustomerSaleHistory.length || ''} 条销售单 第 ${pageSaleHistory.page} / ${Math.ceil(Number(singleCustomerSaleHistory.length)/Number(pageSaleHistory.per_page))} 页`}</span>
+            </div>
           </Card>
         </div>
         <div style={{display: activeTabKey == 'goods' ? 'block' : 'none'}}>
@@ -567,6 +687,9 @@ export default class CustomerDetail extends PureComponent {
           </Card>
           <Card bordered={false}>
             <Table columns={goodsColumns} dataSource={singleCustomerGoodsHistory} onChange={this.handleGoodsHistorySort} pagination={goodsPagination} rowKey='id' />
+            <div style={{marginTop:-43,width:300}}>
+              <span>{`共 ${singleCustomerGoodsHistory.length || ''} 件商品 第 ${pageGoodsHistory.page} / ${Math.ceil(Number(singleCustomerGoodsHistory.length)/Number(pageGoodsHistory.per_page))} 页`}</span>
+            </div>
           </Card>
         </div>
         <div style={{display: activeTabKey == 'payment' ? 'block' : 'none'}}>
@@ -602,6 +725,9 @@ export default class CustomerDetail extends PureComponent {
           </Card>
           <Card bordered={false}>
             <Table columns={paymentColumns} dataSource={singleCustomerPaymentHistory} onChange={this.handlePaymentHistorySort} pagination={paymentPagination} rowKey='id' />
+            <div style={{marginTop:-43,width:300}}>
+              <span>{`共 ${singleCustomerPaymentHistory.length || ''} 条流水 第 ${pagePaymentHistory.page} / ${Math.ceil(Number(singleCustomerPaymentHistory.length)/Number(pagePaymentHistory.per_page))} 页`}</span>
+            </div>
           </Card>
         </div>
       </PageHeaderLayout>

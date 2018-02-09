@@ -49,12 +49,37 @@ export async function editSingle (params) {
   })
 }
 
+export async function getSupplierFinance (params) {
+  return request(`${apiBase}/api/suppliers/${params.id}/finance`,{
+    headers: {'Authorization':token}
+  })
+}
+
+export async function getPurchaseorderNeedPay (params) {
+  const condition = {
+    sorts:params.sorts
+  }
+  return request(`${apiBase}/api/suppliers/${params.id}/purchaseorders/need_pay`,{
+    method:'POST',
+    headers:{'Authorization':token},
+    body:condition
+  })
+}
+
+export async function getStatementsNeedPay (params) {
+  const condition = {
+    sorts:params.sorts
+  }
+  return request(`${apiBase}/api/suppliers/${params.id}/statements/need_pay`,{
+    method:'POST',
+    headers:{'Authorization':token},
+    body:condition
+  })
+}
+
 export async function getSupplierSaleHistory (params) {
   let current = {...params};
   delete current.id
-  if(current.filter) {
-    current = current.filter
-  }
   return request(`${apiBase}/api/suppliers/${params.id}/purchaseorders`,{
     method: 'POST',
     headers: {"Authorization":token},
@@ -65,15 +90,23 @@ export async function getSupplierSaleHistory (params) {
 export async function getSupplierGoodsHistory (params) {
   let current = {...params};
   delete current.id
-  if(current.filter) {
-    current = current.filter
-  }
   return request(`${apiBase}/api/suppliers/${params.id}/items`,{
     method: 'POST',
     headers: {"Authorization":token},
     body: current
   })
 }
+
+export async function getSupplierPaymentHistory (params) {
+  let current = {...params};
+  delete current.id
+  return request(`${apiBase}/api/suppliers/${params.id}/payments`,{
+    method: 'POST',
+    headers: {"Authorization":token},
+    body: current
+  })
+}
+
 
 export async function getGoodsPurchaseDetail (params) {
   const condition = {
@@ -94,18 +127,5 @@ export async function getSkusPurchaseDetail (params) {
     method: 'POST',
     headers:{'Authorization':token},
     body: condition
-  })
-}
-
-export async function getSupplierPaymentHistory (params) {
-  let current = {...params};
-  delete current.id
-  if(current.filter) {
-    current = current.filter
-  }
-  return request(`${apiBase}/api/suppliers/${params.id}/payments`,{
-    method: 'POST',
-    headers: {"Authorization":token},
-    body: current
   })
 }

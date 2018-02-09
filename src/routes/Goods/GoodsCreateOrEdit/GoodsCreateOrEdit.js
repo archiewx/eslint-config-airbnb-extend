@@ -83,7 +83,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    const {usePricelelvel,priceModel,itemBarcodeLevel} = nextProps.configSetting;
+    const {usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel} = nextProps.configSetting;
     const {priceGrades} = nextProps.priceGrade;
     const {colors} = nextProps.color;
     const {sizeLibrarys} = nextProps.sizeLibrary;
@@ -116,7 +116,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
       this.setState({selectSizes:[...showData.selectSizes]})
     }
     if(showData.prices ) {
-      if( !!priceGrades.length && !!shops.length && showData.selectUnits && showData.selectQuantityStep && (Object.values(this.state.priceTableValue).length == priceGrades.length || Object.values(this.state.priceTableValue).length == shops.length || Object.values(this.state.priceTableValue).length == (shops.length * priceGrades.length) )) {
+      if( !!priceGrades.length && !!shops.length && (Object.values(this.state.priceTableValue).length == priceGrades.length || Object.values(this.state.priceTableValue).length == shops.length || Object.values(this.state.priceTableValue).length == (shops.length * priceGrades.length) )) {
         if(!showData.prices.price) {
           if(usePricelelvel === 'yes') {
             if(priceModel === '') {
@@ -381,20 +381,32 @@ export default class GoodsCreateOrEdit extends PureComponent {
         selectWarehouseId:warehouses[0].id 
       })
     }
-    if(!Object.values(this.state.skuImages).length) {
-      let skuImages = {}
-      if(this.state.selectColors.length == 0) {
+    if(itemImageLevel && itemImageLevel == 'item') {
+      if(showData.imageFile) {
+        let skuImages = {}
         skuImages = {
-          fileList: []
+          fileList: showData.imageFile
         }
+        this.setState({skuImages})
       }else {
+        if(!Object.values(this.state.skuImages).length) {
+          let skuImages = {}
+          skuImages = {
+            fileList: []
+          }
+          this.setState({skuImages})
+        }
+      }
+    }else {
+      if(!Object.values(this.state.skuImages).length) {
+        let skuImages = {};
         this.state.selectColors.forEach( item => {
           skuImages[`${item.id}`] = {
             fileList: []
           }
         })
+        this.setState({skuImages})
       }
-      this.setState({skuImages})
     }
   }
 
@@ -403,6 +415,11 @@ export default class GoodsCreateOrEdit extends PureComponent {
     e.preventDefault();
     validateFields((err,value) =>{
       if(!err){
+        let skuStocks = this.state.skuStocks;
+        for(let key in skuStocks) {
+          if(skuStocks[key].store_quantity)
+          skuStocks[key].store_quantity = Number(skuStocks[key].store_quantity) * Number(this.state.selecStockUnitNum)
+        }
         value.stock = this.state.skuStocks;
         this.props.dispatch({type:'goodsCreateOrEdit/setServerData',payload:{
           value,
@@ -414,7 +431,13 @@ export default class GoodsCreateOrEdit extends PureComponent {
           itemImageLevel: this.props.configSetting.itemImageLevel
         }})
         if(this.props.goodsCreateOrEdit.showData.id) {
-
+          // this.props.dispatch({type:'goodsCreateOrEdit/editSingleGoods',payload:{
+          //   serverData:this.props.goodsCreateOrEdit.serverData,
+          //   id:this.props.goodsCreateOrEdit.showData.id,
+          //   imageFile:this.props.goodsCreateOrEdit.imageFile
+          // }}).then(()=>{
+          //   this.props.history.goBack()
+          // })
         }else {
           this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods',payload:{
             serverData:this.props.goodsCreateOrEdit.serverData,
@@ -430,8 +453,12 @@ export default class GoodsCreateOrEdit extends PureComponent {
   handleCheckItemRef = (rule,value,callback) => {
     validateDelay.run(()=>{ 
       if(value) {
-        if(this.props.goodsCreateOrEdit.showData.item_ref && this.props.goodsCreateOrEdit.showData.item_ref == value) {callback()}
-        else {
+        if(this.props.goodsCreateOrEdit.showData.item_ref && this.props.goodsCreateOrEdit.showData.item_ref == value) {
+          callback()
+          this.setState({
+            isNeedIcon:false
+          })
+        }else {
           this.props.dispatch({type:'goodsCreateOrEdit/checkItemRef',payload:value}).then((result)=>{
             if(result.request.item_ref == value) {
               if(result.code != 0) {
@@ -442,7 +469,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
               }else {
                 callback()
                 this.setState({
-                  isNeedIcon:false
+                  isNeedIcon:true
                 })
               }
             }else {
@@ -459,28 +486,13 @@ export default class GoodsCreateOrEdit extends PureComponent {
     }, 300)
   }
 
-  // handleGetItemRef = (e) => {
-  //   const {form} = this.props;
-  //   setTimeout(() => {
-  //     if(!form.getFieldValue('item_ref')) {
-  //       this.setState({
-  //         isNeedIcon: true
-  //       })
-  //     }
-  //   }, 4)
-  // }
-
   handleCancel = () => {
     this.props.form.resetFields()
-    this.props.dispatch(routerRedux.push('/goods-list'))
-  }
-
-  handleCheckNumber = (oldVal,newVal) => {
-    // if(isNaN(newVal)) {
-    //   return oldVal
-    // }else {
-    //   return newVal
-    // }
+    if(this.props.goodsCreateOrEdit.showData.id) {
+      this.props.history.goBack()
+    }else {
+      this.props.dispatch(routerRedux.push('/goods-list'))
+    }
   }
 
   handleGetStandardPrice = (e) => {
@@ -706,26 +718,26 @@ export default class GoodsCreateOrEdit extends PureComponent {
   handleGetStocks = (e) => {
     const {form} = this.props;
     setTimeout(() => {
-      if(this.state.selecStockUnitNum == '1') {
-        this.setState({
-          skuStocks:form.getFieldValue('stock')
-        })
-      }
+      let skuStocks = form.getFieldValue('stock')
+      this.setState({skuStocks})
     }, 0)
   }
 
   handleUnitStockSelect = (value) => {
     const {form} = this.props;
-    let numUnit = Number(value.split('').reverse().join('').match(/\d+/)[0].split('').reverse().join(''))
-    this.setState({
-      selecStockUnitNum:numUnit
-    })
-    let stock = JSON.parse(JSON.stringify(this.state.skuStocks));
+    let selecStockUnitNum = value.match(/\d+/)[0]
+    this.setState({selecStockUnitNum})
+    let onlyStcok = JSON.parse(JSON.stringify(this.state.skuStocks))
+    let stock = JSON.parse(JSON.stringify(this.state.skuStocks))
     for(let key in stock) {
       if(stock[key].store_quantity) {
-        stock[key].store_quantity = Math.floor(Number(stock[key].store_quantity)/Number(numUnit))
+        onlyStcok[key].store_quantity = Number(stock[key].store_quantity) * Number(this.state.selecStockUnitNum) / Number(selecStockUnitNum)
+        stock[key].store_quantity = Math.floor(Number(stock[key].store_quantity) * Number(this.state.selecStockUnitNum) / Number(selecStockUnitNum))
       }
     }
+    this.setState({
+      skuStocks:onlyStcok
+    })
     form.setFieldsValue({stock:stock})
   }
 

@@ -44,7 +44,7 @@ export default class StockTable extends PureComponent {
               <Row gutter={64}>
                 <Col span={8}>
                   <div><label className={styles.StockLabelTitle}>库存</label></div>
-                  <InputNumber value={(skuStocks[`${selectWarehouseId}`] || {}).store_quantity} onChange={this.handleStockInput.bind(null,-1,-1)}  placeholder='请输入' precision={2} style={{width:'100%'}}/>
+                  <InputNumber value={(skuStocks[`${selectWarehouseId}`] || {}).store_quantity} onChange={this.handleStockInput.bind(null,-1,-1)}  placeholder='请输入' precision={0} style={{width:'100%'}}/>
                 </Col>
               </Row>
             </div>
@@ -57,7 +57,7 @@ export default class StockTable extends PureComponent {
                       return (
                         <Col key={item.id} span={8}>
                           <div><label className={styles.StockLabelTitle}>{item.name}</label></div>
-                          <InputNumber value={(skuStocks[`${selectWarehouseId}_${item.id}`] || {} ).store_quantity} onChange={this.handleStockInput.bind(null,item.id,-1)} placeholder='请输入' precision={2} style={{width:'100%'}}/>
+                          <InputNumber value={(skuStocks[`${selectWarehouseId}_${item.id}`] || {} ).store_quantity} onChange={this.handleStockInput.bind(null,item.id,-1)} placeholder='请输入' precision={0} style={{width:'100%'}}/>
                         </Col>
                       )
                     })
@@ -85,7 +85,7 @@ export default class StockTable extends PureComponent {
                             <td className={styles.stockTableHead}><span className={styles.spanColTitlePostion}>{item.name}</span></td>
                             {
                               selectSizes.map( subItem => {
-                                return <td key={subItem.id}><InputNumber value={(skuStocks[`${selectWarehouseId}_${item.id}_${subItem.id}`] || {} ).store_quantity} onChange={this.handleStockInput.bind(null,item.id,subItem.id)} placeholder='请输入'  precision={2} style={{width:'100%',textAlign:'right'}} className={styles.stockInput}/></td>
+                                return <td key={subItem.id}><InputNumber value={(skuStocks[`${selectWarehouseId}_${item.id}_${subItem.id}`] || {} ).store_quantity} onChange={this.handleStockInput.bind(null,item.id,subItem.id)} placeholder='请输入'  precision={0} style={{width:'100%',textAlign:'right'}} className={styles.stockInput}/></td>
                               })
                             }
                           </tr>

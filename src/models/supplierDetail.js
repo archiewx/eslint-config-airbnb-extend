@@ -7,9 +7,12 @@ export default  {
 
   state: {
     singleSupplierDetail: {},
+    singleSupplierFinance:{},
     singleSupplierSaleHistory:[],
     singleSupplierGoodsHistory:[],
     singleSupplierPaymentHistory:[],
+    singleSupplierPurchaseorders:[],
+    singleSupplierStatements:[],
     saleHistoryFilter:[],
     goodsHistoryFilter:[],
     paymentHistoryFilter:[],
@@ -51,11 +54,20 @@ export default  {
         eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
         id:payload.id
       }
-      const [data1,data2,data3,data4] = yield all([
+      const conditionWThree = {
+        sorts: {
+          created_at: 'desc'
+        },
+        id:payload.id
+      }
+      const [data1,data2,data3,data4,data5,data6,data7] = yield all([
         call(supplierService.getSingle,payload),
-        call(supplierService.getSupplierSaleHistory,conditionWTwo),
+        call(supplierService.getSupplierSaleHistory,condition),
         call(supplierService.getSupplierGoodsHistory,conditionWTwo),
-        call(supplierService.getSupplierPaymentHistory,conditionWTwo)
+        call(supplierService.getSupplierPaymentHistory,condition),
+        call(supplierService.getPurchaseorderNeedPay,conditionWThree),
+        call(supplierService.getStatementsNeedPay,conditionWThree),
+        call(supplierService.getSupplierFinance,payload),
       ])
 
       yield put({type:'setShowData',payload:data1.result.data})
@@ -66,7 +78,10 @@ export default  {
         saleHistoryFilter: data2.result.meta.filter.groups,
         goodsHistoryFilter: data3.result.meta.filter.groups,
         paymentHistoryFilter: data4.result.meta.filter.groups,
-        currentId: payload
+        singleSupplierPurchaseorders: data5.result.data,
+        singleSupplierStatements:data6.result.data,
+        currentId: payload,
+        singleSupplierFinance:data7.result.data
       }})
     },
 
@@ -93,6 +108,20 @@ export default  {
       const data = yield call(supplierService.getSupplierPaymentHistory,payload)
       yield put({type:'setState',payload:{
         singleSupplierPaymentHistory:data.result.data
+      }})
+    },
+
+    *getPurchaseorder({payload},{call,put}) {
+      const data = yield call(supplierService.getPurchaseorderNeedPay,payload)
+      yield put({type:'setState',payload:{
+        singleSupplierPurchaseorders:data.result.data
+      }})
+    },
+
+    *getStatement({payload},{call,put}) {
+      const data = yield call(supplierService.getStatementsNeedPay,payload)
+      yield put({type:'setState',payload:{
+        singleSupplierStatements:data.result.data
       }})
     },
 

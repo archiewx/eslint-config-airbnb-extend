@@ -96,16 +96,24 @@ export async function getSkusPurchaseDetail (params) {
 }
 
 export async function getSalesordersNeedPay (params) {
+  const condition = {
+    sorts:params.sorts
+  }
   return request(`${apiBase}/api/customers/${params.id}/salesorders/need_pay`,{
     method: 'POST',
-    headers: {'Authorization': token}
+    headers: {'Authorization': token},
+    body: condition
   })
 }
 
 export async function getStatementsNeedPay (params) {
+  const condition = {
+    sorts:params.sorts
+  }
   return request(`${apiBase}/api/customers/${params.id}/statements/need_pay`,{
     method: 'POST',
-    headers: {'Authorization': token}
+    headers: {'Authorization': token},
+    body: condition
   })
 }
 

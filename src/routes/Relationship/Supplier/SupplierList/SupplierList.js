@@ -208,6 +208,7 @@ export default class SupplierList extends PureComponent {
     const columns = [{
       title: '姓名',
       dataIndex: 'name',
+      width:'15%'
     }, {
       title: '交易笔数',
       dataIndex: 'trade_count',
@@ -216,6 +217,7 @@ export default class SupplierList extends PureComponent {
     }, {
       title: '交易金额',
       dataIndex: 'trade_amount',
+      width:'25%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.trade_amount).format(true)
     }, {
@@ -277,7 +279,7 @@ export default class SupplierList extends PureComponent {
             dataSource={supplierList} 
             pagination={pagination}
           />
-          <div style={{marginTop:-42,width:300}}>
+          <div style={{marginTop:-43,width:300}}>
             <span>{`共 ${supplierPagination.total || ''} 位供应商 第 ${pages.page} / ${Math.ceil(Number(supplierPagination.total)/Number(pages.per_page))} 页`}</span>
           </div>
         </Card>

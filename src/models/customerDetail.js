@@ -12,7 +12,7 @@ export default  {
     singleCustomerGoodsHistory:[],
     singleCustomerPaymentHistory:[],
     singleCustomerSalesorders:[],
-    singleCustomerstatements:[],
+    singleCustomerStatements:[],
     saleHistoryFilter:[],
     goodsHistoryFilter:[],
     paymentHistoryFilter:[],
@@ -79,7 +79,7 @@ export default  {
         goodsHistoryFilter: data3.result.meta.filter.groups,
         paymentHistoryFilter: data4.result.meta.filter.groups,
         singleCustomerSalesorders: data5.result.data,
-        singleCustomerstatements: data6.result.data,
+        singleCustomerStatements: data6.result.data,
         currentId: payload,
         singleCustomerFinance:data7.result.data
       }})
@@ -108,6 +108,20 @@ export default  {
       const data = yield call(customerService.getCustomerPaymentHistory,payload)
       yield put({type:'setState',payload:{
         singleCustomerPaymentHistory:data.result.data
+      }})
+    },
+
+    *getSalesorder({payload},{call,put}) {
+      const data = yield call(customerService.getSalesordersNeedPay,payload)
+      yield put({type:'setState',payload:{
+        singleCustomerSalesorders: data.result.data
+      }})
+    },
+
+    *getStatement({payload},{call,put}) {
+      const data = yield call(customerService.getStatementsNeedPay,payload)
+      yield put({type:'setState',payload:{
+        singleCustomerStatements: data.result.data
       }})
     },
 

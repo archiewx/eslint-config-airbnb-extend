@@ -83,6 +83,10 @@ export default class GoodsDetail extends PureComponent {
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     },
+    pageCustomer: {
+      page: 1,
+      per_page:10
+    },
     sortSupplier: {
       sorts:{}
     },
@@ -104,6 +108,9 @@ export default class GoodsDetail extends PureComponent {
   componentDidMount() {
     if(this.props.history.location.pathname.indexOf('/goods-detail') > -1) {
       const match = pathToRegexp('/goods-detail/:id').exec(this.props.history.location.pathname)
+      this.props.dispatch({type:'goodsDetail/setState',payload:{
+        singleGoodsDetail:{}
+      }})
       if(match) {
         this.props.dispatch({type:'goodsDetail/getSingle',payload:{id:match[1]}})
       }
@@ -209,6 +216,11 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleCustomerSort = (pagination,filters,sorter) => {
+    let pageCustomer = {
+      page:pagination.current,
+      per_page:pagination.pageSize
+    }
+    this.setState({pageCustomer})
     let sortCustomer = {
       sorts:{}
     }
@@ -340,7 +352,7 @@ export default class GoodsDetail extends PureComponent {
 
   render() {
 
-    const {activeTabKey,selectCustomerMode} = this.state
+    const {activeTabKey,selectCustomerMode,pageCustomer} = this.state
     const {singleGoodsDetail,singleGoodsSales,singleGoodsPurchases,singleGoodsCustomers,singleGoodsSuppliers,singleGoodsStocks,currentId,singleCustomerMode} = this.props.goodsDetail
     const {goodsDetailFilter} = this.props.layoutFilter
     const {getFieldDecorator,getFieldValue} = this.props.form;
@@ -447,8 +459,10 @@ export default class GoodsDetail extends PureComponent {
     const saleColumns = [{
       title:'名称',
       dataIndex:'name',
+      width:'15%',
     },{
       title:'销售量',
+      width:'15%',
       dataIndex:'sales_quantity',
       sorter:true,
       className: styles['numberRightMove'],
@@ -457,18 +471,21 @@ export default class GoodsDetail extends PureComponent {
       title:'销售额',
       dataIndex:'sales_amount',
       sorter:true,
+      width:'25%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.sales_amount).format(true)
     },{
       title:'利润',
       dataIndex:'profit',
       sorter:true,
+      width:'25%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.profit).format(true)
     },{
       title:'库存',
       dataIndex:'stock_quantity',
       sorter:true,
+      width:'20%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.stock_quantity).format(true)
     }]
@@ -476,22 +493,26 @@ export default class GoodsDetail extends PureComponent {
     const purchaseColumns = [{
       title:'名称',
       dataIndex:'name',
+      width:'15%',
     },{
       title:'进货量',
       dataIndex:'purchase_quantity',
       sorter:true,
+      width:'25%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.purchase_quantity).format(true)
     },{
       title:'进货额',
       dataIndex:'purchase_amount',
       sorter:true,
+      width:'30%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.purchase_amount).format(true)
     },{
       title:'库存',
       dataIndex:'stock_quantity',
       sorter:true,
+      width:'30%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.stock_quantity).format(true)
     }]
@@ -499,21 +520,25 @@ export default class GoodsDetail extends PureComponent {
     const stockColumns = [{
       title:'名称',
       dataIndex:'name',
+      width:'15%',
     },{
       title:'出货量',
       dataIndex:'sales_quantity',
+      width:'25%',
       sorter:true,
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.sales_quantity).format(true)
     },{
       title:'入货量',
       dataIndex:'purchase_quantity',
+      width:'30%',
       sorter:true,
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.purchase_quantity).format(true)
     },{
       title:'库存量',
       dataIndex:'stock_quantity',
+      width:'30%',
       sorter:true,
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.stock_quantity).format(true)
@@ -522,27 +547,32 @@ export default class GoodsDetail extends PureComponent {
     const customerColumns = [{
       title:'名称',
       dataIndex:'name',
+      width:'15%',
     },{
       title:'购买量',
       dataIndex:'sales_quantity',
+      width:'15%',
       sorter:true,
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.sales_quantity).format(true)
     },{
       title:'购买额',
       dataIndex:'sales_amount',
+      width:'25%',
       sorter:true,
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.sales_amount).format(true)
     },{
       title:'退货量',
       dataIndex:'sales_return_quantity',
+      width:'25%',
       sorter:true,
       className: styles['numberRightMove'],
       render: (text,record) => NCNI(record.sales_return_quantity).format(true)
     },{
       title:'利润',
       dataIndex:'profit',
+      width:'20%',
       sorter:true,
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.profit).format(true)
@@ -551,15 +581,18 @@ export default class GoodsDetail extends PureComponent {
     const supplierColumns = [{
       title:'名称',
       dataIndex:'name',
+      width:'15%',
     },{
       title:'供应量',
       dataIndex:'purchase_quantity',
       sorter:true,
+      width:'40%',
       className: styles['numberRightMove'],
       render:(text,record) => NCNI(record.purchase_quantity).format(true)
     },{
       title:'供应额',
       dataIndex:'purchase_amount',
+      width:'45%',
       sorter:true,
       className: styles['numberRightMove'],
       render:(text,record) => NCNF(record.purchase_amount).format(true)
@@ -594,7 +627,7 @@ export default class GoodsDetail extends PureComponent {
             {
               (singleGoodsDetail.images || []).length === 0 ? null : (
                 <div>
-                  <DescriptionList title='图片' style={{paddingBottom:32}} size='large' >
+                  <DescriptionList title='图片' style={{paddingBottom:32,paddingTop:16}} size='large' >
                     {
                       singleGoodsDetail.images.map( item => {
                         return <img src={`${item.url}`} alt = {item.name} style={{height:104,width:104}} key={item.id}/>
@@ -709,6 +742,13 @@ export default class GoodsDetail extends PureComponent {
           </Card>
           <Card bordered={false} title={selectCustomerMode.name} extra={customerExrta}>
             <Table columns={customerColumns} dataSource={singleGoodsCustomers}  onChange={this.handleCustomerSort} rowKey='id' pagination={ selectCustomerMode.mode == 'customer' ? customerPagination : false}></Table>
+            {
+              selectCustomerMode.mode == 'customer' ? (
+                <div style={{marginTop:-43,width:300}}>
+                  <span>{`共 ${singleGoodsCustomers.length || ''} 位客户 第 ${pageCustomer.page} / ${Math.ceil(Number(singleGoodsCustomers.length)/Number(pageCustomer.per_page))} 页`}</span>
+                </div>
+              ) : null
+            }
           </Card>
         </div>
         <div style={{display: activeTabKey == 'supplier' ? 'block' : 'none'}}>
@@ -743,7 +783,7 @@ export default class GoodsDetail extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false}>
-            <Table columns={supplierColumns} dataSource={singleGoodsSuppliers} onChange={this.handleSupplierSort} pagination={supplierPagination} rowKey='id'></Table>
+            <Table columns={supplierColumns} dataSource={singleGoodsSuppliers} onChange={this.handleSupplierSort} pagination={false} rowKey='id'></Table>
           </Card>
         </div>
         <div style={{display: activeTabKey == 'stock' ? 'block' : 'none'}}>

@@ -209,6 +209,7 @@ export default class CustomerList extends PureComponent {
     const columns = [{
       title: '姓名',
       dataIndex: 'name',
+      width:'15%'
     }, {
       title: '交易笔数',
       dataIndex: 'trade_count',
@@ -217,6 +218,7 @@ export default class CustomerList extends PureComponent {
     }, {
       title: '交易金额',
       dataIndex: 'trade_amount',
+      width:'25%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.trade_amount).format(true)
     }, {
@@ -227,7 +229,7 @@ export default class CustomerList extends PureComponent {
     }, {
       title: '操作',
       dataIndex: 'operation',
-      width:'172px', 
+      width:'172px',
       render: (text,record,index) =>( this.handleMoreOperation(record) )
     }];
 
@@ -297,7 +299,7 @@ export default class CustomerList extends PureComponent {
             dataSource={customerList} 
             pagination={pagination}
           />
-          <div style={{marginTop:-42,width:300}}>
+          <div style={{marginTop:-43,width:300}}>
             <span>{`共 ${customerPagination.total || ''} 位客户 第 ${pages.page} / ${Math.ceil(Number(customerPagination.total)/Number(pages.per_page))} 页`}</span>
           </div>
         </Card>

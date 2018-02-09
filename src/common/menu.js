@@ -14,10 +14,6 @@ const menuData = [{
     path: 'supplier-list'
   }]
 },{
-  name: 'version: 0.0.1',
-  icon: 'smile-o',
-  path: '/'
-},{
   name: '测试',
   icon: 'smile-o',
   path: 'test'
