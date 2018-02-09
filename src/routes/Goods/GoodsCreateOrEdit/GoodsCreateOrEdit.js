@@ -248,7 +248,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
       }
     }
     if(showData.selectColors && showData.selectSizes && showData.stocks) {
-      if(!!warehouses.length && (Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length  == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length) )) {
+      if(!!warehouses.length && !this.state.selectColors.length && (Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length  == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length) )) {
         let skuStocks = {};
         if(showData.selectColors.length == 0) {
           warehouses.forEach( item => {
@@ -319,14 +319,14 @@ export default class GoodsCreateOrEdit extends PureComponent {
       }
     }
     if(showData.selectColors && showData.selectSizes && showData.barcodes) {
-      if(Object.values(this.state.skuBarcodes).length == 1 || Object.values(this.state.skuBarcodes).length == this.state.selectColors.length || Object.values(this.state.skuBarcodes).length == (this.state.selectColors.length * this.state.selectSizes.length)) {
+      if(!this.state.selectColors.length && (Object.values(this.state.skuBarcodes).length == 1 || Object.values(this.state.skuBarcodes).length == this.state.selectColors.length || Object.values(this.state.skuBarcodes).length == (this.state.selectColors.length * this.state.selectSizes.length))) {
         let skuBarcodes = {};
         if(showData.selectColors.length == 0 || itemBarcodeLevel == 0 ) {
           skuBarcodes = {
             barcode: showData.barcodes.barcode || ''
           }
         }else {
-          if(showData.selectSizes.length == 0) {
+          if(!this.state.selectColors.length) {
             showData.selectColors.forEach( item => {
               skuBarcodes[`${item.id}`] = {
                 barcode: showData.barcodes[`${item.id}`].barcode || ''
@@ -423,6 +423,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
         value.stock = this.state.skuStocks;
         this.props.dispatch({type:'goodsCreateOrEdit/setServerData',payload:{
           value,
+          selectColors:this.state.selectColors,
           selectUnits:this.state.selectUnits,
           selectQuantityStep:this.state.selectQuantityStep,
           warehouses:this.props.warehouse.warehouses,
@@ -431,13 +432,13 @@ export default class GoodsCreateOrEdit extends PureComponent {
           itemImageLevel: this.props.configSetting.itemImageLevel
         }})
         if(this.props.goodsCreateOrEdit.showData.id) {
-          // this.props.dispatch({type:'goodsCreateOrEdit/editSingleGoods',payload:{
-          //   serverData:this.props.goodsCreateOrEdit.serverData,
-          //   id:this.props.goodsCreateOrEdit.showData.id,
-          //   imageFile:this.props.goodsCreateOrEdit.imageFile
-          // }}).then(()=>{
-          //   this.props.history.goBack()
-          // })
+          this.props.dispatch({type:'goodsCreateOrEdit/editSingleGoods',payload:{
+            serverData:this.props.goodsCreateOrEdit.serverData,
+            id:this.props.goodsCreateOrEdit.showData.id,
+            imageFile:this.props.goodsCreateOrEdit.imageFile
+          }}).then(()=>{
+            this.props.history.goBack()
+          })
         }else {
           this.props.dispatch({type:'goodsCreateOrEdit/createSingleGoods',payload:{
             serverData:this.props.goodsCreateOrEdit.serverData,
@@ -645,6 +646,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             }
           })
         })
+        this.setState({skuStocks})
         form.setFieldsValue({stock:skuStocks})
       }
       if(this.props.configSetting.itemBarcodeLevel == 1 && !isOnlySame && current[0]) {

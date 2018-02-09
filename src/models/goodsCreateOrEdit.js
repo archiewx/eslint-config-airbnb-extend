@@ -299,7 +299,7 @@ export default  {
     },
 
 
-    setServerData (state,{payload:{value,selectUnits,selectQuantityStep,warehouses,priceModel,itemBarcodeLevel,itemImageLevel}}) {
+    setServerData (state,{payload:{value,selectColors,selectUnits,selectQuantityStep,warehouses,priceModel,itemBarcodeLevel,itemImageLevel}}) {
       console.log(value)
       state.serverData = {}
       state.serverData.item_ref = value.item_ref;
@@ -407,6 +407,12 @@ export default  {
           })
         })
       }else if(value.color_select.length !== 0 && value.size_select.length === 0) {
+        // let skuStock = value.stocks;
+        // warehouses.forEach( item => {
+        //   selectColors.forEach( colorItem => {
+                          
+        //   })
+        // })
         state.serverData.dimension = [1]
         value.color_select.forEach( colorId => {
           if(state.showData.barcodeId && Object.keys(state.showData.barcodeId).some(n => n == colorId)) {

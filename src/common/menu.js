@@ -14,7 +14,7 @@ const menuData = [{
     path: 'supplier-list'
   }]
 },{
-  name: '测试',
+  name: '开发',
   icon: 'smile-o',
   path: 'test'
 }];
