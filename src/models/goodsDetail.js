@@ -278,15 +278,15 @@ export default  {
             }
           }
         })
-        item.skuimages && item.skuimages.data.forEach( subItem => {
-          if(!state.singleGoodsDetail.images.some( imageItem => imageItem.name  == subItem.name)) {
+        if(itemImageLevel == 'sku') {
+          item.skuimages && item.skuimages.data.forEach( subItem => {
             state.singleGoodsDetail.images.push({
               name: subItem.name,
               url: subItem.url,
               id: subItem.id
             })
-          }
-        })
+          })
+        }
       })
       if(itemImageLevel == 'item') {
         state.singleGoodsDetail.images = itemimage.map( (item,index) => {
@@ -457,225 +457,197 @@ export default  {
 
     setShowSaleList(state,{payload}) {
       state.singleGoodsSales = []
+      let expandedRowRender = {};
       if(payload.length === 0) {
         state.singleGoodsSales = payload
       }else {
-        payload.forEach( item => {
-          if(item.skuattributes.length === 0) {
+        payload.forEach( (item,index) => {
+          if(item.skuattributes.length == 0) {
             state.singleGoodsSales.push({
-              id: item.id,
-              name:'',
-              sales_quantity:Number(item.sales_quantity),
-              sales_amount:Number(item.sales_amount).toFixed(2),
-              profit:Number(item.profit).toFixed(2),
-              stock_quantity:Number(item.stock_quantity)
+              id:item.id,
+              sales_quantity:item.sales_quantity,
+              sales_amount:item.sales_amount,
+              profit:item.profit,
+              stock_quantity:item.stock_quantity
             })
-          }else if(item.skuattributes.length === 1) {
+          }else if(item.skuattributes.length == 1) {
             state.singleGoodsSales.push({
               id:item.id,
               name:item.skuattributes[0].name,
-              sales_quantity:Number(item.sales_quantity),
-              sales_amount:Number(item.sales_amount).toFixed(2),
-              profit:Number(item.profit).toFixed(2),
-              stock_quantity:Number(item.stock_quantity)
+              sales_quantity:item.sales_quantity,
+              sales_amount:item.sales_amount,
+              profit:item.profit,
+              stock_quantity:item.stock_quantity
             })
-          }else if(item.skuattributes.length === 2) {
-            if(!state.singleGoodsSales.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
-              state.singleGoodsSales.push({
-                id:item.id,
-                name:item.skuattributes[0].name,
-                sales_quantity:Number(item.sales_quantity),
-                sales_amount:Number(item.sales_amount).toFixed(2),
-                profit:Number(item.profit).toFixed(2),
-                stock_quantity:Number(item.stock_quantity),
-                colorId:item.skuattributes[0].id,
-                childrens:[{
-                  id:item.skuattributes[1].id,
-                  name:item.skuattributes[1].name,
-                  sales_quantity:Number(item.sales_quantity),
-                  sales_amount:Number(item.sales_amount).toFixed(2),
-                  profit:Number(item.profit).toFixed(2),
-                  stock_quantity:Number(item.stock_quantity),
-                }],
+          }else if(item.skuattributes.length == 2) {
+            if(state.singleGoodsSales.some( n => n.id == item.skuattributes[0].id)) {
+              expandedRowRender[`${item.skuattributes[0].id}`].push({
+                id: `${item.skuattributes[1].id}_${index}`,
+                name:item.skuattributes[1].name,
+                sales_quantity:item.sales_quantity,
+                sales_amount:item.sales_amount,
+                profit:item.profit,
+                stock_quantity:item.stock_quantity,
               })
             }else {
-              let current = state.singleGoodsSales[state.singleGoodsSales.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)]
-              current = {
-                id:item.id,
+              state.singleGoodsSales.push({
+                id:item.skuattributes[0].id,
                 name:item.skuattributes[0].name,
-                sales_quantity:Number(current.sales_quantity + Number(item.sales_quantity)),
-                sales_amount:Number(Number(current.sales_amount) + Number(item.sales_amount)).toFixed(2),
-                profit:Number(Number(current.profit) + Number(item.profit)).toFixed(2),
-                stock_quantity:Number(current.stock_quantity + Number(item.stock_quantity)),
-                colorId:item.skuattributes[0].id,
-                childrens:current.childrens
-              }
-              current.childrens.push({
-                id:item.skuattributes[1].id,
-                name:item.skuattributes[1].name,
-                sales_quantity:Number(item.sales_quantity),
-                sales_amount:Number(item.sales_amount).toFixed(2),
-                profit:Number(item.profit).toFixed(2),
-                stock_quantity:Number(item.stock_quantity),
+                sales_quantity:0,
+                sales_amount:0,
+                profit:0,
+                stock_quantity:0,
+                children:[],
               })
-              state.singleGoodsSales[state.singleGoodsSales.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
+              expandedRowRender[`${item.skuattributes[0].id}`] = [];
+              expandedRowRender[`${item.skuattributes[0].id}`].push({
+                id: `${item.skuattributes[1].id}_${index}`,
+                name:item.skuattributes[1].name,
+                sales_quantity:item.sales_quantity,
+                sales_amount:item.sales_amount,
+                profit:item.profit,
+                stock_quantity:item.stock_quantity,
+              })
             }
           }
         })
+        if(Object.values(expandedRowRender).length != 0) {
+          state.singleGoodsSales.forEach( item => {
+            item.children = expandedRowRender[item.id]
+            item.sales_quantity = expandedRowRender[item.id].reduce((sum,item) => (sum + Number(item.sales_quantity)),0)
+            item.sales_amount = expandedRowRender[item.id].reduce((sum,item) => (sum + Number(item.sales_amount)), 0)
+            item.profit = expandedRowRender[item.id].reduce((sum,item) => (sum + Number(item.profit)), 0)
+            item.stock_quantity = expandedRowRender[item.id].reduce((sum,item) => (sum + Number(item.stock_quantity)), 0)
+          })
+        }
       }
       return {...state}
     },
 
     setShowPurchaseList(state,{payload}) {
       state.singleGoodsPurchases = []
+      let expandedRowRender = {};
       if(payload.length === 0) {
         state.singleGoodsPurchases = payload
       }else {
-        payload.forEach( item => {
-          if(item.skuattributes.length === 0) {
+        payload.forEach( (item,index) => {
+          if(item.skuattributes.length == 0) {
             state.singleGoodsPurchases.push({
-              id: item.id,
-              name:'',
-              purchase_quantity:Number(item.purchase_quantity),
-              purchase_amount:Number(item.purchase_amount).toFixed(2),
-              stock_quantity:Number(item.stock_quantity)
+              id:item.id,
+              purchase_quantity:item.purchase_quantity,
+              purchase_amount:item.purchase_amount,
+              stock_quantity:item.stock_quantity
             })
-          }else if(item.skuattributes.length === 1) {
+          }else if(item.skuattributes.length == 1) {
             state.singleGoodsPurchases.push({
               id:item.id,
               name:item.skuattributes[0].name,
-              purchase_quantity:Number(item.purchase_quantity),
-              purchase_amount:Number(item.purchase_amount).toFixed(2),
-              stock_quantity:Number(item.stock_quantity)
+              purchase_quantity:item.purchase_quantity,
+              purchase_amount:item.purchase_amount,
+              stock_quantity:item.stock_quantity
             })
-          }else if(item.skuattributes.length === 2) {
-            if(!state.singleGoodsPurchases.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
+          }else if(item.skuattributes.length == 2) {
+            if(state.singleGoodsPurchases.some( n => n.id == item.skuattributes[0].id)) {
+              expandedRowRender[`${item.skuattributes[0].id}`].push({
+                id:`${item.skuattributes[1].id}_${index}`,
+                name:item.skuattributes[1].name,
+                purchase_quantity:item.purchase_quantity,
+                purchase_amount:item.purchase_amount,
+                stock_quantity:item.stock_quantity,
+              })
+            }else {
               state.singleGoodsPurchases.push({
                 id:item.id,
                 name:item.skuattributes[0].name,
-                purchase_quantity:Number(item.purchase_quantity),
-                purchase_amount:Number(item.purchase_amount).toFixed(2),
-                stock_quantity:Number(item.stock_quantity),
-                colorId:item.skuattributes[0].id,
-                childrens:[{
-                  id:item.skuattributes[1].id,
-                  name:item.skuattributes[1].name,
-                  purchase_quantity:Number(item.purchase_quantity),
-                  purchase_amount:Number(item.purchase_amount).toFixed(2),
-                  stock_quantity:Number(item.stock_quantity),
-                }],
+                purchase_quantity:item.purchase_quantity,
+                purchase_amount:item.purchase_amount,
+                stock_quantity:item.stock_quantity,
+                children:[]
               })
-            }else {
-              let current = state.singleGoodsPurchases[state.singleGoodsPurchases.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)]
-              current = {
-                id:item.id,
-                name:item.skuattributes[0].name,
-                purchase_quantity:Number(current.purchase_quantity + Number(item.purchase_quantity)),
-                purchase_amount:Number(Number(current.purchase_amount) + Number(item.purchase_amount)).toFixed(2),
-                stock_quantity:Number(current.stock_quantity + Number(item.stock_quantity)),
-                colorId:item.skuattributes[0].id,
-                childrens:current.childrens
-              }
-              current.childrens.push({
-                id:item.skuattributes[1].id,
+              expandedRowRender[`${item.skuattributes[0].id}`] = [];
+              expandedRowRender[`${item.skuattributes[0].id}`].push({
+                id:`${item.skuattributes[1].id}_${index}`,
                 name:item.skuattributes[1].name,
-                purchase_quantity:Number(item.purchase_quantity),
-                purchase_amount:Number(item.purchase_amount).toFixed(2),
-                stock_quantity:Number(item.stock_quantity),
+                purchase_quantity:item.purchase_quantity,
+                purchase_amount:item.purchase_amount,
+                stock_quantity:item.stock_quantity,
               })
-              state.singleGoodsPurchases[state.singleGoodsPurchases.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
             }
           }
         })
+        if(Object.values(expandedRowRender).length != 0) {
+          state.singleGoodsPurchases.forEach( item => {
+            item.children = expandedRowRender[item.id];
+            item.purchase_quantity = expandedRowRender[item.id].reduce((sum,item) => (sum,Number(item.purchase_quantity)), 0)
+            item.purchase_amount = expandedRowRender[item.id].reduce((sum,item) => (sum,Number(item.purchase_amount)), 0)
+            item.stock_quantity = expandedRowRender[item.id].reduce((sum,item) => (sum,Number(item.stock_quantity)), 0)
+          })
+        }
       }
       return {...state}
     },
 
     setShowStockList(state,{payload}) {
       state.singleGoodsStocks = []
+      let expandedRowRender = {};
       if(payload.length === 0) {
         state.singleGoodsStocks = payload
       }else {
         payload.forEach( item => {
-          if(item.skuattributes.length === 0) {
+          if(item.skuattributes.length == 0) {
             state.singleGoodsStocks.push({
-              id: item.id,
-              name:'',
+              id:itme.id,
               sales_quantity:item.sales_quantity,
-              purchase_quantity:Number(item.purchase_quantity).toFixed(2),
+              purchase_quantity:item.purchase_quantity,
               stock_quantity:item.stock_quantity
             })
-          }else if(item.skuattributes.length === 1) {
+          }else if(item.skuattributes.length == 1) {
             state.singleGoodsStocks.push({
               id:item.id,
               name:item.skuattributes[0].name,
-              sales_quantity:Number(item.sales_quantity),
-              purchase_quantity:Number(item.purchase_quantity).toFixed(2),
-              stock_quantity:Number(item.stock_quantity)
+              sales_quantity:item.sales_quantity,
+              purchase_quantity:item.purchase_quantity,
+              stock_quantity:item.stock_quantity
             })
-          }else if(item.skuattributes.length === 2) {
-            if(!state.singleGoodsStocks.some( subItem => subItem.colorId == item.skuattributes[0].id)) {
-              state.singleGoodsStocks.push({
-                id:item.id,
-                name:item.skuattributes[0].name,
-                sales_quantity:Number(item.sales_quantity),
-                purchase_quantity:Number(item.purchase_quantity).toFixed(2),
-                stock_quantity:Number(item.stock_quantity),
-                colorId:item.skuattributes[0].id,
-                childrens:[{
-                  id:item.skuattributes[1].id,
-                  name:item.skuattributes[1].name,
-                  sales_quantity:Number(item.sales_quantity),
-                  purchase_quantity:Number(item.purchase_quantity).toFixed(2),
-                  stock_quantity:Number(item.stock_quantity),
-                }],
+          }else if(item.skuattributes.length == 2) {
+            if(state.singleGoodsStocks.some( n => n.id == item.skuattributes[0].id)) {
+              expandedRowRender[`${item.id}`].push({
+                id:`${item.skuattributes[1].id}_${index}`,
+                name: item.skuattributes[1].name,
+                sales_quantity:item.sales_quantity,
+                purchase_quantity:item.purchase_quantity,
+                stock_quantity:item.stock_quantity,
               })
             }else {
-              let current = state.singleGoodsStocks[state.singleGoodsStocks.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)]
-              current = {
-                id:item.id,
+              state.singleGoodsStocks.push({
+                id: item.id,
                 name:item.skuattributes[0].name,
-                sales_quantity:Number(current.sales_quantity + Number(item.sales_quantity)),
-                purchase_quantity:Number(Number(current.purchase_quantity) + Number(item.purchase_quantity)).toFixed(2),
-                stock_quantity:Number(current.stock_quantity + Number(item.stock_quantity)),
-                colorId:item.skuattributes[0].id,
-                childrens:current.childrens
-              }
-              current.childrens.push({
-                id:item.skuattributes[1].id,
-                name:item.skuattributes[1].name,
-                sales_quantity:Number(item.sales_quantity),
-                purchase_quantity:Number(item.purchase_quantity).toFixed(2),
-                stock_quantity:Number(item.stock_quantity),
+                sales_quantity:item.sales_quantity,
+                purchase_quantity:item.purchase_quantity,
+                stock_quantity:item.stock_quantity,
+                children:[]
               })
-              state.singleGoodsStocks[state.singleGoodsStocks.findIndex(subItem => subItem.colorId == item.skuattributes[0].id)] = {...current}
+              expandedRowRender[`${item.id}`] = [];
+              expandedRowRender[`${item.id}`].push({
+                id:`${item.skuattributes[1].id}_${index}`,
+                name: item.skuattributes[1].name,
+                sales_quantity:item.sales_quantity,
+                purchase_quantity:item.purchase_quantity,
+                stock_quantity:item.stock_quantity,
+              })
             }
           }
         })
+        if(Object.values(expandedRowRender).length != 0) {
+          state.singleGoodsStocks.forEach( item => {
+            item.children = expandedRowRender[item.id]
+            item.sales_quantity = expandedRowRender[item.id].reduce((sum,item) => (sum + Number(item.sales_quantity)),0)
+            item.purchase_quantity = expandedRowRender[item.id].reduce((sum,item) => (sum + Number(item.purchase_quantity)),0)
+            item.stock_quantity = expandedRowRender[item.id].reduce((sum,item) => (sum + Number(item.stock_quantity)),0)
+          })
+        }
       }
       return {...state}
     }
-
   },
-
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

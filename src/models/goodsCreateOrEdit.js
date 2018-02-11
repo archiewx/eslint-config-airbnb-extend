@@ -363,21 +363,6 @@ export default  {
             picture.fileName.push(item.name)
           }
         })
-      }else {
-        for(let key in value.picture) {
-          if(!!value.picture[key].fileList.length) {
-            picture[key].fileName = [];
-            value.picture[key].fileList.forEach( item => {
-              delete item.url;
-              let fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (item.type).slice(6,(item.type).length)
-              picture[key].fileName.push( fileName)
-              state.imageFile.push({
-                image_name: fileName,
-                image_file: item
-              })
-            })
-          }
-        }
       }
       state.serverData.skus = [];
       if(value.color_select.length === 0 && value.size_select.length === 0 ) {
@@ -407,14 +392,8 @@ export default  {
           })
         })
       }else if(value.color_select.length !== 0 && value.size_select.length === 0) {
-        // let skuStock = value.stocks;
-        // warehouses.forEach( item => {
-        //   selectColors.forEach( colorItem => {
-                          
-        //   })
-        // })
         state.serverData.dimension = [1]
-        value.color_select.forEach( colorId => {
+        value.color_select.forEach( (colorId,index) => {
           if(state.showData.barcodeId && Object.keys(state.showData.barcodeId).some(n => n == colorId)) {
             state.serverData.skus.push({
               id: state.showData.barcodeId[`${colorId}`].id,
@@ -437,6 +416,22 @@ export default  {
               stocks: []
             })
           }
+          if(itemImageLevel == 'sku') {
+            let currentImageFile = Object.values(value.picture)[index].fileList;
+            currentImageFile.forEach( n => {
+              delete n.url;
+              if(n.type) {
+                let fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (n.type).slice(6,(n.type).length)
+                state.serverData.skus[index].images.push(fileName)
+                state.imageFile.push({
+                  image_name: fileName,
+                  image_file: n
+                })
+              }else {
+                state.serverData.skus[index].images.push(fileName)
+              }
+            })
+          }
         })
         state.serverData.skus.forEach( item => {
           warehouses.forEach( subItem => {
@@ -448,7 +443,7 @@ export default  {
         })
       }else if(value.color_select.length !== 0 && value.size_select !== 0) {
         state.serverData.dimension = [1,2]
-        value.color_select.forEach( colorId => {
+        value.color_select.forEach( (colorId,index) => {
           value.size_select.forEach( sizeId => {
             if(state.showData.barcodeId && Object.keys(state.showData.barcodeId).some( n => n == `${colorId}_${sizeId}`)) {
               state.serverData.skus.push({
@@ -479,6 +474,22 @@ export default  {
               })
             }
           })
+          if(itemImageLevel == 'sku') {
+            let currentImageFile = Object.values(value.picture)[index].fileList;
+            currentImageFile.forEach( n => {
+              delete n.url;
+              if(n.type) {
+                let fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (n.type).slice(6,(n.type).length)
+                state.serverData.skus[index].images.push(fileName)
+                state.imageFile.push({
+                  image_name: fileName,
+                  image_file: n
+                })
+              }else {
+                state.serverData.skus[index].images.push(fileName)
+              }
+            })
+          }
         })
         state.serverData.skus.forEach( item => {
           warehouses.forEach( subItem => {

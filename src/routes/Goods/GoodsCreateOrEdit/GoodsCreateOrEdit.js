@@ -116,7 +116,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
       this.setState({selectSizes:[...showData.selectSizes]})
     }
     if(showData.prices ) {
-      if( !!priceGrades.length && !!shops.length && (Object.values(this.state.priceTableValue).length == priceGrades.length || Object.values(this.state.priceTableValue).length == shops.length || Object.values(this.state.priceTableValue).length == (shops.length * priceGrades.length) )) {
+      if( !!priceGrades.length && !!shops.length && ( Object.values(this.state.priceTableValue).length == 0 || Object.values(this.state.priceTableValue).length == priceGrades.length || Object.values(this.state.priceTableValue).length == shops.length || Object.values(this.state.priceTableValue).length == (shops.length * priceGrades.length) )) {
         if(!showData.prices.price) {
           if(usePricelelvel === 'yes') {
             if(priceModel === '') {
@@ -248,7 +248,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
       }
     }
     if(showData.selectColors && showData.selectSizes && showData.stocks) {
-      if(!!warehouses.length && !this.state.selectColors.length && (Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length  == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length) )) {
+      if(!!warehouses.length && !this.state.selectColors.length && ( Object.values(this.state.skuStocks).length == 0 || Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length  == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length) )) {
         let skuStocks = {};
         if(showData.selectColors.length == 0) {
           warehouses.forEach( item => {
@@ -319,7 +319,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
       }
     }
     if(showData.selectColors && showData.selectSizes && showData.barcodes) {
-      if(!this.state.selectColors.length && (Object.values(this.state.skuBarcodes).length == 1 || Object.values(this.state.skuBarcodes).length == this.state.selectColors.length || Object.values(this.state.skuBarcodes).length == (this.state.selectColors.length * this.state.selectSizes.length))) {
+      if(!this.state.selectColors.length && ( Object.values(this.state.skuBarcodes).length == 0 || Object.values(this.state.skuBarcodes).length == 1 || Object.values(this.state.skuBarcodes).length == this.state.selectColors.length || Object.values(this.state.skuBarcodes).length == (this.state.selectColors.length * this.state.selectSizes.length))) {
         let skuBarcodes = {};
         if(showData.selectColors.length == 0 || itemBarcodeLevel == 0 ) {
           skuBarcodes = {

@@ -9,6 +9,7 @@ import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/antd-pro/DescriptionList';
 import StandardFormRow from '../../../components/antd-pro/StandardFormRow';
 import TagSelect from '../../../components/DuokeTagSelect';
+import LightBoxImage from '../../../components/LightBoxImage/LightBoxImage'
 import PriceTextTable from '../../../components/PriceTextTable/PriceTextTable'
 import styles from './GoodsDetail.less'
 const ButtonGroup = Button.Group;
@@ -627,12 +628,8 @@ export default class GoodsDetail extends PureComponent {
             {
               (singleGoodsDetail.images || []).length === 0 ? null : (
                 <div>
-                  <DescriptionList title='图片' style={{paddingBottom:32,paddingTop:16}} size='large' >
-                    {
-                      singleGoodsDetail.images.map( item => {
-                        return <img src={`${item.url}`} alt = {item.name} style={{height:104,width:104}} key={item.id}/>
-                      })
-                    }
+                  <DescriptionList title='图片' style={{paddingBottom:32,paddingTop:16,marginLeft:0}}  size='large'  >
+                    <LightBoxImage imageSource={singleGoodsDetail.images || []} style={{marginLeft:0}}/>
                   </DescriptionList>
                 </div>
               )
@@ -671,7 +668,7 @@ export default class GoodsDetail extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false}>
-            <Table columns={saleColumns} dataSource={singleGoodsSales} expandedRowRender={saleExpandedRowRender } onChange={this.handleSaleSort} pagination={false} rowKey='id'></Table>
+            <Table columns={saleColumns} dataSource={singleGoodsSales} onChange={this.handleSaleSort} pagination={false} rowKey='id'></Table>
           </Card>
         </div>
         <div style={{display: activeTabKey == 'purchase' ? 'block' : 'none'}}>
@@ -706,7 +703,7 @@ export default class GoodsDetail extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false}>
-            <Table columns={purchaseColumns} dataSource={singleGoodsPurchases} expandedRowRender={purchaseExpandedRowRender } onChange={this.handlePurchaseSort} pagination={false} rowKey='id'></Table>
+            <Table columns={purchaseColumns} dataSource={singleGoodsPurchases}  onChange={this.handlePurchaseSort} pagination={false} rowKey='id'></Table>
           </Card>
         </div>
         <div style={{display: activeTabKey == 'customer' ? 'block' : 'none'}}>
@@ -818,7 +815,7 @@ export default class GoodsDetail extends PureComponent {
             </Form>
           </Card>
           <Card bordered={false}>
-            <Table columns={stockColumns} dataSource={singleGoodsStocks} expandedRowRender={stockExpandedRowRender } onChange={this.handleStockSort} pagination={false} rowKey='id'></Table>
+            <Table columns={stockColumns} dataSource={singleGoodsStocks} onChange={this.handleStockSort} pagination={false} rowKey='id'></Table>
           </Card>
         </div>
       </PageHeaderLayout>

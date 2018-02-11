@@ -7,6 +7,7 @@ import { Row, Col, Card, Button,Icon,Menu,Dropdown,Popconfirm,Divider,Radio,Tabl
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
+import LightBoxImage from '../../../../components/LightBoxImage/LightBoxImage'
 import TagSelect from '../../../../components/DuokeTagSelect';
 import styles from './SupplierDetail.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
@@ -535,11 +536,7 @@ export default class SupplierDetail extends PureComponent {
             ) : null
           }
           {singleSupplierDetail.imageFiles && !!singleSupplierDetail.imageFiles.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>附件</div></div> : null}
-          {
-            singleSupplierDetail.imageFiles && singleSupplierDetail.imageFiles.map( (item,index) => {
-              return <img src={`${item}`} key={index}  alt='无法显示' style={{width:102,height:102,marginRight:20}}/>
-            })
-          }
+          <LightBoxImage imageSource = {singleSupplierDetail.imageFiles || []} />
           { singleSupplierDetail.addresses && !!singleSupplierDetail.addresses.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>地址</div></div> : null}
           {
             singleSupplierDetail.addresses  && singleSupplierDetail.addresses.map( (item,index) => {

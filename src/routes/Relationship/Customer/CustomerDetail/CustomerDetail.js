@@ -7,6 +7,7 @@ import { Row, Col, Card, Button,Icon,Menu,Dropdown,Popconfirm,Divider,Radio,Tabl
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
+import LightBoxImage from '../../../../components/LightBoxImage/LightBoxImage'
 import TagSelect from '../../../../components/DuokeTagSelect';
 import styles from './CustomerDetail.less'
 const { Description } = DescriptionList;
@@ -554,11 +555,7 @@ export default class CustomerDetail extends PureComponent {
             ) : null
           }
           {singleCustomerDetail.imageFiles && !!singleCustomerDetail.imageFiles.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>附件</div></div> : null}
-          {
-            singleCustomerDetail.imageFiles && singleCustomerDetail.imageFiles.map( (item,index) => {
-              return <img src={`${item}`} key={index}  alt='无法显示' style={{width:102,height:102,marginRight:20}}/>
-            })
-          }
+          <LightBoxImage imageSource = {singleCustomerDetail.imageFiles || []} />
           { singleCustomerDetail.addresses && !!singleCustomerDetail.addresses.length ? <div><Divider style={{ marginBottom: 32 }} /><div className={styles.title}>地址</div></div> : null}
           {
             singleCustomerDetail.addresses  && singleCustomerDetail.addresses.map( (item,index) => {
