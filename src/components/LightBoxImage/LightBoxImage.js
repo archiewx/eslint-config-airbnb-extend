@@ -60,10 +60,10 @@ export default class LightBoxImage extends PureComponent {
         }
         <Modal visible={previewVisible} footer={null} onCancel={this.handleOnCancel} className={cx({modalClosePostion:true})} >
           {
-            imageSource.lenght == 1 ? <Icon type="left" className={cx({moveSize:true,moveLeftPosition:true})} onClick={this.handleOnMoveLeft}/> : null
+            imageSource.length > 1 ? <Icon type="left" className={cx({moveSize:true,moveLeftPosition:true})} onClick={this.handleOnMoveLeft}/> : null
           }
           {
-            imageSource.lenght == 1 ? <Icon type="right" className={cx({moveSize:true,moveRightPosition:true})} onClick={this.handleOnMoveRight}/> : null
+            imageSource.length > 1 ? <Icon type="right" className={cx({moveSize:true,moveRightPosition:true})} onClick={this.handleOnMoveRight}/> : null
           }
           <img alt="hello world" style={{ width: '100%' }} src={previewImage} />
         </Modal>
