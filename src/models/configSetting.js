@@ -16,7 +16,8 @@ export default  {
     allowReturn:'',
     defaultTransportFeePayer:'',
     defaultTransportFeeSettle:'',
-    inventoryApprover:[]
+    inventoryApprover:[],
+    itemAttribute:[],
   },
 
   subscriptions: {
@@ -29,6 +30,30 @@ export default  {
     *getConfigSetting({payload},{call,put}) {
       const data = yield call(configSettingService.getConfigSetting)
       yield put({type:'setConfigSetting',payload:data})
+    },
+
+    *switchUsePrice({payload},{call,put}) {
+      yield call(configSettingService.switchUsePrice,payload)
+    },
+
+    *switchPriceModal({payload},{call,put}) {
+      yield call(configSettingService.switchPriceModal,payload)
+    },
+
+    *switchBarcode({payload},{call,put}) {
+      yield call(configSettingService.switchBarcode,payload)
+    },
+
+    *switchPicture({payload},{call,put}) {
+      yield call(configSettingService.switchPicture,payload)
+    },
+
+    *switchShopShareCustomer({payload},{call,put}){
+      yield call(configSettingService.switchShopShareCustomer,payload)
+    },
+
+    *switchItemAttrite({payload},{call,put}) {
+      yield call(configSettingService.switchItemAttrite,payload)
     }
   },
 
@@ -51,6 +76,7 @@ export default  {
       state.defaultTransportFeePayer = allConfigSetting['default_transport_fee_payer'].setting.apply[0]
       state.defaultTransportFeeSettle = allConfigSetting['default_transport_fee_settle'].setting.apply[0]
       // state.inventoryApprove = allConfigSetting['inventoryApprove'].setting.apply[0]
+      state.itemAttribute = allConfigSetting['item_attribute'].setting.apply
       return {...state}
     }
 

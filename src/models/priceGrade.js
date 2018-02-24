@@ -19,7 +19,19 @@ export default  {
       yield put({type:'setState',payload:{
         priceGrades:data.result.data
       }})
-    }
+    },
+
+    *createSingle({payload},{call,put}) {
+      yield call(priceGradeService.createSingle,payload)
+    },
+
+    *editSingle({payload},{call,put}) {
+      yield call(priceGradeService.editSingle,payload)
+    },
+
+    *deleteSingle({payload},{call,put}) {
+      yield call(priceGradeService.deleteSingle,payload)
+    },
   },
 
   reducers: {

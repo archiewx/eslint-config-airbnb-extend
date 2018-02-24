@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
+import pathToRegexp from 'path-to-regexp';
 import { Row, Col, Card, Button, Input, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,InputNumber,Spin,Radio} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import FooterToolbar from '../../../../components/antd-pro/FooterToolbar';
@@ -32,9 +33,16 @@ export default class CustomerCreateOrEdit extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.dispatch({type:'staff/getList'})
-    this.props.dispatch({type:'priceGrade/getList'})
-    this.props.dispatch({type:'customerGroup/getCustomerGroup'})
+    (async () => {
+      const match = pathToRegexp('/relationship/customer-edit/:id').exec(location.hash.slice(1,location.hash.length))
+      if(match) {
+        this.props.dispatch({type:'customerCreateOrEdit/getSingle',payload:{id:match[1]}})
+      }
+    })().then(()=>{
+      this.props.dispatch({type:'staff/getList'})
+      this.props.dispatch({type:'priceGrade/getList'})
+      this.props.dispatch({type:'customerGroup/getCustomerGroup'})
+    })
   }
 
   componentWillReceiveProps(nextProps) {

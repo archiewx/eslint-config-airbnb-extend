@@ -8,63 +8,92 @@ export async function getConfigSetting (params) {
   })
 }
 
-// export async function switchBarCodeMap (params) {
-//   const e = {
-//     setting:[params],
-//   };
-//   return request({
-//     url: `${apiBase.duoke}/api/configs/item_barcode_level/setting`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: e,
-//   })
-// }
+export async function switchUsePrice (params) {
+  const current = {
+    setting:[params],
+  };
+  return request( `${apiBase}/api/configs/use_pricelevel/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
 
-// export async function switchPictureMap (params) {
-//   const e = {
-//     setting:[params],
-//   };
-//   return request({
-//     url: `${apiBase.duoke}/api/configs/item_image_level/setting`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: e,
-//   })
-// }
+export async function switchPriceModal (params) {
+  const current = {
+    setting:[params],
+  };
+  return request(`${apiBase}/api/configs/price_model/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
+
+export async function switchBarcode (params) {
+  const current = {
+    setting:[params],
+  };
+  return request(`${apiBase}/api/configs/item_barcode_level/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
+
+export async function switchPicture (params) {
+  const current = {
+    setting:[params],
+  };
+  return request(`${apiBase}/api/configs/item_image_level/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
+
+export async function switchItemAttrite (params) {
+  const current = {
+    setting:params,
+  }
+  return request(`${apiBase}/api/configs/item_attribute/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
 
 // export async function switchHistoryPriceMap (params) {
-//   const e = {
+//   const current = {
 //     setting:[params],
 //   };
-//   return request({
-//     url: `${apiBase.duoke}/api/configs/use_history_price/setting`,
-//     method: 'put',
+//   return request(`${apiBase}/api/configs/use_history_price/setting`,{
+//     method: 'PUT',
 //     headers: { "Authorization": token },
-//     data: e,
+//     body: current,
 //   })
 // }
 
-// export async function switchShopShareCustomerMap (params) {
-//   const e = {
-//     setting:[params],
-//   };
-//   return request({
-//     url: `${apiBase.duoke}/api/configs/shop_share_customer/setting`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: e,
-//   })
-// }
+export async function switchShopShareCustomer (params) {
+  const current = {
+    setting:[params],
+  };
+  return request(`${apiBase}/api/configs/shop_share_customer/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
 
 // export async function switchDeliveryMap (params) {
 //   const e = {
 //     setting:[params],
 //   };
 //   return request({
-//     url: `${apiBase.duoke}/api/configs/default_delivery_way/setting`,
-//     method: 'put',
+//     url: `${apiBase}/api/configs/default_delivery_way/setting`,
+//     method: 'PUT',
 //     headers: { "Authorization": token },
-//     data: e,
+//     body: e,
 //   })
 // }
 
@@ -73,10 +102,10 @@ export async function getConfigSetting (params) {
 //     setting:[params],
 //   };
 //   return request({
-//     url: `${apiBase.duoke}/api/configs/allow_return/setting`,
-//     method: 'put',
+//     url: `${apiBase}/api/configs/allow_return/setting`,
+//     method: 'PUT',
 //     headers: { "Authorization": token },
-//     data: e,
+//     body: e,
 //   })
 // }
 
@@ -85,10 +114,10 @@ export async function getConfigSetting (params) {
 //     setting:[params],
 //   };
 //   return request({
-//     url: `${apiBase.duoke}/api/configs/default_transport_fee_payer/setting`,
-//     method: 'put',
+//     url: `${apiBase}/api/configs/default_transport_fee_payer/setting`,
+//     method: 'PUT',
 //     headers: { "Authorization": token },
-//     data: e,
+//     body: e,
 //   })
 // }
 
@@ -97,45 +126,23 @@ export async function getConfigSetting (params) {
 //     setting:[params],
 //   };
 //   return request({
-//     url: `${apiBase.duoke}/api/configs/default_transport_fee_settle/setting`,
-//     method: 'put',
+//     url: `${apiBase}/api/configs/default_transport_fee_settle/setting`,
+//     method: 'PUT',
 //     headers: { "Authorization": token },
-//     data: e,
+//     body: e,
 //   })
 // }
 
-// export async function switchPriceStateMap (params) {
-//   const e = {
-//     setting:[params],
-//   };
-//   return request({
-//     url: `${apiBase.duoke}/api/configs/use_pricelevel/setting`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: e,
-//   })
-// }
 
-// export async function switchBasicPriceMap (params) {
-//   const e = {
-//     setting:[params],
-//   };
-//   return request({
-//     url: `${apiBase.duoke}/api/configs/price_model/setting`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: e,
-//   })
-// }
 
 // export async function switchApproverMap (params) {
 //   const e = {
 //     setting:params
 //   }
 //   return request({
-//     url: `${apiBase.duoke}/api/configs/inventory_approver/setting`,
-//     method: 'put',
+//     url: `${apiBase}/api/configs/inventory_approver/setting`,
+//     method: 'PUT',
 //     headers: { "Authorization": token },
-//     data: e,
+//     body: e,
 //   })
 // }

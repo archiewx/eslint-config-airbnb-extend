@@ -7,50 +7,38 @@ export async function getList (params) {
   })
 }
 
-// export async function deleteSingle (params) {
-//   return request({
-//     url: `${apiBase.duoke}/api/skuattributes/${params.id}`,
-//     method: 'delete',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function deleteSingle (params) {
+  return request(`${apiBase}/api/skuattributes/${params.id}`,{
+    method: 'DELETE',
+    headers: { "Authorization": token },
+  })
+}
 
-// export async function createSingle (params) {
-//   params.name = params.name.trim();
-//   return request({
-//     url: `${apiBase.duoke}/api/skuattributes`,
-//     method: 'post',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function createSingle (params) {
+  params.name = params.name.trim();
+  return request(`${apiBase}/api/skuattributes`,{
+    method: 'POST',
+    headers: { "Authorization": token },
+    body: params,
+  })
+}
 
-// export async function editSingle (params) {
-//   params.name = params.name.trim();
-//   return request({
-//     url: `${apiBase.duoke}/api/skuattributes/${params.id}`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
-
-// export async function deleteBatchSome (params) {
-//   let e = params.selectItemList.join(',');
-//   return request({
-//     url: `${apiBase.duoke}/api/skuattributes/${e}/batch`,
-//     method: 'delete',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function editSingle (params) {
+  params.name = params.name.trim();
+  const current = {...params}
+  delete current.id;
+  return request( `${apiBase}/api/skuattributes/${params.id}`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
 
 // export async function editListSort (params) {
 //   return request({
-//     url: `${apiBase.duoke}/api/skuattributes/sort/`,
+//     url: `${apiBase}/api/skuattributes/sort/`,
 //     method: 'put',
 //     headers: { "Authorization": token },
-//     data: params,
+//     body: params,
 //   })
 // }

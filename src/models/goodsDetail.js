@@ -593,10 +593,10 @@ export default  {
       if(payload.length === 0) {
         state.singleGoodsStocks = payload
       }else {
-        payload.forEach( item => {
+        payload.forEach( (item,index) => {
           if(item.skuattributes.length == 0) {
             state.singleGoodsStocks.push({
-              id:itme.id,
+              id:item.id,
               sales_quantity:item.sales_quantity,
               purchase_quantity:item.purchase_quantity,
               stock_quantity:item.stock_quantity

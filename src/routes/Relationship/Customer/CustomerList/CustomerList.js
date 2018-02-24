@@ -184,12 +184,6 @@ export default class CustomerList extends PureComponent {
     )
   }
 
-  handleHeaderExtra = () => {
-    return (
-      <Button type='primary' onClick={this.handleToCustomerCreate}>新建客户</Button>
-    )
-  }
-
   handleTableSortExtra = () => {
     return (
       <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSort} optionLabelProp='value'>
@@ -205,6 +199,10 @@ export default class CustomerList extends PureComponent {
   render() {
     const {customerList: {customerList,customerPagination} , layoutFilter: {customerFilter} , form: {getFieldDecorator}} = this.props;
     const {sorts,pages,filter} = this.state;
+
+    const headerExtra = (
+      <Button type='primary' onClick={this.handleToCustomerCreate}>新建客户</Button>
+    )
 
     const columns = [{
       title: '姓名',
@@ -259,7 +257,7 @@ export default class CustomerList extends PureComponent {
 
     return (
       <PageHeaderLayout
-        extraContent={this.handleHeaderExtra()}
+        extraContent={headerExtra}
         className={styles.customerListExtra}
         >
         <Card bordered={false} className={styles.bottomCardDivided}>

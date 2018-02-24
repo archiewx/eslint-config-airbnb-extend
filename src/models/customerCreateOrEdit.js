@@ -15,10 +15,6 @@ export default  {
     setup({ dispatch, history }) {
       history.listen(() => {
         dispatch({type:'setState',payload:{showData:{}}})
-        const match = pathToRegexp('/relationship/customer-edit/:id').exec(location.hash.slice(1,location.hash.length))
-        if(match) {
-          dispatch({type:'getSingle',payload:{id:match[1]}})
-        }
       })
     },
   },

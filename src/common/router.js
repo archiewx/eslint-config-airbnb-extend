@@ -39,10 +39,10 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['goodsList','layoutFilter'], () => import('../routes/Goods/GoodsList/GoodsList')),
     },
     '/goods-create': {
-      component: dynamicWrapper(app, ['goodsCreateOrEdit','goodsGroup','color','sizeLibrary','unit','priceGrade','priceQuantityStep','shop','warehouse'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
+      component: dynamicWrapper(app, ['goodsCreateOrEdit','goodsGroup','color','size','unit','priceGrade','priceQuantityStep','shop','warehouse'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
     },
     '/goods-edit/:id': {
-      component: dynamicWrapper(app, ['goodsCreateOrEdit','goodsGroup','color','sizeLibrary','unit','priceGrade','priceQuantityStep','shop','warehouse'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
+      component: dynamicWrapper(app, ['goodsCreateOrEdit','goodsGroup','color','size','unit','priceGrade','priceQuantityStep','shop','warehouse'], () => import('../routes/Goods/GoodsCreateOrEdit/GoodsCreateOrEdit')),
     },
     '/goods-detail/:id': {
       component: dynamicWrapper(app, ['goodsDetail','layoutFilter'], () => import('../routes/Goods/GoodsDetail/GoodsDetail')),
@@ -83,11 +83,35 @@ export const getRouterData = (app) => {
     '/relationship/supplier-detail/skus-purchase-detail/:id/:subId': {
       component: dynamicWrapper(app ,['supplierSkusPurchaseDetail'], () => import('../routes/Relationship/Supplier/SupplierDetail/SkusPurchaseDetail'))
     },
+    '/manage-center/goods/goods-attribute':{
+      component: dynamicWrapper(app ,[], () => import('../routes/ManageCenter/Goods/GoodsAttribute/GoodsAttribute'))
+    },
+    '/manage-center/goods/goods-group':{
+      component: dynamicWrapper(app ,['goodsGroup'], () => import('../routes/ManageCenter/Goods/GoodsGroup/GoodsGroup'))
+    },
+    '/manage-center/goods/color':{
+      component: dynamicWrapper(app ,['color'], () => import('../routes/ManageCenter/Goods/Color/Color'))
+    },
+    '/manage-center/goods/size': {
+      component: dynamicWrapper(app ,['size'], () => import('../routes/ManageCenter/Goods/Size/Size'))
+    },
+    '/manage-center/goods/unit':{
+      component: dynamicWrapper(app ,['unit'], () => import('../routes/ManageCenter/Goods/Unit/Unit'))
+    },
+    '/manage-center/goods/price':{
+      component: dynamicWrapper(app ,['priceGrade','priceQuantityStep'], () => import('../routes/ManageCenter/Goods/Price/Price'))
+    },
+    '/manage-center/goods/barcode':{
+      component: dynamicWrapper(app ,[], () => import('../routes/ManageCenter/Goods/Barcode/Barcode'))
+    },
+    '/manage-center/goods/picture':{
+      component: dynamicWrapper(app ,[], () => import('../routes/ManageCenter/Goods/Picture/Picture'))
+    },
     '/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },
     '/test': {
-      component: dynamicWrapper(app, ['test'], () => import('../routes/Test/Test'))
+      component: dynamicWrapper(app, [], () => import('../routes/Test/Test'))
     }
     // '/user': {
     //   component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),

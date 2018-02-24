@@ -61,7 +61,6 @@ export default  {
     },
 
     setShowData (state,{payload:{value,itemimage,usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel}}) {
-      console.log(value)
       state.showData.id = value.id;
       state.showData.item_ref = value.item_ref;
       state.showData.standard_price = (value.standard_price).toString();
@@ -223,6 +222,7 @@ export default  {
       state.showData.stocks = {};
       state.showData.barcodes = {}
       state.showData.barcodeId = {}
+      state.showData.imageFile = {}
       if(state.showData.colors.length == 0) {
         value.skus.data.forEach( item => {
           item.skustocks.data.forEach( subItem => {
@@ -257,6 +257,17 @@ export default  {
             state.showData.barcodeId[`${colorId}`] = {
               id: item.id
             }
+            if( itemImageLevel == 'sku') {
+              item.skuimages.data.forEach( subItem => {
+                state.showData.imageFile[`${colorId}`] = [];
+                state.showData.imageFile[`${colorId}`].push({
+                  uid: Number('-' + window.crypto.getRandomValues(new Uint32Array(1))[0].toString()),
+                  url: subItem.url,
+                  name: subItem.name,
+                  status: 'done'
+                })
+              })
+            }
           })
         }else {
           value.skus.data.forEach( item => {
@@ -278,6 +289,17 @@ export default  {
             }
             state.showData.barcodeId[`${colorId}_${sizeId}`] = {
               id: item.id
+            }
+            if(itemImageLevel == 'sku') {
+              item.skuimages.data.forEach( subItem => {
+                state.showData.imageFile[`${colorId}`] = [];
+                state.showData.imageFile[`${colorId}`].push({
+                  uid: Number('-' + window.crypto.getRandomValues(new Uint32Array(1))[0].toString()),
+                  url: subItem.url,
+                  name: subItem.name,
+                  status: 'done'
+                })
+              })
             }
           })
         }
@@ -428,7 +450,7 @@ export default  {
                   image_file: n
                 })
               }else {
-                state.serverData.skus[index].images.push(fileName)
+                state.serverData.skus[index].images.push(n.name)
               }
             })
           }
@@ -479,14 +501,14 @@ export default  {
             currentImageFile.forEach( n => {
               delete n.url;
               if(n.type) {
-                let fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (n.type).slice(6,(n.type).length)
+                fileName = (window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime() + '.' + (n.type).slice(6,(n.type).length)
                 state.serverData.skus[index].images.push(fileName)
                 state.imageFile.push({
                   image_name: fileName,
                   image_file: n
                 })
               }else {
-                state.serverData.skus[index].images.push(fileName)
+                state.serverData.skus[index].images.push(n.name)
               }
             })
           }

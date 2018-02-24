@@ -75,7 +75,6 @@ export default class GoodsPictureModal extends PureComponent {
   render() {  
     const {selectColors,itemImageLevel} = this.props
     const {previewVisible,previewImage,imageFileList} = this.state
-
     const uploadButton = (
       <div>
         <Icon type="plus" />

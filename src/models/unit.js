@@ -9,7 +9,6 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      
     },
   },
 
@@ -19,6 +18,17 @@ export default  {
       yield put({type:'setState',payload:{
         units:data.result.data
       }})
+    },
+    *createSingle ({payload},{call,put}) {
+      yield call(unitService.createSingle,payload)
+    },
+
+    *editSingle ({payload},{call,put}) {
+      yield call(unitService.editSingle,payload)
+    },
+
+    *deleteSingle ({payload},{call,put}) {
+      yield call(unitService.deleteSingle,payload)
     },
   },
 

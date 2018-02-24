@@ -30,7 +30,7 @@ export default class Test extends PureComponent {
     return (
       <Card>
         <div>
-          <LightBoxImage imageSource={this.state.image}/>
+
         </div>
       </Card>
     );

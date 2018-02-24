@@ -35,12 +35,12 @@ const pictureItemLayout = {
   }
 }
 @Form.create()
-@connect(({configSetting,goodsCreateOrEdit,goodsGroup,color,sizeLibrary,unit,priceGrade,priceQuantityStep,shop,warehouse}) => ({
+@connect(({configSetting,goodsCreateOrEdit,goodsGroup,color,size,unit,priceGrade,priceQuantityStep,shop,warehouse}) => ({
   configSetting,
   goodsCreateOrEdit,
   goodsGroup,
   color,
-  sizeLibrary,
+  size,
   unit,
   priceGrade,
   priceQuantityStep,
@@ -72,7 +72,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
       }
     })().then(()=>{
       this.props.dispatch({type:'color/getList'})
-      this.props.dispatch({type:'sizeLibrary/getList'})
+      this.props.dispatch({type:'size/getSizeLibrary'})
       this.props.dispatch({type:'priceGrade/getList'})
       this.props.dispatch({type:'unit/getList'})
       this.props.dispatch({type:'shop/getList'})
@@ -86,7 +86,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     const {usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel} = nextProps.configSetting;
     const {priceGrades} = nextProps.priceGrade;
     const {colors} = nextProps.color;
-    const {sizeLibrarys} = nextProps.sizeLibrary;
+    const {sizeLibrarys} = nextProps.size;
     const {shops} = nextProps.shop;
     const {units} = nextProps.unit;
     const {warehouses} = nextProps.warehouse;
@@ -398,14 +398,25 @@ export default class GoodsCreateOrEdit extends PureComponent {
         }
       }
     }else {
-      if(!Object.values(this.state.skuImages).length) {
+      if(showData.imageFile) {
         let skuImages = {};
-        this.state.selectColors.forEach( item => {
-          skuImages[`${item.id}`] = {
+        for(let key in showData.imageFile) {
+          skuImages[key] = {
             fileList: []
           }
-        })
+          skuImages[key]['fileList'] = showData.imageFile[key]
+        }
         this.setState({skuImages})
+      }else {
+        if(!Object.values(this.state.skuImages).length) {
+          let skuImages = {};
+          this.state.selectColors.forEach( item => {
+            skuImages[`${item.id}`] = {
+              fileList: []
+            }
+          })
+          this.setState({skuImages})
+        }
       }
     }
   }
@@ -751,7 +762,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
 
   render() {
     const {getFieldDecorator,getFieldValue,setFieldsValue} = this.props.form
-    const {goodsGroup:{goodsGroups},color:{colors},sizeLibrary:{sizeLibrarys},unit:{units},priceGrade:{priceGrades},priceQuantityStep:{priceQuantitySteps},shop:{shops},warehouse:{warehouses}} = this.props;
+    const {goodsGroup:{goodsGroups},color:{colors},size:{sizeLibrarys},unit:{units},priceGrade:{priceGrades},priceQuantityStep:{priceQuantitySteps},shop:{shops},warehouse:{warehouses}} = this.props;
     const {usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel} = this.props.configSetting
     const {showData} = this.props.goodsCreateOrEdit
     const {isNeedIcon,defaultSelectUnits,selectUnits,selectColors,selectSizes,selectQuantityStep,priceTableValue,skuStocks,skuBarcodes, selectWarehouseId,selecStockUnitNum,skuImages} = this.state

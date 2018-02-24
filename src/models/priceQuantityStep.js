@@ -17,6 +17,14 @@ export default  {
     *getList({payload},{call,put}) {
       const data = yield call(priceQuantityStepService.getList) 
       yield put({type:'setpriceQuantityStepState',payload:data.result.data})
+    },
+
+    *createSingle({payload},{call,put}) {
+      yield call(priceQuantityStepService.createSingle,payload)
+    },
+
+    *deleteSingle({payload},{call,put}) {
+      yield call(priceQuantityStepService.deleteSingle,payload)
     }
   },
 
@@ -30,9 +38,7 @@ export default  {
       state.priceQuantitySteps = payload.map((item)=>{
         return {
           id: `${item.id}`,
-          name: item.quantityranges.data.map((item)=>{
-                  return item.min + '~';
-                }).join(''),
+          name: `${item.name}`,
           quantityranges: item.quantityranges.data
         }
       })

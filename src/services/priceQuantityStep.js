@@ -7,23 +7,17 @@ export async function getList (params) {
   })
 }
 
-// export async function deleteSingle (params) {
-//   return request({
-//     url: `${apiBase.duoke}/api/quantityrangegroups/${params.id}`,
-//     method: 'delete',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function deleteSingle (params) {
+  return request(`${apiBase}/api/quantityrangegroups/${params.id}`,{
+    method: 'DELETE',
+    headers: { "Authorization": token },
+  })
+}
 
-// export async function createSingle (params) {
-//   const e = {
-//     quantityranges: params
-//   }
-//   return request({
-//     url: `${apiBase.duoke}/api/quantityrangegroups/`,
-//     method: 'post',
-//     headers: { "Authorization": token },
-//     data: e,
-//   })
-// }
+export async function createSingle (params) {
+  return request(`${apiBase}/api/quantityrangegroups/`,{
+    method: 'POST',
+    headers: { "Authorization": token },
+    body: params,
+  })
+}

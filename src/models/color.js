@@ -9,7 +9,6 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      
     },
   },
 
@@ -19,6 +18,18 @@ export default  {
       yield put({type:'setState',payload:{
         colors:data.result.data.skuattributes.data,
       }})
+    },
+
+    *createSingle ({payload},{call,put}) {
+      yield call(colorService.createSingle,payload)
+    },
+
+    *editSingle ({payload},{call,put}) {
+      yield call(colorService.editSingle,payload)
+    },
+
+    *deleteSingle ({payload},{call,put}) {
+      yield call(colorService.deleteSingle,payload)
     },
   },
 
