@@ -26,6 +26,7 @@ export default class Size extends PureComponent {
     sizeGroupModalVisibel: false,
     sizeGroupModalType: '',
     sizeGroupModalFormValue: {},
+    isSort:false,
   }
 
   componentDidMount(){
@@ -123,14 +124,53 @@ export default class Size extends PureComponent {
     this.setState({activeTabKey:key})
   }
 
+  handleSortStart = () => {
+    this.setState({
+      isSort:true
+    })
+  }
+
+  handleSortCancel = () => {
+    this.setState({
+      isSort:false
+    })
+    this.props.dispatch({type:'size/getSizeLibrary'})
+  }
+
+  handleSortMove = (id,moveWay) => {
+    this.props.dispatch({type:'size/setSortMove',payload:{
+      currentId:id,
+      moveWay:moveWay,
+    }})
+  }
+
+  handleSortOk = () => {
+    this.props.dispatch({type:'size/editSort',payload:this.props.size.sizeLibrarys}).then(()=>{
+      this.handleSortCancel()
+    })
+  }
+
   render() {
     const {sizeLibrarys,sizeGroups} = this.props.size;
-    const {sizeLibraryModalVisibel,sizeLibraryModalType,sizeLibraryModalFormValue,sizeGroupModalVisibel,sizeGroupModalType,sizeGroupModalFormValue,activeTabKey} = this.state;
+    const {sizeLibraryModalVisibel,sizeLibraryModalType,sizeLibraryModalFormValue,sizeGroupModalVisibel,sizeGroupModalType,sizeGroupModalFormValue,activeTabKey,isSort} = this.state;
 
     const sizeLibraryAction = (
       <div>
-        <Button style={{marginRight:10}}>自定义排序</Button>
-        <Button type='primary' onClick={this.handleSizeLibraryModalCreate}>新建</Button>
+        {
+          isSort ? (
+            <div>
+              <Popconfirm title='确认取消自定义排序' onConfirm={this.handleSortCancel}>
+                <Button style={{marginRight:10}}>取消</Button>
+              </Popconfirm>
+              <Button type='primary' onClick={this.handleSortOk}>确认</Button>
+            </div>
+          ) : (
+            <div>
+              <Button style={{marginRight:10}} onClick={this.handleSortStart}>自定义排序</Button>
+              <Button type='primary' onClick={this.handleSizeLibraryModalCreate}>新建尺码库</Button>
+            </div>
+          )
+        }
       </div>
     )
 
@@ -149,9 +189,21 @@ export default class Size extends PureComponent {
       width:172,
       render:(text,record) => (
         <div>
-          <a onClick={this.handleSizeLibraryModalEdit.bind(null,record)}>编辑</a>
-          <Divider  type='vertical' />
-          <Popconfirm onConfirm={this.handleSizeLibraryDeleteSingle.bind(null,record)} title='确认删除此尺码'><a >删除</a></Popconfirm>
+          {
+            isSort ? (
+              <div>
+                <a onClick={this.handleSortMove.bind(null,record.id,'up')} style={{display: sizeLibrarys.findIndex( n => n.id == record.id) == 0 ? 'none' : 'inline-block'}}>上移</a>
+                <Divider  type='vertical' style={{display: (sizeLibrarys.findIndex( n => n.id == record.id) == 0 || sizeLibrarys.findIndex( n => n.id == record.id) == sizeLibrarys.length -1) ? 'none' : 'inline-block'}}/>
+                <a onClick={this.handleSortMove.bind(null,record.id,'down')} style={{display: sizeLibrarys.findIndex( n => n.id == record.id) == sizeLibrarys.length - 1 ? 'none' : 'inline-block'}}>下移</a>
+              </div>
+            ) : (
+              <div>
+                <a onClick={this.handleSizeLibraryModalEdit.bind(null,record)}>编辑</a>
+                <Divider  type='vertical' />
+                <Popconfirm onConfirm={this.handleSizeLibraryDeleteSingle.bind(null,record)} title='确认删除此尺码'><a >删除</a></Popconfirm>
+              </div>
+            )
+          }
         </div>
       )
     }]

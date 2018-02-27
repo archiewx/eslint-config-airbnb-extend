@@ -1,94 +1,45 @@
 import {apiBase,token} from '../common/index'
 import request from '../utils/request';
 
-export async function getListGroup (params) {
+export async function getList (params) {
   return request(`${apiBase}/api/customergroups`, {
     headers: { "Authorization": token },
   })
 }
 
-// export async function deleteSingleGroup (params) {
-//   return request({
-//     url: `${apiBase.duoke}/api/customergroups/${params.id}`,
-//     method: 'delete',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function deleteSingle (params) {
+  return request(`${apiBase}/api/customergroups/${params.id}`,{
+    method: 'DELETE',
+    headers: { "Authorization": token },
+    body: params,
+  })
+}
 
-// export async function createSingleGroup (params) {
-//   params.name = params.name.trim();
-//   return request({
-//     url: `${apiBase.duoke}/api/customergroups/`,
-//     method: 'post',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function createSingle (params) {
+  params.name = params.name.trim();
+  return request(`${apiBase}/api/customergroups/`,{
+    method: 'POST',
+    headers: { "Authorization": token },
+    body: params,
+  })
+}
 
-// export async function editSingleGroup (params) {
-//   params.name = params.name.trim();
-//   return request({
-//     url: `${apiBase.duoke}/api/customergroups/${params.id}`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
-
-// export async function getListEntry (params) {
-//   return request({
-//     url: `${apiBase.duoke}/api/customergroups/${params.id}`,
-//     method: 'get',
-//     headers: { "Authorization": token },
-//     data: '',
-//   })
-// }
-
-// export async function deleteSingleEntry (params) {
-//   return request({
-//     url: `${apiBase.duoke}/api/customergroups/${params.id}`,
-//     method: 'delete',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
-
-// export async function createSingleEntry (params) {
-//   params.name = params.name.trim();
-//   return request({
-//     url: `${apiBase.duoke}/api/customergroups/`,
-//     method: 'post',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
-
-// export async function editSingleEntry (params) {
-//   params.name = params.name.trim();
-//   return request({
-//     url: `${apiBase.duoke}/api/customergroups/${params.id}`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
-
-// export async function deleteBatchSome (params) {
-//   let e = params.selectItemList.join(',');
-//   return request({
-//     url: `${apiBase.duoke}/api/customergroups/${e}/batch`,
-//     method: 'delete',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function editSingle (params) {
+  params.name = params.name.trim();
+  const current = {...params}
+  delete current.id
+  return request( `${apiBase}/api/customergroups/${params.id}`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
 
 // export async function editListSort (params) {
 //   return request({
-//     url: `${apiBase.duoke}/api/customergroups/sort/`,
+//     url: `${apiBase}/api/customergroups/sort/`,
 //     method: 'put',
 //     headers: { "Authorization": token },
-//     data: params,
+//     body: params,
 //   })
 // }

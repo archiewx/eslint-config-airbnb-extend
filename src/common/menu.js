@@ -45,6 +45,51 @@ const menuData = [{
       name:'图片',
       path:'picture'
     }]
+  },{
+    name:'客户',
+    path:'customer',
+    children: [{
+      name:'客户管理',
+      path:'customer-manage',
+    },{
+      name:'客户分组',
+      path:'customer-group'
+    },{
+      name:'客户等级',
+      path:'customer-member'
+    }]
+  },{
+    name:'店仓',
+    path:'shop-warehouse',
+    children:[{
+      name:'店铺',
+      path:'shop'
+    },{
+      name:'仓库',
+      path:'warehouse'
+    }]
+  },{
+    name:'单据',
+    path:'bill',
+    children:[{
+      name:'商品标签',
+      path:'goods-label'
+    },{
+      name:'支付方式',
+      path:'payment'
+    },{
+      name:'销售单',
+      path:'sale-order'
+    },{
+      name:'进货单',
+      path:'purchase-order'
+    },{
+      name:'发货单',
+      path:'deliver-order'
+    },{
+      name:'盘点单',
+      path:'inventory-order'
+    }]
   }]
 },{
   name: '开发',

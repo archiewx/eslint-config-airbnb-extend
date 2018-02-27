@@ -34,11 +34,16 @@ export async function editSingle (params) {
   })
 }
 
-// export async function editListSort (params) {
-//   return request({
-//     url: `${apiBase}/api/units/sort/`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     data: params,
-//   })
-// }
+export async function editSort (params) {
+  const current = params.map( n => {
+    return {
+      id: n.id,
+      sort:n.sort
+    }
+  })
+  return request(`${apiBase}/api/units/sort`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}

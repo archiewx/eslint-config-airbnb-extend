@@ -31,6 +31,10 @@ export default  {
       yield call(goodsGroupService.deleteSingle,payload)
     },
 
+    *editSort ({payload},{call,put}) {
+      yield call(goodsGroupService.editSort,payload)
+    }
+
   },
 
   reducers: {
@@ -63,7 +67,26 @@ export default  {
         }
       })
       return {...state}
+    },
+
+    setSortMove(state,{payload:{currentId,moveWay}}) {
+      moveWay == 'up' ? null : state.colors.reverse();
+      state.colors.forEach( (n,i) => {
+        if(n.id == currentId) {
+          i == 0 ? '' : (
+            state.colors.splice(i,1),
+            state.colors.splice(i-1,0,n)
+          )
+        }
+      })
+      moveWay == 'up' ? null : state.colors.reverse();
+      state.colors.forEach((item,index)=>{
+        item.sort = index;
+      })
+      return {...state}
     }
+
+
   },
 
 };

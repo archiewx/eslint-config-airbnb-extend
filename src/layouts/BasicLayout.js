@@ -14,7 +14,7 @@ import NotFound from '../routes/Exception/404';
 import { getRoutes } from '../utils/utils';
 import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
-
+import duokeLogo from '../assets/duoke_logo.png'
 /**
  * 根据菜单取得重定向地址.
  */

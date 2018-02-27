@@ -32,6 +32,10 @@ export default  {
     *deleteSingle({payload},{call,put}) {
       yield call(priceGradeService.deleteSingle,payload)
     },
+
+    *editSort ({payload},{call,put}) {
+      yield call(priceGradeService.editSort,payload)
+    }
   },
 
   reducers: {
@@ -39,6 +43,24 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
+
+    setSortMove(state,{payload:{currentId,moveWay}}) {
+      moveWay == 'up' ? null : state.priceGrades.reverse();
+      state.priceGrades.forEach( (n,i) => {
+        if(n.id == currentId) {
+          i == 0 ? '' : (
+            state.priceGrades.splice(i,1),
+            state.priceGrades.splice(i-1,0,n)
+          )
+        }
+      })
+      moveWay == 'up' ? null : state.priceGrades.reverse();
+      state.priceGrades.forEach((item,index)=>{
+        item.sort = index;
+      })
+      console.log(state.priceGrades)
+      return {...state}
+    }
   },
 
 };

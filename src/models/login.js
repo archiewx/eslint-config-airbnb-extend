@@ -1,54 +1,63 @@
+import * as loginService from '../services/login'
 import { routerRedux } from 'dva/router';
-import { fakeAccountLogin } from '../services/api';
+const delay = timeout => {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeout);
+  });
+};
+export default  {
 
-export default {
   namespace: 'login',
 
   state: {
-    status: undefined,
+    qrcode:'',
+    isQuerying:false
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      history.listen(()=>{
+        dispatch({type:'checkLogin'})
+        dispatch({type:'pollQrcode'})
+      })
+    },
   },
 
   effects: {
-    *login({ payload }, { call, put }) {
-      yield put({
-        type: 'changeSubmitting',
-        payload: true,
-      });
-      const response = yield call(fakeAccountLogin, payload);
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response,
-      });
-      // Login successfully
-      if (response.status === 'ok') {
-        yield put(routerRedux.push('/'));
+    *pollQrcode ({payload},{call,put,take,select}) {
+      const {isQuerying} = yield select(({login}) => (login))
+      while(isQuerying) {
+        const data = yield call(loginService.createQrcode,payload)
+        yield put({type:'setState',payload:{
+          qrcode:data.result.data.qrcode
+        }})
+        yield call(delay, 1000*60*3);
       }
     },
-    *logout(_, { put }) {
-      yield put({
-        type: 'changeLoginStatus',
-        payload: {
-          status: false,
-        },
-      });
-      yield put(routerRedux.push('/user/login'));
-    },
+
+    *checkLogin({payload},{call,put,select}) {
+      const {isQuerying} = yield select(({login}) => (login))
+      while(isQuerying) {
+        const data = yield call(loginService.checkLogin)
+        if(data.result) {
+          sessionStorage.setItem('token',JSON.stringify(data.result.data.token))
+          yield put({type:'setState',payload:{
+            isQuerying:false
+          }})
+          yield put(routerRedux.push('/goods-list'))
+        }else {
+          yield call(delay, 1000);
+        }
+      }
+    }
   },
 
   reducers: {
-    changeLoginStatus(state, { payload }) {
-      return {
-        ...state,
-        status: payload.status,
-        type: payload.type,
-        submitting: false,
-      };
+
+    setState (state, action) {
+      return { ...state, ...action.payload }
     },
-    changeSubmitting(state, { payload }) {
-      return {
-        ...state,
-        submitting: payload,
-      };
-    },
+
   },
+
 };

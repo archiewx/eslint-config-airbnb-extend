@@ -28,6 +28,11 @@ export default  {
       return { ...state, ...action.payload }
     },
 
+    setShops (state,{payload}) {
+      
+      return {...state}
+    }
+
   },
 
 };

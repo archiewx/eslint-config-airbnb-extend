@@ -30,6 +30,10 @@ export default  {
     *deleteSingle ({payload},{call,put}) {
       yield call(unitService.deleteSingle,payload)
     },
+
+    *editSort ({payload},{call,put}) {
+      yield call(unitService.editSort,payload)
+    }
   },
 
   reducers: {
@@ -37,6 +41,23 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
+
+    setSortMove(state,{payload:{currentId,moveWay}}) {
+      moveWay == 'up' ? null : state.units.reverse();
+      state.units.forEach( (n,i) => {
+        if(n.id == currentId) {
+          i == 0 ? '' : (
+            state.units.splice(i,1),
+            state.units.splice(i-1,0,n)
+          )
+        }
+      })
+      moveWay == 'up' ? null : state.units.reverse();
+      state.units.forEach((item,index)=>{
+        item.sort = index;
+      })
+      return {...state}
+    }
 
   },
 

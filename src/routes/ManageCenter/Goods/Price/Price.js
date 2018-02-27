@@ -26,6 +26,7 @@ export default class Size extends PureComponent {
     priceGradeModalType: '',
     priceGradeModalFormValue: {},
     priceQuantityStepModalVisibel: false,
+    isSort:false
   }
 
   componentDidMount(){
@@ -143,23 +144,56 @@ export default class Size extends PureComponent {
     this.setState({activeTabKey:key})
   }
 
+  handleSortStart = () => {
+    this.setState({
+      isSort:true
+    })
+  }
+
+  handleSortCancel = () => {
+    this.setState({
+      isSort:false
+    })
+    this.props.dispatch({type:'priceGrade/getList'})
+  }
+
+  handleSortMove = (id,moveWay) => {
+    this.props.dispatch({type:'priceGrade/setSortMove',payload:{
+      currentId:id,
+      moveWay:moveWay,
+    }})
+  }
+
+  handleSortOk = () => {
+    this.props.dispatch({type:'priceGrade/editSort',payload:this.props.priceGrade.priceGrades}).then(()=>{
+      this.handleSortCancel()
+    })
+  }
+
   render() {
     const {priceGrades} = this.props.priceGrade;
     const {priceQuantitySteps} = this.props.priceQuantityStep;
     const {usePricelelvel,priceModel} = this.props.configSetting;
-    const {priceGradeModalVisibel,priceGradeModalType,priceGradeModalFormValue,priceQuantityStepModalVisibel,priceQuantityStepModalType,priceQuantityStepModalFormValue,activeTabKey} = this.state;
+    const {priceGradeModalVisibel,priceGradeModalType,priceGradeModalFormValue,priceQuantityStepModalVisibel,priceQuantityStepModalType,priceQuantityStepModalFormValue,activeTabKey,isSort} = this.state;
 
     const priceGradeAction = (
       <div>
-        <Button style={{marginRight:10}}>自定义排序</Button>
-        <Button type='primary' onClick={this.handlePriceGradeModalCreate} style={{marginRight:20}}>新建</Button>
-        <Switch checkedChildren="开" unCheckedChildren="关"  onClick={this.handleSwitchUsePriceLevel} checked={usePricelelvel == 'yes'}/>
-      </div>
-    )
-
-    const sizeGroupAction = (
-      <div>
-        <Button type='primary' onClick={this.handleSizeGroupModalCreate}>新建尺码组</Button>
+        {
+          isSort ? (
+            <div>
+              <Popconfirm title='确认取消自定义排序' onConfirm={this.handleSortCancel}>
+                <Button style={{marginRight:10}} >取消</Button>
+              </Popconfirm>
+              <Button type='primary' onClick={this.handleSortOk}>确认</Button>
+            </div>
+          ) : (
+            <div>
+              <Button style={{marginRight:10}} onClick={this.handleSortStart}>自定义排序</Button>
+              <Button type='primary' onClick={this.handlePriceGradeModalCreate} style={{marginRight:20}}>新建价格等级</Button>
+              <Switch checkedChildren="开" unCheckedChildren="关"  onClick={this.handleSwitchUsePriceLevel} checked={usePricelelvel == 'yes'}/>
+            </div>
+          )
+        }
       </div>
     )
 
@@ -172,9 +206,21 @@ export default class Size extends PureComponent {
       width:172,
       render:(text,record) => (
         <div>
-          <a onClick={this.handlePriceGradeModalModalEdit.bind(null,record)}>编辑</a>
-          { record.default != '1' ? <Divider  type='vertical' /> : null } 
-          { record.default != '1' ? <Popconfirm onConfirm={this.handlePriceGradeModalDeleteSingle.bind(null,record)} title='确认删除此价格等级'><a >删除</a></Popconfirm> : null }
+          {
+            isSort ? (
+              <div>
+                <a onClick={this.handleSortMove.bind(null,record.id,'up')} style={{display: priceGrades.findIndex( n => n.id == record.id) == 0 ? 'none' : 'inline-block'}}>上移</a>
+                <Divider  type='vertical' style={{display: (priceGrades.findIndex( n => n.id == record.id) == 0 || priceGrades.findIndex( n => n.id == record.id) == priceGrades.length -1) ? 'none' : 'inline-block'}}/>
+                <a onClick={this.handleSortMove.bind(null,record.id,'down')} style={{display: priceGrades.findIndex( n => n.id == record.id) == priceGrades.length - 1 ? 'none' : 'inline-block'}}>下移</a>
+              </div>
+            ) : (
+              <div>
+                <a onClick={this.handlePriceGradeModalModalEdit.bind(null,record)}>编辑</a>
+                { record.default != '1' ? <Divider  type='vertical' /> : null } 
+                { record.default != '1' ? <Popconfirm onConfirm={this.handlePriceGradeModalDeleteSingle.bind(null,record)} title='确认删除此价格等级'><a >删除</a></Popconfirm> : null }
+              </div>
+            )
+          }
         </div>
       )
     }]

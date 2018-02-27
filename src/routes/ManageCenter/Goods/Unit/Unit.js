@@ -14,6 +14,7 @@ export default class Unit extends PureComponent {
     modalVisibel: false,
     modalType: '',
     formValue: {},
+    isSort:false
   }
 
   componentDidMount(){
@@ -68,13 +69,53 @@ export default class Unit extends PureComponent {
     })
   }
 
+  handleSortStart = () => {
+    this.setState({
+      isSort:true
+    })
+  }
+
+  handleSortCancel = () => {
+    this.setState({
+      isSort:false
+    })
+    this.props.dispatch({type:'unit/getList'})
+  }
+
+  handleSortMove = (id,moveWay) => {
+    this.props.dispatch({type:'unit/setSortMove',payload:{
+      currentId:id,
+      moveWay:moveWay,
+    }})
+  }
+
+  handleSortOk = () => {
+    this.props.dispatch({type:'unit/editSort',payload:this.props.unit.units}).then(()=>{
+      this.handleSortCancel()
+    })
+  }
+
+
   render() {
     const {units} = this.props.unit;
-    const {modalVisibel,modalType,formValue} = this.state;
+    const {modalVisibel,modalType,formValue,isSort} = this.state;
     const action = (
       <div>
-        <Button>自定义排序</Button>
-        <Button type='primary' onClick={this.handleModalCreate}>新建</Button>
+        {
+          isSort ? (
+            <div>
+              <Popconfirm title='确认取消自定义排序' onConfirm={this.handleSortCancel}>
+                <Button >取消</Button>
+              </Popconfirm>
+              <Button type='primary' onClick={this.handleSortOk}>确认</Button>
+            </div>
+          ): (
+            <div>
+              <Button onClick={this.handleSortStart}>自定义排序</Button>
+              <Button type='primary' onClick={this.handleModalCreate}>新建单位</Button>
+            </div>
+          )
+        }
       </div>
     )
 
@@ -90,9 +131,21 @@ export default class Unit extends PureComponent {
       width:172,
       render:(text,record) => (
         <div>
-          <a onClick={this.handleModalEdit.bind(null,record)}>编辑</a>
-          <Divider  type='vertical' />
-          <Popconfirm onConfirm={this.handleDeleteSingle.bind(null,record)} title='确认删除此单位'><a >删除</a></Popconfirm>
+          {
+            isSort ? (
+              <div>
+                <a onClick={this.handleSortMove.bind(null,record.id,'up')} style={{display: units.findIndex( n => n.id == record.id) == 0 ? 'none' : 'inline-block'}}>上移</a>
+                <Divider  type='vertical' style={{display: (units.findIndex( n => n.id == record.id) == 0 || units.findIndex( n => n.id == record.id) == units.length -1) ? 'none' : 'inline-block'}}/>
+                <a onClick={this.handleSortMove.bind(null,record.id,'down')} style={{display: units.findIndex( n => n.id == record.id) == units.length - 1 ? 'none' : 'inline-block'}}>下移</a>
+              </div>
+            ) : (
+              <div>
+                <a onClick={this.handleModalEdit.bind(null,record)} >编辑</a>
+                <Divider  type='vertical' style={{display:record.default ==1 ? 'none' : 'inline-block'}}/>
+                <Popconfirm onConfirm={this.handleDeleteSingle.bind(null,record)} title='确认删除此单位' ><a style={{display:record.default ==1 ? 'none' : 'inline-block'}}>删除</a></Popconfirm>
+              </div>
+            )
+          }
         </div>
       )
     }]

@@ -51,10 +51,10 @@ export const getRouterData = (app) => {
       component: dynamicWrapper(app, ['customerList','layoutFilter'], () => import('../routes/Relationship/Customer/CustomerList/CustomerList'))
     },
     '/relationship/customer-create': {
-      component: dynamicWrapper(app, ['customerCreateOrEdit','staff','priceGrade','customerGroup','country'], () => import('../routes/Relationship/Customer/CustomerCreateOrEdit/CustomerCreateOrEdit'))
+      component: dynamicWrapper(app, ['customerCreateOrEdit','staff','customerMember','customerGroup','country'], () => import('../routes/Relationship/Customer/CustomerCreateOrEdit/CustomerCreateOrEdit'))
     },
     '/relationship/customer-edit/:id': {
-      component: dynamicWrapper(app, ['customerCreateOrEdit','staff','priceGrade','customerGroup','country'], () => import('../routes/Relationship/Customer/CustomerCreateOrEdit/CustomerCreateOrEdit'))
+      component: dynamicWrapper(app, ['customerCreateOrEdit','staff','customerMember','customerGroup','country'], () => import('../routes/Relationship/Customer/CustomerCreateOrEdit/CustomerCreateOrEdit'))
     },
     '/relationship/customer-detail/:id':{
       component: dynamicWrapper(app, ['customerDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/CustomerDetail'))
@@ -107,15 +107,51 @@ export const getRouterData = (app) => {
     '/manage-center/goods/picture':{
       component: dynamicWrapper(app ,[], () => import('../routes/ManageCenter/Goods/Picture/Picture'))
     },
+    '/manage-center/customer/customer-manage':{
+      component: dynamicWrapper(app ,[], () => import('../routes/ManageCenter/Customer/CustomerManage/CustomerManage'))
+    },
+    '/manage-center/customer/customer-group':{
+      component: dynamicWrapper(app ,['customerGroup'], () => import('../routes/ManageCenter/Customer/CustomerGroup/CustomerGroup'))
+    },
+    '/manage-center/customer/customer-member':{
+      component: dynamicWrapper(app ,['customerMember','priceGrade'], () => import('../routes/ManageCenter/Customer/CustomerMember/CustomerMember'))
+    },
+    '/manage-center/shop-warehouse/shop':{
+      component: dynamicWrapper(app ,['shop','goodsGroup','warehouse'], () => import('../routes/ManageCenter/ShopWarehouse/Shop/Shop'))
+    },
+    '/manage-center/shop-warehouse/warehouse':{
+      component: dynamicWrapper(app ,['warehouse'], () => import('../routes/ManageCenter/ShopWarehouse/Warehouse/Warehouse'))
+    },
+    '/manage-center/bill/goods-label':{
+      component: dynamicWrapper(app ,['label'], () => import('../routes/ManageCenter/Bill/GoodsLabel/GoodsLabel'))
+    },
+    '/manage-center/bill/payment':{
+      component: dynamicWrapper(app ,['payment'], () => import('../routes/ManageCenter/Bill/Payment/Payment'))
+    }, 
+    '/manage-center/bill/sale-order':{
+      component: dynamicWrapper(app ,['adjustPrice','label'], () => import('../routes/ManageCenter/Bill/SaleOrder/SaleOrder'))
+    },
+    '/manage-center/bill/purchase-order':{
+      component: dynamicWrapper(app ,['label'], () => import('../routes/ManageCenter/Bill/PurchaseOrder/PurchaseOrder'))
+    },
+    '/manage-center/bill/deliver-order':{
+      component: dynamicWrapper(app ,['logistics'], () => import('../routes/ManageCenter/Bill/DeliverOrder/DeliverOrder'))
+    },
+    '/manage-center/bill/inventory-order':{
+      component: dynamicWrapper(app ,['inventoryApprover'], () => import('../routes/ManageCenter/Bill/InventoryOrder/InventoryOrder'))
+    },
     '/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },
+    '/user': {
+      component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
+    },
+    '/user/login': {
+      component: dynamicWrapper(app, ['login'], () => import('../routes/Login/Login'))
+    },
     '/test': {
       component: dynamicWrapper(app, [], () => import('../routes/Test/Test'))
-    }
-    // '/user': {
-    //   component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
-    // },
+    },
   };
   // Get name from ./menu.js or just set it in the router data.
   const menuData = getFlatMenuData(getMenuData());

@@ -2,7 +2,7 @@ import {apiBase,token} from '../common/index'
 import request from '../utils/request';
 
 export async function getList (params) {
-  return request( `${apiBase}/api/warehouses/`, {
+  return request( `${apiBase}/api/warehouses`, {
     headers: { "Authorization": token },
   })
 }

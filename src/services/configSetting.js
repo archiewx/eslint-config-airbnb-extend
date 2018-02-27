@@ -19,6 +19,17 @@ export async function switchUsePrice (params) {
   })
 }
 
+export async function switchHistoryPrice (params) {
+  const current = {
+    setting:[params],
+  };
+  return request(`${apiBase}/api/configs/use_history_price/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
+
 export async function switchPriceModal (params) {
   const current = {
     setting:[params],
@@ -63,17 +74,6 @@ export async function switchItemAttrite (params) {
   })
 }
 
-// export async function switchHistoryPriceMap (params) {
-//   const current = {
-//     setting:[params],
-//   };
-//   return request(`${apiBase}/api/configs/use_history_price/setting`,{
-//     method: 'PUT',
-//     headers: { "Authorization": token },
-//     body: current,
-//   })
-// }
-
 export async function switchShopShareCustomer (params) {
   const current = {
     setting:[params],
@@ -85,17 +85,17 @@ export async function switchShopShareCustomer (params) {
   })
 }
 
-// export async function switchDeliveryMap (params) {
-//   const e = {
-//     setting:[params],
-//   };
-//   return request({
-//     url: `${apiBase}/api/configs/default_delivery_way/setting`,
-//     method: 'PUT',
-//     headers: { "Authorization": token },
-//     body: e,
-//   })
-// }
+export async function switchDefaultDeleiverWay (params) {
+  const current = {
+    setting:[params],
+  };
+  return request(`${apiBase}/api/configs/default_delivery_way/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}
+
 
 // export async function switchReturnGoodsMap (params) {
 //   const e = {
@@ -135,14 +135,13 @@ export async function switchShopShareCustomer (params) {
 
 
 
-// export async function switchApproverMap (params) {
-//   const e = {
-//     setting:params
-//   }
-//   return request({
-//     url: `${apiBase}/api/configs/inventory_approver/setting`,
-//     method: 'PUT',
-//     headers: { "Authorization": token },
-//     body: e,
-//   })
-// }
+export async function switchInventoryApprover (params) {
+  const current = {
+    setting:params
+  }
+  return request(`${apiBase}/api/configs/inventory_approver/setting`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}

@@ -50,6 +50,10 @@ export default  {
       yield call(sizeLibraryService.deleteSingle,payload)
     },
 
+    *editSort ({payload},{call,put}) {
+      yield call(sizeLibraryService.editSort,payload)
+    },
+
     *createSizeGroupSingle({payload},{call,put}) {
       yield call(sizeGroupService.createSingle,payload)
     },
@@ -60,7 +64,9 @@ export default  {
 
     *deleteSizeGroupSingle({payload},{call,put}) {
       yield call(sizeGroupService.deleteSingle,payload)
-    }
+    },
+
+
   },
 
   reducers: {
@@ -68,6 +74,23 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
+
+    setSortMove(state,{payload:{currentId,moveWay}}) {
+      moveWay == 'up' ? null : state.sizeLibrarys.reverse();
+      state.sizeLibrarys.forEach( (n,i) => {
+        if(n.id == currentId) {
+          i == 0 ? '' : (
+            state.sizeLibrarys.splice(i,1),
+            state.sizeLibrarys.splice(i-1,0,n)
+          )
+        }
+      })
+      moveWay == 'up' ? null : state.sizeLibrarys.reverse();
+      state.sizeLibrarys.forEach((item,index)=>{
+        item.sort = index;
+      })
+      return {...state}
+    }
 
   },
 

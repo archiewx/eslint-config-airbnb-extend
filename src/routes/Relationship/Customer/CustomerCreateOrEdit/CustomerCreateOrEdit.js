@@ -18,7 +18,7 @@ const FormItem = Form.Item;
 @connect(state => ({
   customerCreateOrEdit: state.customerCreateOrEdit,
   staff: state.staff,
-  priceGrade: state.priceGrade,
+  customerMember: state.customerMember,
   customerGroup: state.customerGroup,
   country: state.country
 }))
@@ -40,8 +40,8 @@ export default class CustomerCreateOrEdit extends PureComponent {
       }
     })().then(()=>{
       this.props.dispatch({type:'staff/getList'})
-      this.props.dispatch({type:'priceGrade/getList'})
-      this.props.dispatch({type:'customerGroup/getCustomerGroup'})
+      this.props.dispatch({type:'customerMember/getList'})
+      this.props.dispatch({type:'customerGroup/getList'})
     })
   }
 
@@ -156,7 +156,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
     const {getFieldDecorator,getFieldValue} = this.props.form;
     const {showData} = this.props.customerCreateOrEdit;
     const {staffs} = this.props.staff;
-    const {priceGrades} = this.props.priceGrade;
+    const {customerMembers} = this.props.customerMember;
     const {customerGroups} = this.props.customerGroup;
     const {country} = this.props.country;
     return (
@@ -229,7 +229,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
                   })(
                     <Select placeholder='请选择'>
                       {
-                        priceGrades.map( item => {
+                        customerMembers.map( item => {
                           return <Option key={item.id}>{item.name}</Option>
                         })
                       }
@@ -258,7 +258,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
                         })(
                           <Select placeholder='请选择客户分组'>
                             {
-                              item.children.data.map( subItem => {
+                              item.children.map( subItem => {
                                 return (
                                   <Option key={subItem.id}>{subItem.name}</Option>
                                 )
