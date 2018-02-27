@@ -69,20 +69,38 @@ export default  {
       return {...state}
     },
 
-    setSortMove(state,{payload:{currentId,moveWay}}) {
-      moveWay == 'up' ? null : state.colors.reverse();
-      state.colors.forEach( (n,i) => {
-        if(n.id == currentId) {
-          i == 0 ? '' : (
-            state.colors.splice(i,1),
-            state.colors.splice(i-1,0,n)
-          )
-        }
-      })
-      moveWay == 'up' ? null : state.colors.reverse();
-      state.colors.forEach((item,index)=>{
-        item.sort = index;
-      })
+    setSortMove(state,{payload:{item,moveWay}}) {
+      if(item.uid) {
+        let currentGoodsGroup = state.goodsGroups.find( n => n.id == item.parent_id).children;
+        moveWay == 'up' ? null : currentGoodsGroup.reverse();
+        currentGoodsGroup.forEach((n,i) => {
+          if(n.uid == item.uid) {
+            i == 0 ? '' : (
+              currentGoodsGroup.splice(i,1),
+              currentGoodsGroup.splice(i-1,0,n)
+            )
+          }
+        })
+        moveWay == 'up' ? null : currentGoodsGroup.reverse();
+        currentGoodsGroup.forEach((item,index)=>{
+          item.sort = index;
+        })
+        state.goodsGroups.find( n => n.id == item.parent_id).children = currentGoodsGroup;
+      }else {
+        moveWay == 'up' ? null : state.goodsGroups.reverse();
+        state.goodsGroups.forEach( (n,i) => {
+          if(n.id == item.id) {
+            i == 0 ? '' : (
+              state.goodsGroups.splice(i,1),
+              state.goodsGroups.splice(i-1,0,n)
+            )
+          }
+        })
+        moveWay == 'up' ? null : state.goodsGroups.reverse();
+        state.goodsGroups.forEach((item,index)=>{
+          item.sort = index;
+        })
+      }
       return {...state}
     }
 

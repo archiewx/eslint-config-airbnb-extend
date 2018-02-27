@@ -32,6 +32,10 @@ export default  {
       yield call(customerGroupService.deleteSingle,payload)
     },
 
+    *editSort ({payload},{call,put}) {
+      yield call(customerGroupService.editSort,payload)
+    }
+
   },
 
   reducers: {
@@ -63,6 +67,41 @@ export default  {
           })
         }
       })
+      return {...state}
+    },
+
+    setSortMove(state,{payload:{item,moveWay}}) {
+      if(item.uid) {
+        let currentGoodsGroup = state.customerGroups.find( n => n.id == item.parent_id).children;
+        moveWay == 'up' ? null : currentGoodsGroup.reverse();
+        currentGoodsGroup.forEach((n,i) => {
+          if(n.uid == item.uid) {
+            i == 0 ? '' : (
+              currentGoodsGroup.splice(i,1),
+              currentGoodsGroup.splice(i-1,0,n)
+            )
+          }
+        })
+        moveWay == 'up' ? null : currentGoodsGroup.reverse();
+        currentGoodsGroup.forEach((item,index)=>{
+          item.sort = index;
+        })
+        state.customerGroups.find( n => n.id == item.parent_id).children = currentGoodsGroup;
+      }else {
+        moveWay == 'up' ? null : state.customerGroups.reverse();
+        state.customerGroups.forEach( (n,i) => {
+          if(n.id == item.id) {
+            i == 0 ? '' : (
+              state.customerGroups.splice(i,1),
+              state.customerGroups.splice(i-1,0,n)
+            )
+          }
+        })
+        moveWay == 'up' ? null : state.customerGroups.reverse();
+        state.customerGroups.forEach((item,index)=>{
+          item.sort = index;
+        })
+      }
       return {...state}
     }
   },

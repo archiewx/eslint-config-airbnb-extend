@@ -35,11 +35,25 @@ export async function editSingle (params) {
   })
 }
 
-// export async function editListSort (params) {
-//   return request({
-//     url: `${apiBase}/api/customergroups/sort/`,
-//     method: 'put',
-//     headers: { "Authorization": token },
-//     body: params,
-//   })
-// }
+export async function editSort (params) {
+  let current = []
+  params.forEach( n => {
+    current.push({
+      id:n.id,
+      sort:n.sort
+    })
+    if(n.children) {
+      n.children.forEach( m => {
+        current.push({
+          id:m.uid,
+          sort:m.sort
+        })
+      })
+    }
+  })
+  return request(`${apiBase}/api/customergroups/sort`,{
+    method: 'PUT',
+    headers: { "Authorization": token },
+    body: current,
+  })
+}

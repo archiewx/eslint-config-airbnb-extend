@@ -75,9 +75,9 @@ export default class GoodsGroup extends PureComponent {
     this.props.dispatch({type:'goodsGroup/getList'})
   }
 
-  handleSortMove = (id,moveWay) => {
+  handleSortMove = (item,moveWay) => {
     this.props.dispatch({type:'goodsGroup/setSortMove',payload:{
-      currentId:id,
+      item:item,
       moveWay:moveWay,
     }})
   }
@@ -125,9 +125,9 @@ export default class GoodsGroup extends PureComponent {
               <div>
                 {record.uid ? <a style={{visibility:'hidden'}}>你好</a> : null}
                 {record.uid ? <Divider style={{visibility:'hidden'}} type='vertical' /> : null}
-                <a onClick={this.handleSortMove.bind(null,record.id,'up')} style={{display: (goodsGroups.findIndex( n => n.id == record.id) == 0 || record.uid && goodsGroups.find( n => n.id == record.parent_id).children.findIndex( n => n.uid == record.uid) == 0 ) ? 'none' : 'inline-block'}}>上移</a>
+                <a onClick={this.handleSortMove.bind(null,record,'up')} style={{display: (goodsGroups.findIndex( n => n.id == record.id) == 0 || record.uid && goodsGroups.find( n => n.id == record.parent_id).children.findIndex( n => n.uid == record.uid) == 0 ) ? 'none' : 'inline-block'}}>上移</a>
                 <Divider  type='vertical' style={{display: (goodsGroups.findIndex( n => n.id == record.id) == 0 || goodsGroups.findIndex( n => n.id == record.id) == goodsGroups.length -1 || record.uid && goodsGroups.find( n => n.id == record.parent_id).children.findIndex( n => n.uid == record.uid) == 0 || record.uid && goodsGroups.find( n => n.id == record.parent_id).children.findIndex( n => n.uid == record.uid) == goodsGroups.find( n => n.id == record.parent_id).children.length -1) ? 'none' : 'inline-block'}}/>
-                <a onClick={this.handleSortMove.bind(null,record.id,'down')} style={{display: (goodsGroups.findIndex( n => n.id == record.id) == goodsGroups.length - 1 || record.uid && goodsGroups.find( n => n.id == record.parent_id).children.findIndex( n => n.uid == record.uid) == goodsGroups.find( n => n.id == record.parent_id).children.length -1) ? 'none' : 'inline-block'}}>下移</a>
+                <a onClick={this.handleSortMove.bind(null,record,'down')} style={{display: (goodsGroups.findIndex( n => n.id == record.id) == goodsGroups.length - 1 || record.uid && goodsGroups.find( n => n.id == record.parent_id).children.findIndex( n => n.uid == record.uid) == goodsGroups.find( n => n.id == record.parent_id).children.length -1) ? 'none' : 'inline-block'}}>下移</a>
               </div>
             ) : (
               <div>

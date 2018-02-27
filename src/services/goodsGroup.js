@@ -36,14 +36,23 @@ export async function editSingle (params) {
 
 
 export async function editSort (params) {
-  const current = params.map( n => {
-    return {
-      id: n.id,
+  let current = []
+  params.forEach( n => {
+    current.push({
+      id:n.id,
       sort:n.sort
+    })
+    if(n.children) {
+      n.children.forEach( m => {
+        current.push({
+          id:m.uid,
+          sort:m.sort
+        })
+      })
     }
   })
-  return request(`${apiBase}/api/itemgroups/sort/`,{
-    method: 'put',
+  return request(`${apiBase}/api/itemgroups/sort`,{
+    method: 'PUT',
     headers: { "Authorization": token },
     body: current,
   })
