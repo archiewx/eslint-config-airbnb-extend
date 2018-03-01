@@ -53,12 +53,11 @@ export default  {
         const data = yield call(loginService.checkLogin,code)
         if(data.result) {
           sessionStorage.setItem('auth','user')
+          sessionStorage.setItem('oncefetch',true)
           sessionStorage.setItem('token',JSON.stringify(data.result.data.token))
           yield put({type:'setState',payload:{
             isQuerying:true
           }})
-          const configData = yield call(configSettingService.getConfigSetting)
-          yield put({type:'configSetting/setConfigSetting',payload:configData.result.data})
           reloadAuthorized();
           yield put(routerRedux.push('/goods-list'))
         }else {

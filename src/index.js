@@ -28,4 +28,9 @@ app.router(require('./router'));
 
 // 5. Start
 app.start('#root');
+
+window.onbeforeunload = function() {
+  sessionStorage.setItem('oncefetch',true)
+}
+
 FastClick.attach(document.body);

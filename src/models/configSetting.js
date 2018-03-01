@@ -22,7 +22,14 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      // dispatch({type:'getConfigSetting'})
+      history.listen(({pathname})=>{
+        if(location.hash.indexOf('/user/login') == -1) {
+          if(sessionStorage.getItem('oncefetch') == 'true') {
+            dispatch({type:'getConfigSetting'})
+            sessionStorage.setItem('oncefetch',false)
+          }
+        }
+      })
     },
   },
 

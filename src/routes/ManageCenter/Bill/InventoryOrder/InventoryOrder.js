@@ -40,7 +40,6 @@ export default class Inventory extends PureComponent {
   }
 
   handleModalOk = (value) => {
-    console.log(value)
     let inventoryApprover = {...this.props.configSetting.inventoryApprover}
     for(let key in inventoryApprover) {
       if(value.warehouse_id  == inventoryApprover[key].warehouse_id) {
