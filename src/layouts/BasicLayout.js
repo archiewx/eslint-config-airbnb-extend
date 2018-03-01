@@ -12,9 +12,11 @@ import GlobalFooter from '../components/antd-pro/GlobalFooter';
 import SiderMenu from '../components/antd-pro/SiderMenu';
 import NotFound from '../routes/Exception/404';
 import { getRoutes } from '../utils/utils';
+import Authorized from '../utils/Authorized';
 import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
 import duokeLogo from '../assets/duoke_logo.png'
+const { AuthorizedRoute } = Authorized;
 /**
  * 根据菜单取得重定向地址.
  */
@@ -112,6 +114,7 @@ class BasicLayout extends React.PureComponent {
     const {
       currentUser, collapsed, fetchingNotices, notices, routerData, match, location,
     } = this.props;
+    // const isLogin = sessionStorage.getItem('token')
     const layout = (
       <Layout>
         <SiderMenu
@@ -143,22 +146,24 @@ class BasicLayout extends React.PureComponent {
                 }
                 {
                   getRoutes(match.path, routerData).map(item => (
-                    <Route
+                    <AuthorizedRoute
                       key={item.key}
                       path={item.path}
                       component={item.component}
                       exact={item.exact}
+                      authority={item.authority}
+                      redirectPath="/401"
                     />
                   ))
                 }
-                <Redirect exact from="/" to="goods-list" />
+                <Redirect exact from="/" to="/goods-list" />
                 <Route render={NotFound} />
               </Switch>
             </div>
             <GlobalFooter
               copyright={
                 <div>
-                  Copyright <Icon type="copyright" /> 2017
+                  Copyright <Icon type="copyright" /> 2018
                 </div>
               }
             />

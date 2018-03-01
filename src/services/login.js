@@ -8,5 +8,5 @@ export async function createQrcode (params) {
 }
 
 export async function checkLogin (params) {
-  return request('http://duoke3api-beta.duoke.net/api/auth/qrcode_token')
+  return request(`http://duoke3api-beta.duoke.net/api/auth/qrcode_token?code=${params}`)
 }

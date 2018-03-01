@@ -14,9 +14,6 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      history.listen(()=>{
-        dispatch({type:'setState',payload:{showData:{}}})
-      })
     },
   },
 
@@ -61,6 +58,7 @@ export default  {
     },
 
     setShowData (state,{payload:{value,itemimage,usePricelelvel,priceModel,itemBarcodeLevel,itemImageLevel}}) {
+      console.log(value)
       state.showData.id = value.id;
       state.showData.item_ref = value.item_ref;
       state.showData.standard_price = (value.standard_price).toString();
@@ -258,7 +256,7 @@ export default  {
               id: item.id
             }
             if( itemImageLevel == 'sku') {
-              item.skuimages.data.forEach( subItem => {
+              item.skuimages && item.skuimages.data.forEach( subItem => {
                 state.showData.imageFile[`${colorId}`] = [];
                 state.showData.imageFile[`${colorId}`].push({
                   uid: Number('-' + window.crypto.getRandomValues(new Uint32Array(1))[0].toString()),
@@ -291,7 +289,7 @@ export default  {
               id: item.id
             }
             if(itemImageLevel == 'sku') {
-              item.skuimages.data.forEach( subItem => {
+              item.skuimages && item.skuimages.data.forEach( subItem => {
                 state.showData.imageFile[`${colorId}`] = [];
                 state.showData.imageFile[`${colorId}`].push({
                   uid: Number('-' + window.crypto.getRandomValues(new Uint32Array(1))[0].toString()),

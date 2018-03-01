@@ -8,13 +8,20 @@ import QRCode from 'qrcode'
 
 @connect(state => ({
   login: state.login,
+  // configSetting:state.configSetting
 }))
 export default class LoginPage extends Component {
 
+  componentDidMount() {
+
+  }
+
   componentWillReceiveProps({login}) {
-    QRCode.toDataURL(login.qrcode,{ errorCorrectionLevel: 'H',color:{light: '#F0F2F5'} ,width:220}).then((url)=>{
-      let img = document.getElementById('login_qrcode')
-      img.src = url;
+    QRCode.toDataURL(login.qrcode || '',{ errorCorrectionLevel: 'H',color:{light: '#F0F2F5'} ,width:220}).then((url)=>{
+      if(url && !login.isQuerying) {
+        let img = document.getElementById('login_qrcode')
+        img.src = url ;
+      }
     })
   }
 

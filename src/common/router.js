@@ -143,6 +143,9 @@ export const getRouterData = (app) => {
     '/404': {
       component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
     },
+    // '/401': {
+    //   component: dynamicWrapper(app, [], () => import('../layouts/NoTokenLayout')),
+    // },
     '/user': {
       component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
     },
@@ -162,5 +165,13 @@ export const getRouterData = (app) => {
       name: routerData[item].name || menuData[item.replace(/^\//, '')],
     };
   });
+  // Object.keys(menuData).forEach((item) => {
+  //   if(!Object.keys(routerDataWithName).some( n => item == n.replace(/^\//, ''))) {
+  //     routerDataWithName[`/${item}`] = {
+  //       name: menuData[item],
+  //     }
+  //   }
+  // })
+  // console.log(routerDataWithName)
   return routerDataWithName;
 };

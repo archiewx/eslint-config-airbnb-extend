@@ -4,7 +4,7 @@ import request from '../utils/request';
 export async function getConfigSetting (params) {
   return request(`${apiBase}/api/configs/list`,{
     method: 'POST',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
   })
 }
 
@@ -14,7 +14,7 @@ export async function switchUsePrice (params) {
   };
   return request( `${apiBase}/api/configs/use_pricelevel/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
@@ -25,7 +25,7 @@ export async function switchHistoryPrice (params) {
   };
   return request(`${apiBase}/api/configs/use_history_price/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
@@ -36,7 +36,7 @@ export async function switchPriceModal (params) {
   };
   return request(`${apiBase}/api/configs/price_model/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
@@ -47,7 +47,7 @@ export async function switchBarcode (params) {
   };
   return request(`${apiBase}/api/configs/item_barcode_level/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
@@ -58,7 +58,7 @@ export async function switchPicture (params) {
   };
   return request(`${apiBase}/api/configs/item_image_level/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
@@ -69,7 +69,7 @@ export async function switchItemAttrite (params) {
   }
   return request(`${apiBase}/api/configs/item_attribute/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
@@ -80,7 +80,7 @@ export async function switchShopShareCustomer (params) {
   };
   return request(`${apiBase}/api/configs/shop_share_customer/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
@@ -91,7 +91,7 @@ export async function switchDefaultDeleiverWay (params) {
   };
   return request(`${apiBase}/api/configs/default_delivery_way/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
@@ -104,7 +104,7 @@ export async function switchDefaultDeleiverWay (params) {
 //   return request({
 //     url: `${apiBase}/api/configs/allow_return/setting`,
 //     method: 'PUT',
-//     headers: { "Authorization": token },
+//     headers: { "Authorization": token() },
 //     body: e,
 //   })
 // }
@@ -116,7 +116,7 @@ export async function switchDefaultDeleiverWay (params) {
 //   return request({
 //     url: `${apiBase}/api/configs/default_transport_fee_payer/setting`,
 //     method: 'PUT',
-//     headers: { "Authorization": token },
+//     headers: { "Authorization": token() },
 //     body: e,
 //   })
 // }
@@ -128,7 +128,7 @@ export async function switchDefaultDeleiverWay (params) {
 //   return request({
 //     url: `${apiBase}/api/configs/default_transport_fee_settle/setting`,
 //     method: 'PUT',
-//     headers: { "Authorization": token },
+//     headers: { "Authorization": token() },
 //     body: e,
 //   })
 // }
@@ -141,7 +141,7 @@ export async function switchInventoryApprover (params) {
   }
   return request(`${apiBase}/api/configs/inventory_approver/setting`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }

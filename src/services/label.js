@@ -3,7 +3,7 @@ import request from '../utils/request';
 
 export async function getItemLabel (params) {
   return request(`${apiBase}/api/docdetailtags`,{
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
   })
 }
 
@@ -13,14 +13,14 @@ export async function editItemLableSingle (params) {
   delete current.id
   return request( `${apiBase}/api/docdetailtags/${params.id}`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
 
 export async function getSaleOrderLabel (params) {
   return request(`${apiBase}/api/doctags?doctype_id=1`,{
-    headers: {'Authorization':token}
+    headers: {'Authorization':token()}
   })
 }
 
@@ -30,14 +30,14 @@ export async function editSaleOrderLabel (params) {
   delete current.id
   return request( `${apiBase}/api/doctags/${params.id}`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }
 
 export async function getPurchaseOrderLabel (params) {
   return request(`${apiBase}/api/doctags?doctype_id=2`,{
-    headers: {'Authorization':token}
+    headers: {'Authorization':token()}
   })
 }
 
@@ -47,7 +47,7 @@ export async function editPurchaseOrderLabel (params) {
   delete current.id
   return request( `${apiBase}/api/doctags/${params.id}`,{
     method: 'PUT',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: current,
   })
 }

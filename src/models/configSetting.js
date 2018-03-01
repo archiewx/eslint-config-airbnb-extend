@@ -22,7 +22,7 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      dispatch({type:'getConfigSetting'})
+      // dispatch({type:'getConfigSetting'})
     },
   },
 

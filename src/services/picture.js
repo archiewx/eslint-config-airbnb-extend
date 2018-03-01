@@ -5,7 +5,7 @@ import fetch from 'dva/fetch';
 export async function upload (params) {
   // return request(`${apiBase}/api/images`,{
   //   method: 'POST',
-  //   headers: { "Authorization": token },
+  //   headers: { "Authorization": token() },
   //   body: params
   // // })
   const formData = new FormData();
@@ -13,7 +13,7 @@ export async function upload (params) {
   formData.append('image_file',params.image_file)
   fetch(`${apiBase}/api/images`,{
     method: 'POST',
-    headers: { "Authorization": token },
+    headers: { "Authorization": token() },
     body: formData
   })
 }

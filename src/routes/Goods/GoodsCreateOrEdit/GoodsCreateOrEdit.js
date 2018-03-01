@@ -66,7 +66,10 @@ export default class GoodsCreateOrEdit extends PureComponent {
 
   componentDidMount() {
     (async () => {
-      if(this.props.history.location.pathname != '/goods-create') {
+      this.props.dispatch({type:'goodsCreateOrEdit/setState',payload:{
+        showData:{}
+      }})
+      if(this.props.history.location.pathname.indexOf('/goods-edit') > -1) {
         const match = pathToRegexp('/goods-edit/:id').exec(this.props.history.location.pathname)
         this.props.dispatch({type:'goodsCreateOrEdit/getSingleGoods',payload:{id:match[1]}})
       }

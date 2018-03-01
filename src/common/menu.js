@@ -1,7 +1,7 @@
 const menuData = [{
   name: '商品',
   icon: 'form',
-  path: 'goods-list'
+  path: 'goods-list',
 },{
   name: '关系',
   icon: 'check-circle-o',
@@ -11,7 +11,7 @@ const menuData = [{
     path: 'customer-list',
   },{
     name: '供应商',
-    path: 'supplier-list'
+    path: 'supplier-list',
   }]
 },{
   name:'管理中心',
@@ -94,7 +94,7 @@ const menuData = [{
 },{
   name: '开发',
   icon: 'smile-o',
-  path: 'test'
+  path: 'test',
 }];
 
 function formatter(data, parentPath = '') {

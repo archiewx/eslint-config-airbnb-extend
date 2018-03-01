@@ -31,6 +31,13 @@ export default class ShopModal extends PureComponent {
   render() {
     const {visible,formValue,onOk,onCancel,goodsGroups,warehouses } = this.props;
     const {getFieldDecorator} = this.props.form;
+    const groupIds = {};
+    formValue.itemgroups && formValue.itemgroups.forEach( n => {
+      groupIds[`${n.id}`] = [];
+      n.children.forEach( m => {
+        groupIds[`${n.id}`].push(m.id)
+      })
+    })
     return (
       <Modal
         title='编辑店铺'
@@ -56,7 +63,7 @@ export default class ShopModal extends PureComponent {
               return (
                 <FormItem key={n.id} label={n.name} {...formItemLayout}>
                   {getFieldDecorator(`group_${n.id}`,{
-
+                    initialValue: groupIds[`${n.id}`]
                   })(
                     <Select placeholder='请选择' mode='multiple'>
                       {

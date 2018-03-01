@@ -1,4 +1,6 @@
 import * as loginService from '../services/login'
+import { reloadAuthorized } from '../utils/Authorized'
+import * as configSettingService from '../services/configSetting'
 import { routerRedux } from 'dva/router';
 const delay = timeout => {
   return new Promise(resolve => {
@@ -11,39 +13,53 @@ export default  {
 
   state: {
     qrcode:'',
-    isQuerying:false
+    code:'',
+    isQuerying:false,
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(()=>{
-        dispatch({type:'checkLogin'})
-        dispatch({type:'pollQrcode'})
+        if(location.hash.indexOf('user/login') > -1) {
+          sessionStorage.clear()
+          dispatch({type:'setState',payload:{
+            isQuerying:false
+          }})
+          dispatch({type:'checkLogin'}) 
+          dispatch({type:'pollQrcode'}) 
+        }
       })
     },
   },
 
   effects: {
     *pollQrcode ({payload},{call,put,take,select}) {
-      const {isQuerying} = yield select(({login}) => (login))
-      while(isQuerying) {
+      while(true) {
+        const {isQuerying} = yield select(({login}) => (login))
+        if(isQuerying) break;
         const data = yield call(loginService.createQrcode,payload)
         yield put({type:'setState',payload:{
-          qrcode:data.result.data.qrcode
+          qrcode:data.result.data.qrcode,
+          code:data.result.data.code
         }})
         yield call(delay, 1000*60*3);
       }
     },
 
     *checkLogin({payload},{call,put,select}) {
-      const {isQuerying} = yield select(({login}) => (login))
-      while(isQuerying) {
-        const data = yield call(loginService.checkLogin)
+      while(true) {
+        const {isQuerying,code} = yield select(({login}) => (login))
+        if(isQuerying) break;
+        const data = yield call(loginService.checkLogin,code)
         if(data.result) {
+          sessionStorage.setItem('auth','user')
           sessionStorage.setItem('token',JSON.stringify(data.result.data.token))
           yield put({type:'setState',payload:{
-            isQuerying:false
+            isQuerying:true
           }})
+          const configData = yield call(configSettingService.getConfigSetting)
+          yield put({type:'configSetting/setConfigSetting',payload:configData.result.data})
+          reloadAuthorized();
           yield put(routerRedux.push('/goods-list'))
         }else {
           yield call(delay, 1000);

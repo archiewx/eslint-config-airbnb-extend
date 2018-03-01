@@ -35,7 +35,7 @@ export default  {
         call(goodsService.getSingleCustomers,payload),
         call(goodsService.getSingleSuppliers,payload),
         call(goodsService.getSingleStocks,payload),
-        call(customerGroupService.getListGroup),
+        call(customerGroupService.getList),
       ])
       const {usePricelelvel,priceModel,itemImageLevel} = yield select(({configSetting}) => (configSetting))
       yield put({type:'setsingleGoodsDetail',payload:{

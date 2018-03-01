@@ -171,7 +171,11 @@ export default  {
         })
       })
 
-      state.singleCustomerDetail.imageFiles = payload.attachments_url.map( item => item )
+      state.singleCustomerDetail.imageFiles = payload.attachments_url.map( item => {
+        return {
+          url:item
+        }
+      } )
       state.singleCustomerDetail.freeze = payload.freeze;
       state.singleCustomerDetail.addresses = payload.addresses.data;
       return {...state}

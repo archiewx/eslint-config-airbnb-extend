@@ -107,7 +107,6 @@ export default class GoodsDetail extends PureComponent {
   }
 
   componentDidMount() {
-    if(this.props.history.location.pathname.indexOf('/goods-detail') > -1) {
       const match = pathToRegexp('/goods-detail/:id').exec(this.props.history.location.pathname)
       this.props.dispatch({type:'goodsDetail/setState',payload:{
         singleGoodsDetail:{}
@@ -115,7 +114,6 @@ export default class GoodsDetail extends PureComponent {
       if(match) {
         this.props.dispatch({type:'goodsDetail/getSingle',payload:{id:match[1]}})
       }
-    }
   }
 
   componentWillReceiveProps(nextProps) {

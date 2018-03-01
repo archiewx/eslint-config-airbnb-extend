@@ -37,7 +37,38 @@ export default class Shop extends PureComponent {
   }
 
   handleModalOk = (value) => {
-    console.log(value)
+    let warehouseData , itemData ,groupsId = [];
+    warehouseData = {
+      id:value.id,
+      warehouse_id: [{
+        id: value.warehouse_id
+      }]
+    }
+    itemData = {
+      id: value.id,
+      item_id: []
+    }
+    for(let key in value) {
+      if(key.indexOf('group_') > -1) {
+        if(value[key]) {
+          groupsId =  groupsId.concat(value[key]) 
+        }
+      }
+    }
+    itemData.item_id = groupsId.map( n => {
+      return {
+        id: n
+      }
+    })
+    this.setState({
+      modalVisibel:false
+    })
+    this.props.dispatch({type:'shop/editBind',payload:{
+      itemData:itemData,
+      warehouseData:warehouseData,
+    }}).then(()=>{
+      this.props.dispatch({type:'shop/getList'})
+    })
   }
 
   render() {
@@ -56,7 +87,16 @@ export default class Shop extends PureComponent {
                 <div>
                   <div className={styles.relationGoodsGroup}>关联的商品分组</div>
                   <div>
-                    
+                    {
+                      n.itemgroups.map( m => {
+                        return (
+                          <div key={m.id} style={{marginTop:20}}>
+                            <label className={styles.labelTitle}>{`${m.name}:`}</label>
+                            <span>{`${m.children.map( e => e.name).join('、')}`}</span>
+                          </div>
+                        )
+                      })
+                    }
                   </div>
                 </div>
               </Card>
