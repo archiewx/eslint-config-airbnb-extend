@@ -60,6 +60,11 @@ export default class Shop extends PureComponent {
         id: n
       }
     })
+    this.props.goodsGroup.goodsGroups.forEach( n => {
+      itemData.item_id.push({
+        id: n.id
+      })
+    })
     this.setState({
       modalVisibel:false
     })
