@@ -27,10 +27,28 @@ export async function editSingle(params) {
   })
 }
 
-
 export async function deleteSingle(params) {
   return request(`${apiBase}/api/paymentmethods/${params.id}`,{
     method:'DELETE',
     headers:{'Authorization':token()}
+  })
+}
+
+export async function editSort(params) {
+  const current = {
+    paymentmethods: []
+  }
+  current.paymentmethods = params.map( n => {
+    return {
+      id:n.id,
+      code:n.code,
+      name:n.name,
+      sort:n.sort
+    }
+  })
+  return request(`${apiBase}/api/paymentmethods/batch`,{
+    method:'PUT',
+    headers:{'Authorization':token()},
+    body:current
   })
 }

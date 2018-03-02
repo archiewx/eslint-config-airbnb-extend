@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
+import breadCrumbList from '../../../../common/breadCrumbList'
 import ShopModal from './Modal'
 import styles from './Shop.less'
 @connect(state => ({
@@ -83,7 +84,7 @@ export default class Shop extends PureComponent {
     const {modalVisibel,formValue} = this.state;
 
     return (
-      <PageHeaderLayout >
+      <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)}>
         {
           shops.map( n => {
             return (

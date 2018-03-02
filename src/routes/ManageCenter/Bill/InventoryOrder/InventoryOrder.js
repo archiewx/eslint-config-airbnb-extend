@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
+import breadCrumbList from '../../../../common/breadCrumbList'
 import InventoryModal from './Modal'
 import styles from './InventoryOrder.less'
 const tabList = [{
@@ -100,7 +101,7 @@ export default class Inventory extends PureComponent {
     }]
 
     return (
-      <PageHeaderLayout tabList={tabList} activeTabKey={activeTabKey}>
+      <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} tabList={tabList} activeTabKey={activeTabKey}>
         <Card>
           <Table dataSource={inventoryApprover} columns={columns} rowKey='warehouse_id' pagination={false}/>
         </Card>

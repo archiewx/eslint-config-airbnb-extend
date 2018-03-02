@@ -13,6 +13,11 @@ import styles from './SupplierCreateOrEdit.less'
 const ButtonGroup = Button.Group;
 const Option = Select.Option;
 const FormItem = Form.Item;
+const breadcrumbList = [{
+  title:'关系'
+},{
+  title:'供应商'
+}]
 @Form.create()
 @connect(state => ({
   supplierCreateOrEdit: state.supplierCreateOrEdit,
@@ -154,6 +159,7 @@ export default class SupplierCreateOrEdit extends PureComponent {
     return (
       <PageHeaderLayout
         title={showData.id ? '编辑供应商' : '新建供应商'}
+        breadcrumbList={breadcrumbList}
         >
         <Spin size='large'  spinning={false}>
           <Card bordered={false} title='基本资料' className={styles.bottomCardDivided}>

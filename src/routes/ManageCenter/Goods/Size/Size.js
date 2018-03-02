@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
-import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider} from 'antd';
+import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Popover} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import SizeLibraryModal from './SizeLibraryModal'
+import breadCrumbList from '../../../../common/breadCrumbList'
 import SizeGroupModal from './SizeGroupModal'
 import styles from './Size.less'
 const tabList = [{
@@ -150,6 +151,13 @@ export default class Size extends PureComponent {
     })
   }
 
+  handleMouseMove = (record) => {
+    return {
+      onMouseEnter:() => {
+      }
+    }
+  }
+
   render() {
     const {sizeLibrarys,sizeGroups} = this.props.size;
     const {sizeLibraryModalVisibel,sizeLibraryModalType,sizeLibraryModalFormValue,sizeGroupModalVisibel,sizeGroupModalType,sizeGroupModalFormValue,activeTabKey,isSort} = this.state;
@@ -215,7 +223,11 @@ export default class Size extends PureComponent {
     },{
       title:'包含的尺码',
       dataIndex:'includeSize',
-      render:(text,record) => `${record.skuattributes.data.map( n => n.name).join('、')}`
+      render:(text,record) => (
+        <Popover content={`${record.skuattributes.data.map( n => n.name).join('、')}`} title='包含的尺码'>
+          {`${record.skuattributes.data.map( n => n.name).join('、')}`}
+        </Popover>
+      ) 
     },{
       title:'操作',
       dataIndex:'operation',
@@ -230,7 +242,7 @@ export default class Size extends PureComponent {
     }]
 
     return (
-      <PageHeaderLayout tabList={tabList} activeTabKey={activeTabKey} onTabChange={this.handleTabChange}>
+      <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} tabList={tabList} activeTabKey={activeTabKey} onTabChange={this.handleTabChange}>
         <div style={{display:activeTabKey == 'sizeLibrary' ? 'block' : 'none'}}>
           <Card bordered={false} title='尺码库列表' extra={sizeLibraryAction}>
             <Table dataSource={sizeLibrarys} columns={sizeLibraryColumns} rowKey='id' pagination={false}/>
@@ -238,7 +250,8 @@ export default class Size extends PureComponent {
         </div>
         <div style={{display:activeTabKey == 'sizeGroup' ? 'block' : 'none'}}>
           <Card bordered={false} title='尺码组列表' extra={sizeGroupAction}>
-            <Table dataSource={sizeGroups} columns={sizeGroupColumns} rowKey='id' pagination={false}/>
+            <Table 
+              dataSource={sizeGroups} columns={sizeGroupColumns} rowKey='id' pagination={false} onRow={this.handleMouseMove} />
           </Card>
         </div>       
         <SizeLibraryModal type={sizeLibraryModalType} visible={sizeLibraryModalVisibel} formValue={sizeLibraryModalFormValue} onOk={this.handleSizeLibraryModalOk} onCancel={this.handleSizeLibraryModalCancel} sortLength={sizeLibrarys.length}/>

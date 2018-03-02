@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
+import breadCrumbList from '../../../../common/breadCrumbList'
 import AdjustPriceModal from './AdjustPriceModal'
 import SaleLabelModal from './SaleLabelModal'
 import styles from './SaleOrder.less'
@@ -258,7 +259,7 @@ export default class SaleOrder extends PureComponent {
     }]
 
     return (
-      <PageHeaderLayout tabList={tabList} activeTabKey={activeTabKey} onTabChange={this.handleTabChange}>
+      <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} tabList={tabList} activeTabKey={activeTabKey} onTabChange={this.handleTabChange}>
         <div style={{display: activeTabKey == 'adjust_price' ? 'block' : 'none'}}>
           <Card title='调价方式列表' extra={action}>
             <Table dataSource={adjustPrices} columns={ isSort ? sortAdjustPriceColumns : adjustPriceColumns} rowKey='id' pagination={false}/>

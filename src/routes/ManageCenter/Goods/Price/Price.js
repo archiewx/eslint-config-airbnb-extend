@@ -4,6 +4,7 @@ import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import PriceGradeModal from './PriceGradeModal'
+import breadCrumbList from '../../../../common/breadCrumbList'
 import PriceQuantityStepModal from './PriceQuantityStepModal'
 import styles from './Price.less'
 const tabList = [{
@@ -240,7 +241,7 @@ export default class Size extends PureComponent {
     }]
 
     return (
-      <PageHeaderLayout tabList={tabList} activeTabKey={activeTabKey} onTabChange={this.handleTabChange}>
+      <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} tabList={tabList} activeTabKey={activeTabKey} onTabChange={this.handleTabChange}>
       <div style={{display:activeTabKey == 'priceGrade' ? 'block' : 'none'}}>
         <Card bordered={false} title='价格等级列表' extra={priceGradeAction}>
           <Table dataSource={priceGrades} columns={priceGradeColumns} rowKey='id' pagination={false}/>

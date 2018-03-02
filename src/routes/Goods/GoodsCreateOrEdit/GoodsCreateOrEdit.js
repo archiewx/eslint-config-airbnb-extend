@@ -13,6 +13,9 @@ import GoodsPictureModal from '../../../components/GoodsPictureModal/GoodsPictur
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import styles from './GoodsCreateOrEdit.less'
 import { DelayRunner } from '@crow/util';
+const breadcrumbList = [{
+  title:'商品',
+}]
 const FormItem = Form.Item;
 const Option = Select.Option;
 let cx = classNames.bind(styles);
@@ -799,6 +802,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     return (
       <PageHeaderLayout
         title={showData.item_ref ? '编辑商品' : '新建商品'}
+        breadcrumbList={breadcrumbList}
       >
         <Spin size='large' spinning={!units.length || !priceGrades.length || !shops.length || !warehouses.length }>
           <Card title='属性' bordered={false} className={styles.bottomCardDivided}>

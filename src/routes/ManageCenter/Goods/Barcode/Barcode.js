@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
+import breadCrumbList from '../../../../common/breadCrumbList'
 import styles from './Barcode.less'
 @connect(state => ({
   configSetting:state.configSetting
@@ -25,7 +26,7 @@ export default class Barcode extends PureComponent {
     const useBarcode = this.props.configSetting.itemBarcodeLevel != -1 
     const itemBarcodeLevel = this.props.configSetting.itemBarcodeLevel
     return (
-      <PageHeaderLayout >
+      <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)}>
         <Card bordered={false} style={{marginBottom: 18}}>
           <div><span className={styles.useBarcodeTitle}>使用条码</span><Switch onClick={this.handleSwitchUseBarcode.bind(null,useBarcode)} checked={useBarcode} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关" /></div>
         </Card>

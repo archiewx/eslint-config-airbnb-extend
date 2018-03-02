@@ -4,6 +4,7 @@ import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import UnitModal from './Modal'
+import breadCrumbList from '../../../../common/breadCrumbList'
 import styles from './Unit.less'
 @connect(state => ({
   unit:state.unit,
@@ -151,7 +152,7 @@ export default class Unit extends PureComponent {
     }]
 
     return (
-      <PageHeaderLayout action={action} className={styles.actionExtra}>
+      <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} action={action} className={styles.actionExtra}>
         <Card>
           <Table dataSource={units} columns={columns} rowKey='id' pagination={false}/>
         </Card>

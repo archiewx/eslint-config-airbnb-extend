@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
+import breadCrumbList from '../../../../common/breadCrumbList'
 import PurchaseOrderLableModal from './Modal'
 // import styles from './GoodsLabel.less'
 const tabList = [{
@@ -66,7 +67,7 @@ export default class PurchaseOrderLabel extends PureComponent {
     }]
 
     return (
-      <PageHeaderLayout tabList={tabList} activeTabKey={activeTabKey}>
+      <PageHeaderLayout  breadcrumbList={breadCrumbList(this.props.history.location.pathname)} tabList={tabList} activeTabKey={activeTabKey}>
         <Card>
           <Table dataSource={purchaseLabels} columns={columns} rowKey='id' pagination={false}/>
         </Card>

@@ -16,6 +16,7 @@ import Authorized from '../utils/Authorized';
 import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
 import duokeLogo from '../assets/duoke_logo.png'
+import duokeLogo2 from '../assets/duoke_logo2.png'
 const { AuthorizedRoute } = Authorized;
 /**
  * 根据菜单取得重定向地址.
@@ -118,7 +119,7 @@ class BasicLayout extends React.PureComponent {
     const layout = (
       <Layout>
         <SiderMenu
-          logo={logo}
+          logo={duokeLogo2}
           menuData={getMenuData()}
           collapsed={collapsed}
           location={location}

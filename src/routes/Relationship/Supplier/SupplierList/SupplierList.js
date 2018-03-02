@@ -84,6 +84,11 @@ const condition = {
   sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
   eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
 }
+const breadcrumbList = [{
+  title:'关系',
+},{
+  title:'供应商'
+}]
 @Form.create()
 @connect(state => ({
   supplierList:state.supplierList,
@@ -107,6 +112,7 @@ export default class SupplierList extends PureComponent {
 
   componentDidMount() {
     this.props.dispatch({type:'supplierList/getList',payload:{...condition}})
+    this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
   }
 
   handleToSupplierCreate = () => {
@@ -260,6 +266,7 @@ export default class SupplierList extends PureComponent {
       <PageHeaderLayout
         extraContent={this.handleHeaderExtra()}
         className={styles.supplierListExtra}
+        breadcrumbList={breadcrumbList}
         >
         <Card bordered={false} className={styles.bottomCardDivided}>
           <Form layout='inline'>

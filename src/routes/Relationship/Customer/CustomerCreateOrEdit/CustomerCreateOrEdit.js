@@ -14,6 +14,11 @@ import styles from './CustomerCreateOrEdit.less'
 const ButtonGroup = Button.Group;
 const Option = Select.Option;
 const FormItem = Form.Item;
+const breadcrumbList = [{
+  title:'关系'
+},{
+  title:'客户'
+}]
 @Form.create()
 @connect(state => ({
   customerCreateOrEdit: state.customerCreateOrEdit,
@@ -161,6 +166,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
     const {country} = this.props.country;
     return (
       <PageHeaderLayout
+        breadcrumbList={breadcrumbList}
         title={showData.id ? '编辑客户' : '新建客户'}
         >
         <Card bordered={false} title='基本资料' className={styles.bottomCardDivided}>

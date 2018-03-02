@@ -182,6 +182,7 @@ export default class GoodsList extends PureComponent {
 
   componentDidMount() {
     this.props.dispatch({type:'goodsList/getGoodsList'})
+    this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
   }
   
   handleTabChange = (key) => {

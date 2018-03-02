@@ -107,13 +107,14 @@ export default class GoodsDetail extends PureComponent {
   }
 
   componentDidMount() {
-      const match = pathToRegexp('/goods-detail/:id').exec(this.props.history.location.pathname)
-      this.props.dispatch({type:'goodsDetail/setState',payload:{
-        singleGoodsDetail:{}
-      }})
-      if(match) {
-        this.props.dispatch({type:'goodsDetail/getSingle',payload:{id:match[1]}})
-      }
+    const match = pathToRegexp('/goods-detail/:id').exec(this.props.history.location.pathname)
+    this.props.dispatch({type:'goodsDetail/setState',payload:{
+      singleGoodsDetail:{}
+    }})
+    if(match) {
+      this.props.dispatch({type:'goodsDetail/getSingle',payload:{id:match[1]}})
+      this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -365,6 +366,12 @@ export default class GoodsDetail extends PureComponent {
       </DescriptionList>
     )
 
+    const breadcrumbList = [{
+      title:'商品'
+    },{
+      title:singleGoodsDetail.item_ref||''
+    }]
+
     const menu = (
       <Menu>
         <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement='bottom' onConfirm={this.handleDeleteSingleGoods.bind(null,currentId)}>删除</Popconfirm></Menu.Item>
@@ -601,6 +608,7 @@ export default class GoodsDetail extends PureComponent {
       <PageHeaderLayout
         title={`货号：${singleGoodsDetail.item_ref || ''}`}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
+        breadcrumbList={breadcrumbList}
         activeTabKey={activeTabKey}
         tabList={tabList}
         content={description}

@@ -32,6 +32,16 @@ export default class GoodsPurchaseDetail extends PureComponent {
 
     const {goodsPurchaseList,customerId} = this.props.supplierGoodsPurchaseDetail
 
+    const breadcrumbList = [{
+      title:'关系',
+    },{
+      title:'供应商'
+    },{
+      title: this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/')+1)
+    },{
+      title: '商品购买详情'
+    }]
+
     const columns = [{
       title: '名称',
       dataIndex: 'name',
@@ -57,14 +67,14 @@ export default class GoodsPurchaseDetail extends PureComponent {
       render: (text,record) => (
         record.name ? (
           record.children ? (
-            ((record.id).toString()).indexOf('_') > -1 ? <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}`}>查看</Link> : null
-          ) :  <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}`}>查看</Link>
+            ((record.id).toString()).indexOf('_') > -1 ? <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}/${this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/')+1)}`}>查看</Link> : null
+          ) :  <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}/${this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/')+1)}`}>查看</Link>
         ) : null
       )
     }]
 
     return (
-      <PageHeaderLayout
+      <PageHeaderLayout breadcrumbList={breadcrumbList}
       >
         <Card bordered={false}>
           <Table columns={columns}  dataSource={goodsPurchaseList} onChange={this.handleSort} rowKey="id" pagination={false}/>

@@ -4,6 +4,7 @@ import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import styles from './GoodsAttribute.less'
+import breadCrumbList from '../../../../common/breadCrumbList'
 @connect(state => ({
   configSetting:state.configSetting
 }))
@@ -30,9 +31,9 @@ export default class GoodsAttribute extends PureComponent {
 
   render() {
     const {itemAttribute} = this.props.configSetting;
-
+   
     return (
-      <PageHeaderLayout >
+      <PageHeaderLayout breadcrumbList={ breadCrumbList(this.props.history.location.pathname)} >
         <Card bordered={false}>
           <div><span className={styles.spanTitle}>货号</span><Switch disabled defaultChecked={true} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关" /></div>
         </Card>

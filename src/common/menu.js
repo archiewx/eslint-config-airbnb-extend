@@ -4,7 +4,7 @@ const menuData = [{
   path: 'goods-list',
 },{
   name: '关系',
-  icon: 'check-circle-o',
+  icon: 'table',
   path: 'relationship',
   children: [{
     name: '客户',
@@ -14,8 +14,25 @@ const menuData = [{
     path: 'supplier-list',
   }]
 },{
-  name:'管理中心',
+  name:'单据',
   icon:'dashboard',
+  path:'bill',
+  children:[{
+    name:'销售单',
+    path:'sale-order'
+  },{
+    name:'进货单',
+    path:'purchase-order'
+  },{
+    name:'盘点单',
+    path:'inventory-order'
+  },{
+    name:'调货单',
+    path:'deliver-order'
+  }]
+},{
+  name:'管理中心',
+  icon:'check-circle-o',
   path:'manage-center',
   children: [{
     name:'商品',

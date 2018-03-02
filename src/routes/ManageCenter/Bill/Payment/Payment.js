@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
+import breadCrumbList from '../../../../common/breadCrumbList'
 import PaymentModal from './Modal'
 import styles from './Payment.less'
 @connect(state => ({
@@ -14,6 +15,7 @@ export default class Payment extends PureComponent {
     modalVisibel: false,
     modalType: '',
     formValue: {},
+    isSort:false
   }
 
   componentDidMount(){
@@ -59,13 +61,52 @@ export default class Payment extends PureComponent {
     })
   }
 
+  handleSortStart = () => {
+    this.setState({
+      isSort:true
+    })
+  }
+
+  handleSortCancel = () => {
+    this.setState({
+      isSort:false
+    })
+    this.props.dispatch({type:'payment/getList'})
+  }
+
+  handleSortMove = (id,moveWay) => {
+    this.props.dispatch({type:'payment/setSortMove',payload:{
+      currentId:id,
+      moveWay:moveWay,
+    }})
+  }
+
+  handleSortOk = () => {
+    this.props.dispatch({type:'payment/editSort',payload:this.props.payment.payments}).then(()=>{
+      this.handleSortCancel()
+    })
+  }
+
   render() {
     const {payments} = this.props.payment;
-    const {modalVisibel,modalType,formValue} = this.state;
+    const {modalVisibel,modalType,formValue,isSort} = this.state;
     const action = (
       <div>
-        <Button>自定义排序</Button>
-        <Button type='primary' onClick={this.handleModalCreate}>新建支付方式</Button>
+        {
+          isSort ? (
+            <div>
+              <Popconfirm title='确认取消自定义排序' onConfirm={this.handleSortCancel}>
+                <Button >取消</Button>
+              </Popconfirm>
+              <Button type='primary' onClick={this.handleSortOk}>确认</Button>
+            </div>
+          ) : (
+            <div>
+              <Button onClick={this.handleSortStart}>自定义排序</Button>
+              <Button type='primary' onClick={this.handleModalCreate}>新建支付方式</Button>
+            </div>
+          )
+        }
       </div>
     )
 
@@ -78,15 +119,27 @@ export default class Payment extends PureComponent {
       width:172,
       render:(text,record) => (
         <div>
-          <a onClick={this.handleModalEdit.bind(null,record)}>编辑</a>
-          <Divider  type='vertical' />
-          <Popconfirm onConfirm={this.handleDeleteSingle.bind(null,record)} title='确认删除此支付方式'><a >删除</a></Popconfirm>
+          {
+            isSort ? (
+              <div>
+                <a onClick={this.handleSortMove.bind(null,record.id,'up')} style={{display: payments.findIndex( n => n.id == record.id) == 0 ? 'none' : 'inline-block'}}>上移</a>
+                <Divider  type='vertical' style={{display: (payments.findIndex( n => n.id == record.id) == 0 || payments.findIndex( n => n.id == record.id) == payments.length -1) ? 'none' : 'inline-block'}}/>
+                <a onClick={this.handleSortMove.bind(null,record.id,'down')} style={{display: payments.findIndex( n => n.id == record.id) == payments.length - 1 ? 'none' : 'inline-block'}}>下移</a>
+              </div>
+            ) : (
+              <div>
+                <a onClick={this.handleModalEdit.bind(null,record)}>编辑</a>
+                <Divider  type='vertical' />
+                <Popconfirm onConfirm={this.handleDeleteSingle.bind(null,record)} title='确认删除此支付方式'><a >删除</a></Popconfirm>
+              </div>
+            )
+          }
         </div>
       )
     }]
 
     return (
-      <PageHeaderLayout action={action} className={styles.actionExtra}>
+      <PageHeaderLayout  breadcrumbList={breadCrumbList(this.props.history.location.pathname)} action={action} className={styles.actionExtra}>
         <Card>
           <Table dataSource={payments} columns={columns} rowKey='id' pagination={false}/>
         </Card>

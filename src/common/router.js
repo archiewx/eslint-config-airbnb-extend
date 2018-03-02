@@ -59,10 +59,10 @@ export const getRouterData = (app) => {
     '/relationship/customer-detail/:id':{
       component: dynamicWrapper(app, ['customerDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/CustomerDetail'))
     },
-    '/relationship/customer-detail/goods-purchase-detail/:id/:subId': {
+    '/relationship/customer-detail/goods-purchase-detail/:id/:subId/:name': {
       component: dynamicWrapper(app ,['customerGoodsPurchaseDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/GoodsPurchaseDetail'))
     },
-    '/relationship/customer-detail/skus-purchase-detail/:id/:subId': {
+    '/relationship/customer-detail/skus-purchase-detail/:id/:subId/:name': {
       component: dynamicWrapper(app ,['customerSkusPurchaseDetail'], () => import('../routes/Relationship/Customer/CustomerDetail/SkusPurchaseDetail'))
     },
     '/relationship/supplier-list': {
@@ -77,11 +77,26 @@ export const getRouterData = (app) => {
     '/relationship/supplier-detail/:id': {
       component: dynamicWrapper(app, ['supplierDetail'], () => import('../routes/Relationship/Supplier/SupplierDetail/SupplierDetail'))
     },
-    '/relationship/supplier-detail/goods-purchase-detail/:id/:subId': {
+    '/relationship/supplier-detail/goods-purchase-detail/:id/:subId/:name': {
       component: dynamicWrapper(app ,['supplierGoodsPurchaseDetail'], () => import('../routes/Relationship/Supplier/SupplierDetail/GoodsPurchaseDetail'))
     },
-    '/relationship/supplier-detail/skus-purchase-detail/:id/:subId': {
+    '/relationship/supplier-detail/skus-purchase-detail/:id/:subId/:name': {
       component: dynamicWrapper(app ,['supplierSkusPurchaseDetail'], () => import('../routes/Relationship/Supplier/SupplierDetail/SkusPurchaseDetail'))
+    },
+    '/bill/sale-order':{
+      component: dynamicWrapper(app, ['saleOrderList','layoutFilter'], () => import('../routes/Bill/SaleOrder/SaleOrderList/SaleOrderList'))
+    },
+    '/bill/sale-detail/:id':{
+      component: dynamicWrapper(app, ['saleOrderDetail'], () => import('../routes/Bill/SaleOrder/SaleOrderDetail/SaleOrderDetail'))
+    },
+    '/bill/purchase-order':{
+      component: dynamicWrapper(app, ['purchaseOrderList','layoutFilter'], () => import('../routes/Bill/PurchaseOrder/PurchaseOrderList/PurchaseOrderList'))
+    },
+    '/bill/inventory-order':{
+      component: dynamicWrapper(app, ['inventoryOrderList','layoutFilter'], () => import('../routes/Bill/InventoryOrder/InventoryOrderList/InventoryOrderList'))
+    },
+    '/bill/deliver-order':{
+      component: dynamicWrapper(app, ['deliverOrderList','layoutFilter'], () => import('../routes/Bill/DeliverOrder/DeliverOrderList/DeliverOrderList'))
     },
     '/manage-center/goods/goods-attribute':{
       component: dynamicWrapper(app ,[], () => import('../routes/ManageCenter/Goods/GoodsAttribute/GoodsAttribute'))
@@ -165,13 +180,5 @@ export const getRouterData = (app) => {
       name: routerData[item].name || menuData[item.replace(/^\//, '')],
     };
   });
-  // Object.keys(menuData).forEach((item) => {
-  //   if(!Object.keys(routerDataWithName).some( n => item == n.replace(/^\//, ''))) {
-  //     routerDataWithName[`/${item}`] = {
-  //       name: menuData[item],
-  //     }
-  //   }
-  // })
-  // console.log(routerDataWithName)
   return routerDataWithName;
 };

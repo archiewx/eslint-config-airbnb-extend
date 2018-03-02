@@ -347,6 +347,13 @@ export default class CustomerDetail extends PureComponent {
         </Menu.Item>
       </Menu>
     )
+    const breadcrumbList = [{
+      title:'关系',
+    },{
+      title:'客户'
+    },{
+      title: singleCustomerDetail.name || ''
+    }]
 
     const action = (
       <div>
@@ -423,7 +430,7 @@ export default class CustomerDetail extends PureComponent {
       title: '操作',
       width:'10%',
       dataIndex: 'operation',
-      render: (text,record) => (<Link to={`/relationship/customer-detail/goods-purchase-detail/${currentId.id}/${record.id}`}>查看</Link>)
+      render: (text,record) => (<Link to={`/relationship/customer-detail/goods-purchase-detail/${currentId.id}/${record.id}/${singleCustomerDetail.name}`}>查看</Link>)
     }]
 
     const paymentColumns = [{
@@ -529,6 +536,7 @@ export default class CustomerDetail extends PureComponent {
       <PageHeaderLayout
         title={`单号：${singleCustomerDetail.name || ''}`}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
+        breadcrumbList={breadcrumbList}
         content={description}
         activeTabKey={activeTabKey}
         action={action}

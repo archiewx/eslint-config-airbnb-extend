@@ -3,6 +3,7 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
+import breadCrumbList from '../../../../common/breadCrumbList'
 import styles from './Picture.less'
 @connect(state => ({
   configSetting:state.configSetting
@@ -19,7 +20,7 @@ export default class Picture extends PureComponent {
     const {itemImageLevel} = this.props.configSetting;
 
     return (
-      <PageHeaderLayout >
+      <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)}>
         <Card bordered={false} className={styles.barcodePosition}>
           <div><span className={styles.spanTitle}>图片属于货号</span><Switch onClick={this.handleSwitchImageLevel} checked={itemImageLevel == 'item'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
         </Card>

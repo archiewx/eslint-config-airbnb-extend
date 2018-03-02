@@ -13,6 +13,11 @@ const NCNI = value => currency(value, { symbol: "", precision: 0});
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
+const breadcrumbList = [{
+  title:'关系',
+},{
+  title:'客户'
+}]
 const sortOptions = [{
   name:'创建时间降序',
   id:1,
@@ -108,6 +113,7 @@ export default class CustomerList extends PureComponent {
 
   componentDidMount() {
     this.props.dispatch({type:'customerList/getList',payload:{...condition}})
+    this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
   }
 
   handleToCustomerCreate = () => {
@@ -259,6 +265,7 @@ export default class CustomerList extends PureComponent {
       <PageHeaderLayout
         extraContent={headerExtra}
         className={styles.customerListExtra}
+        breadcrumbList={breadcrumbList}
         >
         <Card bordered={false} className={styles.bottomCardDivided}>
           <Form layout='inline'>

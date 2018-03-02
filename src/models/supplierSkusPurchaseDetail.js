@@ -13,11 +13,11 @@ export default  {
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(() => {
-        const match = pathToRegexp('/relationship/supplier-detail/skus-purchase-detail/:id/:subId').exec(location.hash.slice(1,location.hash.length))
-        dispatch({type:'setState',payload:{
-          skusPurchaseList:[],
-        }})
+        const match = pathToRegexp('/relationship/supplier-detail/skus-purchase-detail/:id/:subId/:name').exec(location.hash.slice(1,location.hash.length))
         if(match) {
+          dispatch({type:'setState',payload:{
+            skusPurchaseList:[],
+          }})
           dispatch({type:'getList',payload:{
             id:match[1],
             subId:match[2],

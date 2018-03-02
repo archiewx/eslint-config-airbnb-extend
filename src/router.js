@@ -37,5 +37,3 @@ function RouterConfig({ history, app }) {
 
 export default RouterConfig;
 
-
-//<Route path="/401" render={props => <NoTokenLayout {...props} />} />

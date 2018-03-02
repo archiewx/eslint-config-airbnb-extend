@@ -32,6 +32,16 @@ export default class SkusPurchaseDetail extends PureComponent {
 
     const {skusPurchaseList} = this.props.customerSkusPurchaseDetail
 
+    const breadcrumbList = [{
+      title:'关系',
+    },{
+      title:'客户'
+    },{
+      title: this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/')+1)
+    },{
+      title: 'SKU购买详情'
+    }]
+
     const columns = [{
       title: '单号',
       dataIndex: 'number',
@@ -59,7 +69,7 @@ export default class SkusPurchaseDetail extends PureComponent {
     }]
 
     return (
-      <PageHeaderLayout
+      <PageHeaderLayout breadcrumbList={breadcrumbList}
       >
         <Card bordered={false}>
           <Table columns={columns}  dataSource={skusPurchaseList} onChange={this.handleSort} rowKey="id" pagination={false}/>
