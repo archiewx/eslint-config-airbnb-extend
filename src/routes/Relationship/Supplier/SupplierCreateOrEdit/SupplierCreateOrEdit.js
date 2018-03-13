@@ -271,7 +271,7 @@ export default class SupplierCreateOrEdit extends PureComponent {
           <SupplierModal type={modalType} visible={modalVisibel} formValue={formValue} onOk={this.handleModalOk} onCancel={this.handleModalCancel} country={country} uid={uid} addresses={addresses}/>
           <FooterToolbar>
             <div id="noScroll">
-              <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={ showData.id ? '确认取消编辑供应商':'确认取消新建供应商'} onConfirm={this.handleSupplierCancel}><Button>取消</Button></Popconfirm>
+              <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={ showData.id ? '确认取消编辑供应商?':'确认取消新建供应商?'} onConfirm={this.handleSupplierCancel}><Button>取消</Button></Popconfirm>
               <Button type="primary" onClick={this.handleSubmit}>
                 确认
               </Button>

@@ -16,7 +16,7 @@ const { RangePicker } = DatePicker;
 const breadcrumbList = [{
   title:'单据',
 },{
-  title:'销售单'
+  title:'调货单'
 }]
 const sortOptions = [{
   name:'创建时间降序',
@@ -112,6 +112,22 @@ export default class DeliverOrderList extends PureComponent {
     this.handleGetList(this.state.filter,this.state.pages,sorts)
   }
 
+  handlSortTable = (pagination, filters, sorter) => {
+    if(sorter.order) {
+      let sorts = {
+        [`${sorter.field}`] : sorter.order.slice(0,sorter.order.length-3)
+      }
+      this.setState({sorts})
+      this.handleGetList(this.state.filter,this.state.pages,sorts)
+    }else {
+      const sorts = {
+        created_at: 'desc'
+      };
+      this.setState({sorts})
+      this.handleGetList(this.state.filter,this.state.pages,sorts)
+    }
+  }
+
   handleFormSubmit = () => {
     const { form, dispatch } = this.props;
     setTimeout(() => {
@@ -133,13 +149,13 @@ export default class DeliverOrderList extends PureComponent {
   handleMoreOperation = (item) => {
     return (
       <div>
-        <Link to={`/bill/sale-order/${item.id}`}>查看</Link>
+        <Link to={`/bill/deliver-detail/${item.id}`}>查看</Link>
         {/*<Divider type='vertical' />
         <Link to={`/bill/sale-order/${item.id}`}>编辑</Link>*/}
         <Divider  type='vertical' />
         <Dropdown overlay={    
           <Menu>
-            <Menu.Item key="1"><Popconfirm title="确认删除此销售单?" onConfirm={this.handleDeleteSingle.bind(null,item.id)}>删除</Popconfirm></Menu.Item>
+            <Menu.Item key="1"><Popconfirm title="确认删除此调货单?" onConfirm={this.handleDeleteSingle.bind(null,item.id)}>删除</Popconfirm></Menu.Item>
           </Menu>
         }>
         <a className="ant-dropdown-link">更多<Icon type="down" /></a>
@@ -262,15 +278,16 @@ export default class DeliverOrderList extends PureComponent {
             </FormItem>
           </Form>
         </Card>
-        <Card bordered={false} title='销售单列表' extra={this.handleTableSortExtra()}>
+        <Card bordered={false} title='调货单列表' extra={this.handleTableSortExtra()}>
           <Table 
             rowKey='id'
             columns={columns} 
             dataSource={deliverOrderList} 
             pagination={pagination}
+            onChange={this.handlSortTable}
           />
           <div style={{marginTop:-43,width:300}}>
-            <span>{`共 ${deliverOrderPagination.total || ''} 条销售单 第 ${pages.page} / ${Math.ceil(Number(deliverOrderPagination.total)/Number(pages.per_page))} 页`}</span>
+            <span>{`共 ${deliverOrderPagination.total || ''} 条调货单 第 ${pages.page} / ${Math.ceil(Number(deliverOrderPagination.total)/Number(pages.per_page))} 页`}</span>
           </div>
         </Card>
       </PageHeaderLayout>

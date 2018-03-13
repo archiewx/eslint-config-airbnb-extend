@@ -8,3 +8,27 @@
 .numberRightMove span {
  float: right; 
 }
+.hideCancel {
+  :global {
+    .ant-popover-buttons {
+      button:first-of-type {
+        display: none
+      }
+    }
+  }
+}
+.againModalConfirm {
+  :global {
+    .ant-confirm-btns {
+      button:first-of-type {
+        margin-right: 110px;
+      }
+    }
+  }
+}
+
+.paymentsPositon {
+  position: absolute;
+  left: 186px;
+  top: 88px;
+}

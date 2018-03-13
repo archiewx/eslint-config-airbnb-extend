@@ -3,7 +3,7 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import moment from 'moment';
 import currency from 'currency.js'
-import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker,Spin} from 'antd';
+import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker,Spin,Modal} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
 import TagSelect from '../../../../components/DuokeTagSelect';
@@ -13,6 +13,7 @@ const NCNI = value => currency(value, { symbol: "", precision: 0});
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
+const {againModalConfirm} = styles;
 const breadcrumbList = [{
   title:'单据',
 },{
@@ -62,7 +63,7 @@ const condition = {
   page:1,
   per_page:10,
   date_type:'custom',
-  sday:moment(new Date((new Date).getTime() - 60*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+  sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
   eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
 }
 @Form.create()
@@ -106,6 +107,22 @@ export default class SaleOrderList extends PureComponent {
     }})
   }
 
+  handlSortTable = (pagination, filters, sorter) => {
+    if(sorter.order) {
+      let sorts = {
+        [`${sorter.field}`] : sorter.order.slice(0,sorter.order.length-3)
+      }
+      this.setState({sorts})
+      this.handleGetList(this.state.filter,this.state.pages,sorts)
+    }else {
+      const sorts = {
+        created_at: 'desc'
+      };
+      this.setState({sorts})
+      this.handleGetList(this.state.filter,this.state.pages,sorts)
+    }
+  }
+
   handleSelectSort = (value) => {
     const sorts = sortOptions.find( item => item.name == value.slice(6,value.length)).sorts;
     this.setState({sorts})
@@ -139,13 +156,64 @@ export default class SaleOrderList extends PureComponent {
         <Divider  type='vertical' />
         <Dropdown overlay={    
           <Menu>
-            <Menu.Item key="1"><Popconfirm title="确认删除此销售单?" onConfirm={this.handleDeleteSingle.bind(null,item.id)}>删除</Popconfirm></Menu.Item>
+            <Menu.Item key="1">{this.handleDeletePopConfirm(item.settle_way,item.pay_status,item.delivery_way)}</Menu.Item>
           </Menu>
         }>
         <a className="ant-dropdown-link">更多<Icon type="down" /></a>
         </Dropdown>
       </div>
     )
+  }
+
+  handleDeletePopConfirm = (settleWay,payStatus,deliveryStatus) => {
+    let popconfirmModal;
+    if(settleWay == 1) {
+      if(deliveryStatus == 1) {
+        popconfirmModal = (
+          <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的流水将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm}>
+            删除
+          </Popconfirm>
+        )
+      }else {
+        popconfirmModal = (
+          <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的发货单与流水将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm}>
+            删除
+          </Popconfirm>
+        )
+      }
+    }else {
+      if(payStatus == 1) {
+        if(deliveryStatus == 1) {
+          popconfirmModal = (
+            <Popconfirm title='确认删除结算单' onConfirm={this.handleAgianPopConfirm} okText='继续'>
+              删除
+            </Popconfirm>
+          )
+        }else {
+          popconfirmModal = (
+            <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的发货单将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm}>
+              删除
+            </Popconfirm>
+          )
+        }
+      }else if(payStatus == 3) {
+        popconfirmModal = (
+          <Popconfirm overlayClassName={styles.hideCancel} title='销售单已结算，无法删除' >
+            删除
+          </Popconfirm>
+        )
+      }
+    }
+    return popconfirmModal;
+  }
+
+  handleAgianPopConfirm = () => {
+    Modal.confirm({
+      className: againModalConfirm,
+      title: '关联的流水将如何处理',
+      content: <Button type='primary' className={styles.paymentsPositon}>充值到流水</Button>,
+      okText: '删除流水',
+    })
   }
 
   handleTableSortExtra = () => {
@@ -191,6 +259,7 @@ export default class SaleOrderList extends PureComponent {
       title:'创建时间',
       dataIndex:'created_at',
       width:'20%',
+      sorter:true
     },{
       title: '操作',
       dataIndex: 'operation',
@@ -262,6 +331,7 @@ export default class SaleOrderList extends PureComponent {
             columns={columns} 
             dataSource={saleOrderList} 
             pagination={pagination}
+            onChange={this.handlSortTable}
           />
           <div style={{marginTop:-43,width:300}}>
             <span>{`共 ${pagination.total || ''} 条销售单 第 ${pages.page} / ${Math.ceil(Number(pagination.total)/Number(pages.per_page))} 页`}</span>

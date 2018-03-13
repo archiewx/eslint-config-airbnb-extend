@@ -16,6 +16,12 @@ export async function deleteSingle (params) {
   })
 }
 
+export async function getSingle (params) {
+  return request(`${apiBase}/api/transferdocs/${params.id}`,{
+    headers: { "Authorization": token() },
+  })
+}
+
 // export async function createSingle (params) {
 //   params.name = params.name.trim();
 //   params.percent == 0 ? params.value = 1 : params.value = 0;

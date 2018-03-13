@@ -341,7 +341,7 @@ export default class CustomerDetail extends PureComponent {
       </DescriptionList>
     )
     const menu = (
-      <Menu>
+      <Menu style={{width: 109}}>
         <Menu.Item key='1'>
           <Popconfirm title="确认删除此客户?" placement='bottom' onConfirm={this.handleDeleteSingleCustomer.bind(null,currentId.id)}>删除</Popconfirm>
         </Menu.Item>
@@ -358,7 +358,7 @@ export default class CustomerDetail extends PureComponent {
     const action = (
       <div>
         <ButtonGroup>
-            <Popconfirm title={singleCustomerDetail.freeze == 1 ? '确定解冻此客户' : '确定冻结此客户'} placement='bottom' onConfirm={this.handleChangeCustomerStatus.bind(null,currentId.id,singleCustomerDetail.freeze)}><Button >{singleCustomerDetail.freeze == 1 ? '解冻' : '冻结'}</Button></Popconfirm>
+          <Popconfirm title={singleCustomerDetail.freeze == 1 ? '确定解冻此客户?' : '确定冻结此客户?'} placement='bottom' onConfirm={this.handleChangeCustomerStatus.bind(null,currentId.id,singleCustomerDetail.freeze)}><Button >{singleCustomerDetail.freeze == 1 ? '解冻' : '冻结'}</Button></Popconfirm>
           <Dropdown overlay={menu} placement="bottomRight">
             <Button><Icon type="ellipsis" /></Button>
           </Dropdown>
@@ -626,7 +626,7 @@ export default class CustomerDetail extends PureComponent {
             <Form layout='inline'>
               {
                 saleHistoryFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`sale_${item.code}`)(
@@ -664,7 +664,7 @@ export default class CustomerDetail extends PureComponent {
             <Form layout='inline'>
               {
                 goodsHistoryFilter.map( (item,index) => {
-                  return (
+                  return  item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`goods_${item.code}`)(
@@ -702,7 +702,7 @@ export default class CustomerDetail extends PureComponent {
             <Form layout='inline'>
               {
                 paymentHistoryFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem expandable>
                         {getFieldDecorator(`payment_${item.code}`)(

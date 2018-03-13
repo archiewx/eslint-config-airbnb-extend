@@ -184,11 +184,11 @@ export default  {
       let alreadyExitItemGroups = []
       value.itemgroups.data.forEach( item => {
         if(alreadyExitItemGroups.some( n => n == item.parent_id)) {
-          state.showData.goodsGroup[`${item.parent_id}`].push((item.id).toString())
+          state.showData.goodsGroup[`${item.parent_id}`].push(item.id)
         }else {
           alreadyExitItemGroups.push(item.parent_id)
           state.showData.goodsGroup[`${item.parent_id}`] = [];
-          state.showData.goodsGroup[`${item.parent_id}`].push((item.id).toString())
+          state.showData.goodsGroup[`${item.parent_id}`].push(item.id)
         }
       })
       state.showData.colors = [];

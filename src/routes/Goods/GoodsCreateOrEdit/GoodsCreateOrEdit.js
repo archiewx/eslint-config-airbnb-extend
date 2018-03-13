@@ -254,7 +254,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
       }
     }
     if(showData.selectColors && showData.selectSizes && showData.stocks) {
-      if(!!warehouses.length && !this.state.selectColors.length && ( Object.values(this.state.skuStocks).length == 0 || Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length  == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length) )) {
+      if(!!warehouses.length && ( Object.values(this.state.skuStocks).length == 0 || Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length  == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length) )) {
         let skuStocks = {};
         if(showData.selectColors.length == 0) {
           warehouses.forEach( item => {
@@ -1028,7 +1028,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
           }
           <FooterToolbar>
             <div id="noScroll">
-              <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={ showData.item_ref ?  '确认放弃编辑商品' : '确认放弃新建商品'} onConfirm={this.handleCancel}><Button>取消</Button></Popconfirm>
+              <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={ showData.item_ref ?  '确认放弃编辑商品?' : '确认放弃新建商品?'} onConfirm={this.handleCancel}><Button>取消</Button></Popconfirm>
               <Button type="primary" onClick={this.handleSubmit}>
                 确认
               </Button>

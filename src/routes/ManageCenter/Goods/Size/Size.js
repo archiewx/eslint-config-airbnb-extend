@@ -57,19 +57,24 @@ export default class Size extends PureComponent {
   }
 
   handleSizeLibraryModalOk = (value) => {
+    this.setState({
+      sizeLibraryModalVisibel:false,
+    })
     if(this.state.sizeLibraryModalType === 'create') {
-      this.setState({
-        sizeLibraryModalVisibel:false,
-      })
-      this.props.dispatch({type:'size/createSizeLibrarySingle',payload:value}).then(()=>{
-        this.props.dispatch({type:'size/getSizeLibrary'})
+      this.props.dispatch({type:'size/createSizeLibrarySingle',payload:value}).then((result)=>{
+        if(result.code != 0) {
+          message.error(`${result.message}`)
+        }else {
+          this.props.dispatch({type:'size/getSizeLibrary'})
+        }
       })
     }else if(this.state.sizeLibraryModalType === 'edit') {
-      this.setState({
-        sizeLibraryModalVisibel:false,
-      })
       this.props.dispatch({type:'size/editSizeLibrarySingle',payload:value}).then(()=>{
-        this.props.dispatch({type:'size/getSizeLibrary'})
+        if(result.code != 0) {
+          message.error(`${result.message}`)
+        }else {
+          this.props.dispatch({type:'size/getSizeLibrary'})
+        }
       })
     }
   }
@@ -108,8 +113,12 @@ export default class Size extends PureComponent {
     this.setState({
       sizeGroupModalVisibel:false
     })
-    this.props.dispatch({type:`size/${ this.state.sizeGroupModalType == 'create' ? 'createSizeGroupSingle' : 'editSizeGroupSingle' }` ,payload: value}).then(()=>{
-      this.props.dispatch({type:'size/getSizeGroup'})
+    this.props.dispatch({type:`size/${ this.state.sizeGroupModalType == 'create' ? 'createSizeGroupSingle' : 'editSizeGroupSingle' }` ,payload: value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(`${result.message}`)
+      }else {
+        this.props.dispatch({type:'size/getSizeGroup'})
+      }
     })
   }
 

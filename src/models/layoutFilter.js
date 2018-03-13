@@ -14,6 +14,9 @@ export default  {
     purchaseOrderFilter:[],
     inventoryOrderFilter:[],
     deliverOrderFilter:[],
+    paymentsFilter:[],
+    saleSettleFilter:[],
+    purchaseSettleFilter:[],
   },
 
   subscriptions: {
@@ -35,6 +38,9 @@ export default  {
         purchaseOrderFilter: data.result.purchaseorder_list.filter.groups,
         inventoryOrderFilter: data.result.inventorydoc_list.filter.groups,
         deliverOrderFilter: data.result.transferdoc_list.filter.groups,
+        paymentsFilter: data.result.payment_list.filter.groups,
+        saleSettleFilter: data.result.statement_list.filter.groups,
+        purchaseSettleFilter: data.result.statement_list.filter.groups,
       }})
     }
   },

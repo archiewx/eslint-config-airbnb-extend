@@ -48,6 +48,7 @@ export default  {
     },
 
     setGoodsPurchaseList (state,{payload}) {
+      console.log(payload)
       state.goodsPurchaseList = []
       let data = payload.data;
       let expandedRowRender = {};
@@ -76,6 +77,7 @@ export default  {
           if(state.goodsPurchaseList.some( n => n.id == item.skuattributes[0].id)) {
             expandedRowRender[`${item.skuattributes[0].id}`].push({
               id: `${item.skuattributes[1].id}_${index}`,
+              skuId: item.id,
               name:item.skuattributes[1].name,
               total_quantity:item.total_quantity,
               total_fee:item.total_fee,
@@ -94,6 +96,7 @@ export default  {
             expandedRowRender[`${item.skuattributes[0].id}`] = [];
             expandedRowRender[`${item.skuattributes[0].id}`].push({
               id: `${item.skuattributes[1].id}_${index}`,
+              skuId: item.id,
               name:item.skuattributes[1].name,
               total_quantity:item.total_quantity,
               total_fee:item.total_fee,
@@ -107,6 +110,7 @@ export default  {
           item.total_fee = expandedRowRender[item.id].reduce((sum,item)=> (sum + Number(item.total_fee)),0)
         })         
       }
+      console.log(state.goodsPurchaseList)
       return {...state}
     }
   },

@@ -15,17 +15,17 @@ export default  {
   effects: {
     *getList ({payload},{call,put,take}) {
       const data = yield call(adjustPriceService.getList)
-      yield put({type:'setState',payload:{
-        adjustPrices:data.result.data
-      }})
+      yield put({type:'setAdjustPrice',payload:data.result.data})
     },
 
     *createSingle ({payload},{call,put}) {
-      yield call(adjustPriceService.createSingle,payload)
+      const data = yield call(adjustPriceService.createSingle,payload)
+      return data
     },
 
     *editSingle ({payload},{call,put}) {
-      yield call(adjustPriceService.editSingle,payload)
+      const data = yield call(adjustPriceService.editSingle,payload)
+      return data
     },
 
     *deleteSingle ({payload},{call,put}) {
@@ -41,6 +41,16 @@ export default  {
 
     setState (state, action) {
       return { ...state, ...action.payload }
+    },
+
+    setAdjustPrice (state,{payload}) {
+      state.adjustPrices = [];
+      payload.forEach( n => {
+        if(n.id != 1) {
+          state.adjustPrices.push(n)
+        }
+      })
+      return {...state}
     },
 
     setSortMove(state,{payload:{currentId,moveWay}}) {

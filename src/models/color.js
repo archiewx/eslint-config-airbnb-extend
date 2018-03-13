@@ -21,11 +21,13 @@ export default  {
     },
 
     *createSingle ({payload},{call,put}) {
-      yield call(colorService.createSingle,payload)
+      const data = yield call(colorService.createSingle,payload)
+      return data;
     },
 
     *editSingle ({payload},{call,put}) {
-      yield call(colorService.editSingle,payload)
+      const data = yield call(colorService.editSingle,payload)
+      return data;
     },
 
     *deleteSingle ({payload},{call,put}) {

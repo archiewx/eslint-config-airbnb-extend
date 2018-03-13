@@ -136,6 +136,22 @@ export default class InventoryOrderList extends PureComponent {
     this.handleGetList(this.state.filter,this.state.pages,sorts)
   }
 
+  handlSortTable = (pagination, filters, sorter) => {
+    if(sorter.order) {
+      let sorts = {
+        [`${sorter.field}`] : sorter.order.slice(0,sorter.order.length-3)
+      }
+      this.setState({sorts})
+      this.handleGetList(this.state.filter,this.state.pages,sorts)
+    }else {
+      const sorts = {
+        created_at: 'desc'
+      };
+      this.setState({sorts})
+      this.handleGetList(this.state.filter,this.state.pages,sorts)
+    }
+  }
+
   handleFormSubmit = () => {
     const { form, dispatch } = this.props;
     setTimeout(() => {
@@ -157,7 +173,7 @@ export default class InventoryOrderList extends PureComponent {
   handleMoreOperation = (item) => {
     return (
       <div>
-        <Link to={`/bill/sale-order/${item.id}`}>查看</Link>
+        <Link to={`/bill/inventory-detail/${item.id}`}>查看</Link>
         {/*<Divider type='vertical' />
         <Link to={`/bill/sale-order/${item.id}`}>编辑</Link>*/}
         <Divider  type='vertical' />
@@ -295,9 +311,10 @@ export default class InventoryOrderList extends PureComponent {
             columns={columns} 
             dataSource={inventoryOrderList} 
             pagination={pagination}
+            onChange={this.handlSortTable}
           />
           <div style={{marginTop:-43,width:300}}>
-            <span>{`共 ${inventoryOrderPagination.total || ''} 条销售单 第 ${pages.page} / ${Math.ceil(Number(inventoryOrderPagination.total)/Number(pages.per_page))} 页`}</span>
+            <span>{`共 ${inventoryOrderPagination.total || ''} 条盘点单 第 ${pages.page} / ${Math.ceil(Number(inventoryOrderPagination.total)/Number(pages.per_page))} 页`}</span>
           </div>
         </Card>
       </PageHeaderLayout>

@@ -1,4 +1,3 @@
-import { stringify } from 'qs';
 import request from '../utils/request';
 
 export async function queryProjectNotice() {
@@ -9,9 +8,9 @@ export async function queryActivities() {
   return request('/api/activities');
 }
 
-export async function queryRule(params) {
-  return request(`/api/rule?${stringify(params)}`);
-}
+// export async function queryRule(params) {
+//   return request(`/api/rule?${stringify(params)}`);
+// }
 
 export async function removeRule(params) {
   return request('/api/rule', {
@@ -56,9 +55,9 @@ export async function queryAdvancedProfile() {
   return request('/api/profile/advanced');
 }
 
-export async function queryFakeList(params) {
-  return request(`/api/fake_list?${stringify(params)}`);
-}
+// export async function queryFakeList(params) {
+//   return request(`/api/fake_list?${stringify(params)}`);
+// }
 
 export async function fakeAccountLogin(params) {
   return request('/api/login/account', {

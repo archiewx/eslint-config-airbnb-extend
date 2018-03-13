@@ -92,11 +92,35 @@ export const getRouterData = (app) => {
     '/bill/purchase-order':{
       component: dynamicWrapper(app, ['purchaseOrderList','layoutFilter'], () => import('../routes/Bill/PurchaseOrder/PurchaseOrderList/PurchaseOrderList'))
     },
+    '/bill/purchase-detail/:id':{
+      component: dynamicWrapper(app, ['purchaseOrderDetail'], () => import('../routes/Bill/PurchaseOrder/PurchaseOrderDetail/PurchaseOrderDetail'))
+    },
     '/bill/inventory-order':{
       component: dynamicWrapper(app, ['inventoryOrderList','layoutFilter'], () => import('../routes/Bill/InventoryOrder/InventoryOrderList/InventoryOrderList'))
     },
+    '/bill/inventory-detail/:id':{
+      component: dynamicWrapper(app, ['inventoryOrderDetail'], () => import('../routes/Bill/InventoryOrder/InventoryOrderDetail/InventoryOrderDetail'))
+    },
     '/bill/deliver-order':{
       component: dynamicWrapper(app, ['deliverOrderList','layoutFilter'], () => import('../routes/Bill/DeliverOrder/DeliverOrderList/DeliverOrderList'))
+    },
+    '/bill/deliver-detail/:id':{
+      component: dynamicWrapper(app, ['deliverOrderDetail'], () => import('../routes/Bill/DeliverOrder/DeliverOrderDetail/DeliverOrderDetail'))
+    },
+    '/finance/payments':{
+      component: dynamicWrapper(app, ['paymentsList','layoutFilter'], () => import('../routes/Finance/Payments/PaymentsList/PaymentsList'))
+    },
+    '/finance/payments-detail/:id':{
+      component: dynamicWrapper(app, ['paymentsDetail'], () => import('../routes/Finance/Payments/PaymentsDetail/PaymentsDetail'))
+    },
+    '/finance/sale-settle':{
+      component: dynamicWrapper(app, ['saleSettleList','layoutFilter'], () => import('../routes/Finance/SaleSettle/SaleSettleList/SaleSettleList'))
+    },
+    '/finance/purchase-settle':{
+      component: dynamicWrapper(app, ['purchaseSettleList','layoutFilter'], () => import('../routes/Finance/PurchaseSettle/PurchaseSettleList/PurchaseSettleList'))
+    },
+    '/finance/purchase-settle-detail/:id':{
+      component: dynamicWrapper(app, ['purchaseSettleDetail'], () => import('../routes/Finance/PurchaseSettle/PurchaseSettleDetail/PurchaseSettleDetail'))
     },
     '/manage-center/goods/goods-attribute':{
       component: dynamicWrapper(app ,[], () => import('../routes/ManageCenter/Goods/GoodsAttribute/GoodsAttribute'))

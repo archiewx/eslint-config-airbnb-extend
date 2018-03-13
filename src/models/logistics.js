@@ -21,16 +21,22 @@ export default  {
     },
 
     *createSingle ({payload},{call,put}) {
-      yield call(logisticsService.createSingle,payload)
+      const data = yield call(logisticsService.createSingle,payload)
+      return data
     },
 
     *editSingle ({payload},{call,put}) {
-      yield call(logisticsService.editSingle,payload)
+      const data = yield call(logisticsService.editSingle,payload)
+      return data
     },
 
     *deleteSingle ({payload},{call,put}) {
       yield call(logisticsService.deleteSingle,payload)
     },
+
+    *editSort ({payload},{call,put}) {
+      yield call(logisticsService.editSort,payload)
+    }
   },
 
   reducers: {
@@ -38,6 +44,23 @@ export default  {
     setState (state, action) {
       return { ...state, ...action.payload }
     },
+
+    setSortMove(state,{payload:{currentId,moveWay}}) {
+      moveWay == 'up' ? null : state.logistics.reverse();
+      state.logistics.forEach( (n,i) => {
+        if(n.id == currentId) {
+          i == 0 ? '' : (
+            state.logistics.splice(i,1),
+            state.logistics.splice(i-1,0,n)
+          )
+        }
+      })
+      moveWay == 'up' ? null : state.logistics.reverse();
+      state.logistics.forEach((item,index)=>{
+        item.sort = index;
+      })
+      return {...state}
+    }
 
   },
 

@@ -271,11 +271,11 @@ export default class CustomerList extends PureComponent {
           <Form layout='inline'>
             {
               customerFilter.map( (item,index) => {
-                return (
+                return item.options.length == 0 ? null : (
                   <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                     <FormItem>
                       {getFieldDecorator(`${item.code}`)(
-                        <TagSelect expandable onChange={this.handleCustomerFormSubmit}>
+                        <TagSelect  expandable onChange={this.handleCustomerFormSubmit}>
                           {
                             item.options.map( (subItem,subIndex) => {
                               return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>

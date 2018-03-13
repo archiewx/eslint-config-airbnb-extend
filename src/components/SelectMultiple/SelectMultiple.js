@@ -56,7 +56,7 @@ export default class SelectMultiple extends PureComponent {
                     {
                       item.children.map( subItem => {
                         return (
-                          <Option key={subItem.id} value={(subItem.id).toString()}>{subItem.name}</Option>
+                          <Option key={(subItem.uid)} value={(subItem.uid)}>{subItem.name}</Option>
                         )
                       })
                     }

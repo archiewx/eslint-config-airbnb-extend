@@ -50,8 +50,12 @@ export default class CustomerMember extends PureComponent {
     this.setState({
       modalVisibel:false
     })
-    this.props.dispatch({type:`customerMember/${value.id ? 'editSingle':'createSingle' }`,payload:value}).then(()=>{
-      this.props.dispatch({type:'customerMember/getList'})  
+    this.props.dispatch({type:`customerMember/${value.id ? 'editSingle':'createSingle' }`,payload:value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(`${result.message}`)
+      }else {
+        this.props.dispatch({type:'customerMember/getList'})  
+      }
     })
   }
 

@@ -20,11 +20,13 @@ export default  {
       }})
     },
     *createSingle ({payload},{call,put}) {
-      yield call(unitService.createSingle,payload)
+      const data = yield call(unitService.createSingle,payload)
+      return data
     },
 
     *editSingle ({payload},{call,put}) {
-      yield call(unitService.editSingle,payload)
+      const data = yield call(unitService.editSingle,payload)
+      return data
     },
 
     *deleteSingle ({payload},{call,put}) {

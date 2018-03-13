@@ -1,5 +1,6 @@
 import fetch from 'dva/fetch';
 import { notification } from 'antd';
+import { reloadAuthorized } from './Authorized';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据',
@@ -7,7 +8,7 @@ const codeMessage = {
   202: '一个请求已经进入后台排队（异步任务）',
   204: '删除数据成功。',
   400: '发出的请求有错误，服务器没有进行新建或修改数据,的操作。',
-  401: '用户没有权限（令牌、用户名、密码错误）。',
+  401: '用户没有权限',
   403: '用户得到授权，但是访问是被禁止的。',
   404: '发出的请求针对的是不存在的记录，服务器没有进行操作',
   406: '请求的格式不可得。',
@@ -19,6 +20,10 @@ const codeMessage = {
   504: '网关超时',
 };
 function checkStatus(response) {
+  if(response.status == 401) {
+    window.location = '#user'
+    throw new Error('token过期，请重新授权');
+  }
   if (response.status >= 200 && response.status < 300) {
     return response;
   }

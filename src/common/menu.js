@@ -15,7 +15,7 @@ const menuData = [{
   }]
 },{
   name:'单据',
-  icon:'dashboard',
+  icon:'profile',
   path:'bill',
   children:[{
     name:'销售单',
@@ -30,6 +30,20 @@ const menuData = [{
     name:'调货单',
     path:'deliver-order'
   }]
+},{
+  // name:'财务',
+  // path:'finance',
+  // icon:'dashboard',
+  // children:[{
+  //   name:'流水',
+  //   path:'payments'
+  // },{
+  //   name:'销售结算',
+  //   path:'sale-settle'
+  // },{
+  //   name:'进货结算',
+  //   path:'purchase-settle'
+  // }]
 },{
   name:'管理中心',
   icon:'check-circle-o',

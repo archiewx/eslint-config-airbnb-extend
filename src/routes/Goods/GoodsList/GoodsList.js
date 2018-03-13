@@ -4,6 +4,7 @@ import { routerRedux,Link } from 'dva/router';
 import moment from 'moment';
 import classNames from 'classnames/bind'
 import currency from 'currency.js'
+import {imageApiBase} from '../../../common/index'
 import { Row, Col, Card, Button, message, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker} from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import StandardFormRow from '../../../components/antd-pro/StandardFormRow';
@@ -325,6 +326,11 @@ export default class GoodsList extends PureComponent {
     )
 
     const salesColumns = [{
+      title: '',
+      dataIndex:'image',
+      width: 60,
+      render: (text,record) => record.itemimage_names.length == 0 ? null : <img src={`${imageApiBase}/${record.itemimage_names[0]}`} style={{width: 42,height: 42}} alt='未显示' />
+    },{
       title: '货号',
       dataIndex: 'item_ref',
       width:'10%'
@@ -376,6 +382,11 @@ export default class GoodsList extends PureComponent {
     }]
 
     const purchaseColumns = [{
+      title: '',
+      dataIndex:'image',
+      width: 60,
+      render: (text,record) => record.itemimage_names.length == 0 ? null : <img src={`${imageApiBase}/${record.itemimage_names[0]}`} style={{width: 42,height: 42}} alt='未显示' />
+    }, {
       title: '货号',
       dataIndex: 'item_ref',
       width:'10%'
@@ -485,7 +496,7 @@ export default class GoodsList extends PureComponent {
             <Form layout='inline'>
               {
                 goodsSaleFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`sale_${item.code}`)(
@@ -529,7 +540,7 @@ export default class GoodsList extends PureComponent {
             <Form layout='inline'>
               {
                 goodsPurchaseFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`purchase_${item.code}`)(

@@ -45,21 +45,16 @@ export default class Unit extends PureComponent {
   }
 
   handleModalOk = (value) => {
-    if(this.state.modalType === 'create') {
-      this.setState({
-        modalVisibel:false,
-      })
-      this.props.dispatch({type:'unit/createSingle',payload:value}).then(()=>{
+    this.setState({
+      modalVisibel:false,
+    })
+    this.props.dispatch({type:`unit/createSingle${this.state.modalType === 'create' ? 'createSingle' : 'editSingle'}`,payload:value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(`${result.message}`)
+      }else {
         this.props.dispatch({type:'unit/getList'})
-      })
-    }else if(this.state.modalType === 'edit') {
-      this.setState({
-        modalVisibel:false,
-      })
-      this.props.dispatch({type:'unit/editSingle',payload:value}).then(()=>{
-        this.props.dispatch({type:'unit/getList'})
-      })
-    }
+      }
+    })
   }
 
   handleDeleteSingle = (item) => {

@@ -71,7 +71,7 @@ export default class CustomerMemberModal extends PureComponent {
               <Input placeholder='请输入' />
             )}
           </FormItem>
-          <FormItem label='赊账额度' {...formItemLayout}>
+          <FormItem label='价格调整' {...formItemLayout}>
             {getFieldDecorator('discount',{
               initialValue: discount
             })(

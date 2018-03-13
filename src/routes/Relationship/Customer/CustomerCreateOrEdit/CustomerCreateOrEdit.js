@@ -341,7 +341,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
         <CustomerModal type={modalType} visible={modalVisibel} formValue={formValue} onOk={this.handleModalOk} onCancel={this.handleModalCancel} country={country} uid={uid} addresses={addresses}/>
         <FooterToolbar>
           <div id="noScroll">
-            <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={ showData.id ? '确认取消编辑客户':'确认取消新建客户'} onConfirm={this.handleCustomerCancel} placement='top'><Button>取消</Button></Popconfirm>
+            <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={ showData.id ? '确认取消编辑客户?':'确认取消新建客户?'} onConfirm={this.handleCustomerCancel} placement='top'><Button>取消</Button></Popconfirm>
             <Button type="primary" onClick={this.handleSubmit}>
               确认
             </Button>

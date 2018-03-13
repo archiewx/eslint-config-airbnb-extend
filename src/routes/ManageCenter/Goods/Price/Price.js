@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
-import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch} from 'antd';
+import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch,Modal} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import PriceGradeModal from './PriceGradeModal'
 import breadCrumbList from '../../../../common/breadCrumbList'
@@ -171,6 +171,24 @@ export default class Size extends PureComponent {
     })
   }
 
+  handlePriceGradeConfirm = () => {
+    Modal.confirm({
+      title:'确认更改价格等级策略',
+      onOk: () => {
+        this.handleSwitchUsePriceLevel()
+      },
+    })
+  }
+
+  handlePriceCompositionConfirm = (key) => {
+    Modal.confirm({
+      title:'确认更改价格组成策略',
+      onOk: () => {
+        this.handleSwitchPriceModal(key)
+      },
+    })
+  }
+
   render() {
     const {priceGrades} = this.props.priceGrade;
     const {priceQuantitySteps} = this.props.priceQuantityStep;
@@ -191,7 +209,7 @@ export default class Size extends PureComponent {
             <div>
               <Button style={{marginRight:10}} onClick={this.handleSortStart}>自定义排序</Button>
               <Button type='primary' onClick={this.handlePriceGradeModalCreate} style={{marginRight:20}}>新建价格等级</Button>
-              <Switch checkedChildren="开" unCheckedChildren="关"  onClick={this.handleSwitchUsePriceLevel} checked={usePricelelvel == 'yes'}/>
+              <Switch checkedChildren="开" unCheckedChildren="关"  onClick={this.handlePriceGradeConfirm} checked={usePricelelvel == 'yes'}/>
             </div>
           )
         }
@@ -250,18 +268,18 @@ export default class Size extends PureComponent {
       <div style={{display:activeTabKey == 'priceComposition' ? 'block' : 'none'}}>
         <Card bordered={false} className={styles.cardBottom}>
           <div>
-            <span className={styles.spanTitle}>按店铺区分价格</span><Switch onClick={this.handleSwitchPriceModal.bind(null,0)} checked={priceModel == 'shop'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}></Switch>
+            <span className={styles.spanTitle}>按店铺区分价格</span><Switch onClick={this.handlePriceCompositionConfirm.bind(null,0)} checked={priceModel == 'shop'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}></Switch>
           </div>
         </Card>
         <Card bordered={false} className={styles.cardBottom}>
           <div>
-            <span className={styles.spanTitle}>按单位区分价格</span><Switch onClick={this.handleSwitchPriceModal.bind(null,1)} checked={priceModel == 'unit'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}></Switch>
+            <span className={styles.spanTitle}>按单位区分价格</span><Switch onClick={this.handlePriceCompositionConfirm.bind(null,1)} checked={priceModel == 'unit'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}></Switch>
           </div>
         </Card>
         <Card bordered={false} >
           <div style={{marginBottom:32}}>
             <span className={styles.spanTitle}>按购买量区分价格</span>
-            <span className={styles.switchPosition}><Button type='primary' style={{marginRight:24}} onClick={this.handlePriceQuantityStepModalCreate}>新建价格阶梯</Button><Switch onClick={this.handleSwitchPriceModal.bind(null,2)} checked={priceModel == 'quantityrange'} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}></Switch></span>
+            <span className={styles.switchPosition}><Button type='primary' style={{marginRight:24}} onClick={this.handlePriceQuantityStepModalCreate}>新建价格阶梯</Button><Switch onClick={this.handlePriceCompositionConfirm.bind(null,2)} checked={priceModel == 'quantityrange'} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}></Switch></span>
           </div>
           <Table dataSource={priceQuantitySteps} columns={priceQuantityStepColumns} rowKey='id' pagination={false}/>
         </Card>

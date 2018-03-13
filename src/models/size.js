@@ -39,11 +39,13 @@ export default  {
     },
 
     *createSizeLibrarySingle({payload},{call,put}) {
-      yield call(sizeLibraryService.createSingle,payload)
+      const data = yield call(sizeLibraryService.createSingle,payload)
+      return data
     },
 
     *editSizeLibrarySingle({payload},{call,put}) {
-      yield call(sizeLibraryService.editSingle,payload)
+      const data = yield call(sizeLibraryService.editSingle,payload)
+      return data
     },
 
     *deleteSizeLibrarySingle({payload},{call,put}) {
@@ -55,11 +57,13 @@ export default  {
     },
 
     *createSizeGroupSingle({payload},{call,put}) {
-      yield call(sizeGroupService.createSingle,payload)
+      const data = yield call(sizeGroupService.createSingle,payload)
+      return data;
     },
 
     *editSizeGroupSingle({payload},{call,put}) {
-      yield call(sizeGroupService.editSingle,payload)
+      const data = yield call(sizeGroupService.editSingle,payload)
+      return data
     },
 
     *deleteSizeGroupSingle({payload},{call,put}) {

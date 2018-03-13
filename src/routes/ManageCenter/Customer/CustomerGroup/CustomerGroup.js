@@ -50,8 +50,12 @@ export default class CustomerGroup extends PureComponent {
     this.setState({
       modalVisibel: false
     })
-    this.props.dispatch({type:`customerGroup/${ this.state.modalType.indexOf('Create') > -1 ? 'createSingle' : 'editSingle'}`,payload:value}).then(()=>{
-      this.props.dispatch({type:'customerGroup/getList'})
+    this.props.dispatch({type:`customerGroup/${ this.state.modalType.indexOf('Create') > -1 ? 'createSingle' : 'editSingle'}`,payload:value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(`${result.message}`)
+      }else {
+        this.props.dispatch({type:'customerGroup/getList'})
+      }
     })
   }
 

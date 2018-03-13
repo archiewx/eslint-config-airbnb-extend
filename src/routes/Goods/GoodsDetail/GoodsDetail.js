@@ -373,7 +373,7 @@ export default class GoodsDetail extends PureComponent {
     }]
 
     const menu = (
-      <Menu>
+      <Menu style={{width: 109}}> 
         <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement='bottom' onConfirm={this.handleDeleteSingleGoods.bind(null,currentId)}>删除</Popconfirm></Menu.Item>
       </Menu>
     );
@@ -381,8 +381,8 @@ export default class GoodsDetail extends PureComponent {
     const action = (
       <div>
         <ButtonGroup>
-          <Popconfirm title={ singleGoodsDetail.not_sale === '1' ? '确认解除停售此商品' : '确认停售此商品'} onConfirm={this.handleSelectGoodStatus.bind(null,singleGoodsDetail.not_sale,currentId)}><Button>{singleGoodsDetail.not_sale === '1' ? '在售' : '停售'}</Button></Popconfirm>
-          <Dropdown overlay={menu} >
+          <Popconfirm title={ singleGoodsDetail.not_sale === '1' ? '确认解除停售此商品?' : '确认停售此商品?'} onConfirm={this.handleSelectGoodStatus.bind(null,singleGoodsDetail.not_sale,currentId)}><Button>{singleGoodsDetail.not_sale === '1' ? '在售' : '停售'}</Button></Popconfirm>
+          <Dropdown overlay={menu} placement="bottomRight">
             <Button><Icon type="ellipsis" /></Button>
           </Dropdown>
         </ButtonGroup>
@@ -647,7 +647,7 @@ export default class GoodsDetail extends PureComponent {
             <Form layout='inline'>
               {
                 goodsDetailFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`sale_${item.code}`)(
@@ -682,7 +682,7 @@ export default class GoodsDetail extends PureComponent {
             <Form layout='inline'>
               {
                 goodsDetailFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`purchase_${item.code}`)(
@@ -717,7 +717,7 @@ export default class GoodsDetail extends PureComponent {
             <Form layout='inline'>
               {
                 goodsDetailFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`customer_${item.code}`)(
@@ -759,7 +759,7 @@ export default class GoodsDetail extends PureComponent {
             <Form layout='inline'>
               {
                 goodsDetailFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`supplier_${item.code}`)(
@@ -794,7 +794,7 @@ export default class GoodsDetail extends PureComponent {
             <Form layout='inline'>
               {
                 goodsDetailFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`stock_${item.code}`)(

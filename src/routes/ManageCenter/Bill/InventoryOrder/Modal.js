@@ -37,7 +37,7 @@ export default class InventoryModal extends PureComponent {
     const {getFieldDecorator} = this.props.form;
     return (
       <Modal
-        title={`${formValue.warehouse_name}盘点单审批`}
+        title={`${formValue.warehouse_name}盘点审批`}
         visible={visible}
         onOk={this.handleConfirm}
         onCancel={onCancel}

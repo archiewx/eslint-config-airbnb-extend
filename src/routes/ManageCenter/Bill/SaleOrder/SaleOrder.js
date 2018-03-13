@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
-import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch} from 'antd';
+import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Switch,Modal} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import breadCrumbList from '../../../../common/breadCrumbList'
 import AdjustPriceModal from './AdjustPriceModal'
@@ -82,8 +82,12 @@ export default class SaleOrder extends PureComponent {
     this.setState({
       modalAdjustPriceVisibel:false,
     })
-    this.props.dispatch({type:`adjustPrice/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then(()=>{
-      this.props.dispatch({type:'adjustPrice/getList'})
+    this.props.dispatch({type:`adjustPrice/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(`${result.message}`)
+      }else {
+        this.props.dispatch({type:'adjustPrice/getList'})
+      }
     })
   }
 
@@ -175,6 +179,24 @@ export default class SaleOrder extends PureComponent {
     })
   }
 
+  handleDeliverConfirm = (key) => {
+    Modal.confirm({
+      title:'确认更改默认发货方式策略',
+      onOk: () => {
+        this.handleSwitchDefaultDeliverWay(key)
+      },
+    })
+  }
+
+  handleDefaultConfirm = (key) => {
+    Modal.confirm({
+      title:'确认更改默认价格策略',
+      onOk: () => {
+        this.handleSwitchDefaultPrice(key)
+      },
+    })
+  }
+
   render() {
     const {adjustPrices} = this.props.adjustPrice;
     const {defaultDeliveryWay,usePricelelvel,useHistoryPrice} = this.props.configSetting;
@@ -245,9 +267,9 @@ export default class SaleOrder extends PureComponent {
 
     const saleLabelColumns = [{
       title:' ',
-      dataIndex:'adjustPrice',
+      dataIndex:'color',
       width:30,
-      render:(text,record) => <div style={{width:24,height:24,borderRadius:12,background:`#${record.adjustPrice}`}}></div>
+      render:(text,record) => <div style={{width:24,height:24,borderRadius:12,background:`#${record.color}`}}></div>
     },{
       title:'名称',
       dataIndex:'name'
@@ -267,32 +289,32 @@ export default class SaleOrder extends PureComponent {
         </div>
         <div style={{display: activeTabKey == 'default_deliver_way' ? 'block' : 'none'}}>
           <Card bordered={false}>
-            <div><span className={styles.spanTitle}>现场自提</span><Switch onClick={this.handleSwitchDefaultDeliverWay.bind(null,1)} checked={defaultDeliveryWay == 1} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
+            <div><span className={styles.spanTitle}>现场自提</span><Switch onClick={this.handleDeliverConfirm.bind(null,1)} checked={defaultDeliveryWay == 1} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
           </Card>
           <Divider style={{margin:0,width:0}}/>
           <Card bordered={false}>
-            <div><span className={styles.spanTitle}>稍后自提</span><Switch onClick={this.handleSwitchDefaultDeliverWay.bind(null,2)} checked={defaultDeliveryWay == 2} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
+            <div><span className={styles.spanTitle}>稍后自提</span><Switch onClick={this.handleDeliverConfirm.bind(null,2)} checked={defaultDeliveryWay == 2} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
           </Card>
           <Divider style={{margin:0,width:0}}/>
           <Card bordered={false}>
-            <div><span className={styles.spanTitle}>稍后拼包</span><Switch onClick={this.handleSwitchDefaultDeliverWay.bind(null,3)} checked={defaultDeliveryWay == 3} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
+            <div><span className={styles.spanTitle}>稍后拼包</span><Switch onClick={this.handleDeliverConfirm.bind(null,3)} checked={defaultDeliveryWay == 3} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
           </Card>
           <Divider style={{margin:0,width:0}}/>
           <Card bordered={false}>
-            <div><span className={styles.spanTitle}>物流运输</span><Switch onClick={this.handleSwitchDefaultDeliverWay.bind(null,4)} checked={defaultDeliveryWay == 4} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
+            <div><span className={styles.spanTitle}>物流运输</span><Switch onClick={this.handleDeliverConfirm.bind(null,4)} checked={defaultDeliveryWay == 4} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
           </Card>
         </div>
         <div style={{display: activeTabKey == 'default_price' ? 'block' : 'none'}}>
           <Card bordered={false}>
-            <div><span className={styles.spanTitle}>标准价</span><Switch onClick={this.handleSwitchDefaultPrice.bind(null,1)} checked={usePricelelvel == 'no' && useHistoryPrice == 'no'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
+            <div><span className={styles.spanTitle}>标准价</span><Switch onClick={this.handleDefaultConfirm.bind(null,1)} checked={usePricelelvel == 'no' && useHistoryPrice == 'no'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
           </Card>
           <Divider style={{margin:0,width:0}}/>
           <Card bordered={false}>
-            <div><span className={styles.spanTitle}>客户价</span><Switch onClick={this.handleSwitchDefaultPrice.bind(null,2)} checked={usePricelelvel == 'yes' && useHistoryPrice == 'no'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
+            <div><span className={styles.spanTitle}>客户价</span><Switch onClick={this.handleDefaultConfirm.bind(null,2)} checked={usePricelelvel == 'yes' && useHistoryPrice == 'no'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
           </Card>
           <Divider style={{margin:0,width:0}}/>
           <Card bordered={false}>
-            <div><span className={styles.spanTitle}>历史购买价</span><Switch onClick={this.handleSwitchDefaultPrice.bind(null,3)} checked={ useHistoryPrice == 'yes'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
+            <div><span className={styles.spanTitle}>历史购买价</span><Switch onClick={this.handleDefaultConfirm.bind(null,3)} checked={ useHistoryPrice == 'yes'} className={styles.switchPosition} checkedChildren={<Icon type="check" />} unCheckedChildren={<Icon type="cross" />}/></div>
           </Card>
         </div>
         <div style={{display: activeTabKey == 'sale_label' ? 'block' : 'none'}}>

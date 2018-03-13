@@ -50,7 +50,10 @@ export default class GoodsGroup extends PureComponent {
     this.setState({
       modalVisibel: false
     })
-    this.props.dispatch({type:`goodsGroup/${ this.state.modalType.indexOf('Create') > -1 ? 'createSingle' : 'editSingle'}`,payload:value}).then(()=>{
+    this.props.dispatch({type:`goodsGroup/${ this.state.modalType.indexOf('Create') > -1 ? 'createSingle' : 'editSingle'}`,payload:value}).then((result)=>{
+      if(result.code != 0 ) {
+        message.error(`${result.message}`)
+      }
       this.props.dispatch({type:'goodsGroup/getList'})
     })
   }

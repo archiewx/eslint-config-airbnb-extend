@@ -34,3 +34,17 @@ export async function editSingle (params) {
   })
 }
 
+
+export async function editSort (params) {
+  const current = params.map( n => {
+    return {
+      id: n.id,
+      sort:n.sort
+    }
+  })
+  return request(`${apiBase}/api/transportways/batch`,{
+    method: 'PUT',
+    headers: { "Authorization": token() },
+    body: current,
+  })
+}

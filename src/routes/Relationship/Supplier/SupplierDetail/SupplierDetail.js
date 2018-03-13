@@ -320,7 +320,7 @@ export default class SupplierDetail extends PureComponent {
       </DescriptionList>
     )
     const menu = (
-      <Menu>
+      <Menu style={{width: 109}}>
         <Menu.Item key='1'>
           <Popconfirm title="确认删除此供应商?" placement='bottom' onConfirm={this.handleDeleteSingleSupplier.bind(null,currentId.id)}>删除</Popconfirm>
         </Menu.Item>
@@ -337,7 +337,7 @@ export default class SupplierDetail extends PureComponent {
     const action = (
       <div>
         <ButtonGroup>
-          <Popconfirm title={ singleSupplierDetail.freeze == 1 ? '确认解冻此供应商' : '确认冻结此供应商'} placement='bottom' onConfirm={this.handleChangeSupplierStatus.bind(null,currentId.id,singleSupplierDetail.freeze)}>
+          <Popconfirm title={ singleSupplierDetail.freeze == 1 ? '确认解冻此供应商?' : '确认冻结此供应商?'} placement='bottom' onConfirm={this.handleChangeSupplierStatus.bind(null,currentId.id,singleSupplierDetail.freeze)}>
             <Button>{singleSupplierDetail.freeze == 1 ? '解冻' : '冻结'}</Button>
           </Popconfirm>
           <Dropdown overlay={menu} placement="bottomRight">
@@ -607,7 +607,7 @@ export default class SupplierDetail extends PureComponent {
             <Form layout='inline'>
               {
                 saleHistoryFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`sale_${item.code}`)(
@@ -645,7 +645,7 @@ export default class SupplierDetail extends PureComponent {
             <Form layout='inline'>
               {
                 goodsHistoryFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem>
                         {getFieldDecorator(`goods_${item.code}`)(
@@ -683,7 +683,7 @@ export default class SupplierDetail extends PureComponent {
             <Form layout='inline'>
               {
                 paymentHistoryFilter.map( (item,index) => {
-                  return (
+                  return item.options.length == 0 ? null : (
                     <StandardFormRow key={`${index}`} title={`${item.name}`} block>
                       <FormItem expandable >
                         {getFieldDecorator(`payment_${item.code}`)(

@@ -59,7 +59,6 @@ class TagSelect extends Component {
     }
 
     this.setState({ checkedTags });
-
     if (onChange) {
       onChange(checkedTags);
     }

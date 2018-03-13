@@ -20,6 +20,7 @@ export default class DeliverOrder extends PureComponent {
     modalVisibel: false,
     modalType: '',
     formValue: {},
+    isSort:false
   }
 
   componentDidMount(){
@@ -52,8 +53,12 @@ export default class DeliverOrder extends PureComponent {
     this.setState({
       modalVisibel:false,
     })
-    this.props.dispatch({type:`logistics/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then(()=>{
-      this.props.dispatch({type:'logistics/getList'})
+    this.props.dispatch({type:`logistics/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(`${result.message}`)
+      }else {
+        this.props.dispatch({type:'logistics/getList'})
+      }
     })
   }
 
@@ -77,14 +82,53 @@ export default class DeliverOrder extends PureComponent {
     })
   }
 
+  handleSortStart = () => {
+    this.setState({
+      isSort:true
+    })
+  }
+
+  handleSortCancel = () => {
+    this.setState({
+      isSort:false
+    })
+    this.props.dispatch({type:'logistics/getList'})
+  }
+
+  handleSortMove = (id,moveWay) => {
+    this.props.dispatch({type:'logistics/setSortMove',payload:{
+      currentId:id,
+      moveWay:moveWay,
+    }})
+  }
+
+  handleSortOk = () => {
+    this.props.dispatch({type:'logistics/editSort',payload:this.props.logistics.logistics}).then(()=>{
+      this.handleSortCancel()
+    })
+  }
+
   render() {
     const {logistics} = this.props.logistics;
-    const {modalVisibel,modalType,formValue,activeTabKey} = this.state;
+    const {modalVisibel,modalType,formValue,activeTabKey,isSort} = this.state;
 
     const action = (
       <div>
-        <Button style={{marginRight:10}}>自定义排序</Button>
-        <Button type='primary' onClick={this.handleModalCreate}>新建物流公司</Button>
+        {
+          isSort ? (
+            <div>
+              <Popconfirm title='确认取消自定义排序' onConfirm={this.handleSortCancel}>
+                <Button style={{marginRight:10}}>取消</Button>
+              </Popconfirm>
+              <Button type='primary' onClick={this.handleSortOk}>确认</Button>
+            </div>
+          ) : (
+            <div>
+              <Button style={{marginRight:10}} onClick={this.handleSortStart}>自定义排序</Button>
+              <Button type='primary' onClick={this.handleModalCreate}>新建物流公司</Button>
+            </div>
+          )
+        }
       </div>
     )
 
@@ -112,10 +156,26 @@ export default class DeliverOrder extends PureComponent {
       )
     }]
 
+    const sortColumns = [{
+      title:'名称',
+      dataIndex:'name'
+    },{
+      title:'操作',
+      dataIndex:'operation',
+      width:172,
+      render:(text,record) => (
+        <div>
+          <a onClick={this.handleSortMove.bind(null,record.id,'up')} style={{display: logistics.findIndex( n => n.id == record.id) == 0 ? 'none' : 'inline-block'}}>上移</a>
+          <Divider  type='vertical' style={{display: (logistics.findIndex( n => n.id == record.id) == 0 || logistics.findIndex( n => n.id == record.id) == logistics.length -1) ? 'none' : 'inline-block'}}/>
+          <a onClick={this.handleSortMove.bind(null,record.id,'down')} style={{display: logistics.findIndex( n => n.id == record.id) == logistics.length - 1 ? 'none' : 'inline-block'}}>下移</a>
+        </div>
+      )
+    }]
+
     return (
       <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} tabList={tabList} activeTabKey={activeTabKey}>
         <Card title='物流公司' extra={action}>
-          <Table dataSource={logistics} columns={columns} rowKey='id' pagination={false}/>
+          <Table dataSource={logistics} columns={isSort ? sortColumns : columns} rowKey='id' pagination={false}/>
         </Card>
         <DeliverOrderModal type={modalType} visible={modalVisibel} formValue={formValue} onOk={this.handleModalOk} onCancel={this.handleModalCancel} sortLength={logistics.length}/>
       </PageHeaderLayout>

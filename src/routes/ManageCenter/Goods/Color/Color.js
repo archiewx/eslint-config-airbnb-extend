@@ -48,8 +48,12 @@ export default class Color extends PureComponent {
     this.setState({
       modalVisibel:false,
     })
-    this.props.dispatch({type:`color/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then(()=>{
-      this.props.dispatch({type:'color/getList'})
+    this.props.dispatch({type:`color/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(`${result.message}`)
+      }else {
+        this.props.dispatch({type:'color/getList'})
+      }
     })
   }
 

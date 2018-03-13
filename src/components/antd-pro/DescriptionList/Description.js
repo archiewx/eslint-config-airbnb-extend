@@ -25,10 +25,10 @@ Description.propTypes = {
     PropTypes.string,
     PropTypes.element,
   ]),
-  children: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]),
+  // children: PropTypes.oneOfType([
+  //   PropTypes.string,
+  //   PropTypes.element,
+  // ]),
 };
 
 export default Description;

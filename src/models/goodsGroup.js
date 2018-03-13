@@ -20,11 +20,13 @@ export default  {
     },
 
     *createSingle ({payload},{call,put}) {
-      yield call(goodsGroupService.createSingle,payload)
+      const data = yield call(goodsGroupService.createSingle,payload)
+      return data;
     },
 
     *editSingle ({payload},{call,put}) {
-      yield call(goodsGroupService.editSingle,payload)
+      const data = yield call(goodsGroupService.editSingle,payload)
+      return data;
     },
 
     *deleteSingle ({payload},{call,put}) {
