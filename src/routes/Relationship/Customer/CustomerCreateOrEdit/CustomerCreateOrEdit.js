@@ -39,7 +39,10 @@ export default class CustomerCreateOrEdit extends PureComponent {
 
   componentDidMount() {
     (async () => {
-      const match = pathToRegexp('/relationship/customer-edit/:id').exec(location.hash.slice(1,location.hash.length))
+      this.props.dispatch({type:'customerCreateOrEdit/setState',payload:{
+        showData:{}
+      }})
+      const match = pathToRegexp('/relationship/customer-edit/:id').exec(this.props.history.location.pathname)
       if(match) {
         this.props.dispatch({type:'customerCreateOrEdit/getSingle',payload:{id:match[1]}})
       }
@@ -264,7 +267,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
                         })(
                           <Select placeholder='请选择客户分组'>
                             {
-                              item.children.map( subItem => {
+                              item.children && item.children.map( subItem => {
                                 return (
                                   <Option key={subItem.id}>{subItem.name}</Option>
                                 )

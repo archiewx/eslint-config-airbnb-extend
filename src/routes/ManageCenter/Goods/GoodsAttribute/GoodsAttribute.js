@@ -11,7 +11,7 @@ import breadCrumbList from '../../../../common/breadCrumbList'
 export default class GoodsAttribute extends PureComponent {
 
   handleSwitchItemAttribute = (key) => {
-    let current = this.props.configSetting.itemAttribute;
+    const current = JSON.parse(JSON.stringify(this.props.configSetting.itemAttribute));
     if(key == 0) {
       this.props.configSetting.itemAttribute.some( n => n == 'name') ? current.splice(current.findIndex( n => n == 'name'),1) : current.push('name')
     }else if(key == 1) {
@@ -45,31 +45,31 @@ export default class GoodsAttribute extends PureComponent {
         <Card bordered={false}>
           <div><span className={styles.spanTitle}>货号</span><Switch disabled defaultChecked={true} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关" /></div>
         </Card>
-        <Divider style={{margin:0,width:0}}/>
+        <Divider className={styles.dividerStyle}/>
         <Card bordered={false}>
           <div><span className={styles.spanTitle}>标准价</span><Switch disabled defaultChecked={true} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关" /></div>
         </Card>
-        <Divider style={{margin:0,width:0}}/>
+        <Divider className={styles.dividerStyle}/>
         <Card bordered={false}>
           <div><span className={styles.spanTitle}>{'价格等级 + 价格组成'}</span><Switch disabled defaultChecked={true} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关" /></div>
         </Card>
-        <Divider style={{margin:0,width:0}}/>
+        <Divider className={styles.dividerStyle}/>
         <Card bordered={false} className={styles.barcodePosition}>
           <div><span className={styles.spanTitle}>名称</span><Switch onClick={this.handleConfirm.bind(null,0)} checked={itemAttribute.some( n => n == 'name')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
         </Card>
-        <Divider style={{margin:0,width:0}}/>
+        <Divider className={styles.dividerStyle}/>
         <Card bordered={false} className={styles.barcodePosition}>
           <div><span className={styles.spanTitle}>单位</span><Switch onClick={this.handleConfirm.bind(null,1)} checked={itemAttribute.some( n => n == 'unit')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
         </Card>
-        <Divider style={{margin:0,width:0}}/>
+        <Divider className={styles.dividerStyle}/>
         <Card bordered={false} className={styles.barcodePosition}>
           <div><span className={styles.spanTitle}>颜色</span><Switch onClick={this.handleConfirm.bind(null,2)} checked={itemAttribute.some( n => n == 'skuattributetype_1')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
         </Card>
-        <Divider style={{margin:0,width:0}}/>
+        <Divider className={styles.dividerStyle}/>
         <Card bordered={false} className={styles.barcodePosition}>
           <div><span className={styles.spanTitle}>尺码</span><Switch onClick={this.handleConfirm.bind(null,3)} checked={itemAttribute.some( n => n == 'skuattributetype_2')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
         </Card>
-        <Divider style={{margin:0,width:0}}/>
+        <Divider className={styles.dividerStyle}/>
         <Card bordered={false} className={styles.barcodePosition}>
           <div><span className={styles.spanTitle}>进货价</span><Switch onClick={this.handleConfirm.bind(null,4)} checked={itemAttribute.some( n => n == 'purchase_price')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
         </Card>

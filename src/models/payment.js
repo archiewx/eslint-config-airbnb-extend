@@ -21,11 +21,13 @@ export default  {
     },
 
     *createSingle ({payload},{call,put}) {
-      yield call(paymentService.createSingle,payload)
+      const data = yield call(paymentService.createSingle,payload)
+      return data;
     },
 
     *editSingle ({payload},{call,put}) {
-      yield call(paymentService.editSingle,payload)
+      const data = yield call(paymentService.editSingle,payload)
+      return data;
     },
 
     *deleteSingle ({payload},{call,put}) {

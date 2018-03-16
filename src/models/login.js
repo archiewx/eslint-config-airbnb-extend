@@ -2,6 +2,7 @@ import * as loginService from '../services/login'
 import { reloadAuthorized } from '../utils/Authorized'
 import * as configSettingService from '../services/configSetting'
 import { routerRedux } from 'dva/router';
+import {message} from 'antd'
 const delay = timeout => {
   return new Promise(resolve => {
     setTimeout(resolve, timeout);
@@ -56,7 +57,8 @@ export default  {
           sessionStorage.setItem('oncefetch',true)
           sessionStorage.setItem('token',JSON.stringify(data.result.data.token))
           yield put({type:'setState',payload:{
-            isQuerying:true
+            isQuerying:true,
+            code:'',
           }})
           reloadAuthorized();
           yield put(routerRedux.push('/goods-list'))
@@ -64,6 +66,10 @@ export default  {
           yield call(delay, 1000);
         }
       }
+    },
+
+    *logout({payload},{call,put}) {
+      yield put(routerRedux.push('/user'))
     }
   },
 

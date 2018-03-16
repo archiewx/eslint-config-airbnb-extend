@@ -1,15 +1,5 @@
 import * as goodsService from '../services/goods'
 import moment from 'moment';
-const condition = {
-  sorts: {
-    created_at: 'desc'
-  },
-  page:1,
-  per_page:10,
-  date_type:'custom',
-  sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-  eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
-}
 export default  {
 
   namespace: 'goodsList',
@@ -30,7 +20,7 @@ export default  {
 
   effects: {
     *getGoodsList({payload},{call,put,all}) {
-      const [data1,data2] = yield all([call(goodsService.getListSales,condition),call(goodsService.getListPurchase,condition)])
+      const [data1,data2] = yield all([call(goodsService.getListSales,payload),call(goodsService.getListPurchase,payload)])
       yield put({type:'setState',payload:{
         goodsListSales:data1.result.data,
         goodsListPurchases:data2.result.data,
@@ -56,13 +46,11 @@ export default  {
     },
 
     *changeGoodsStatus({payload},{call,put}) {
-      const data = yield call(goodsService.changeGoodsStatus,payload)
-      yield put({type:'getGoodsList'})
+      yield call(goodsService.changeGoodsStatus,payload)
     },
 
     *deleteSingleGoods({payload},{call,put}) {
-      const data = yield call(goodsService.deleteSingleGoods,payload)
-      yield put({type:'getGoodsList'})
+      yield call(goodsService.deleteSingleGoods,payload)
     }
   },
 
@@ -77,7 +65,7 @@ export default  {
       for(let key in payload) {
         if(key.indexOf('sale_') == 0) {
           if(payload[key]) {
-            let name = key.slice(5,key.length)
+            const name = key.slice(5,key.length)
             if(name == 'datePick') {
               current['date_type'] = 'custom'
               current['sday'] = payload[key][0]
@@ -102,7 +90,7 @@ export default  {
       for(let key in payload) {
         if(key.indexOf('purchase_') == 0) {
           if(payload[key]) {
-            let name = key.slice(9,key.length)
+            const name = key.slice(9,key.length)
             if(name == 'datePick') {
               current['date_type'] = 'custom'
               current['sday'] = payload[key][0]

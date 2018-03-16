@@ -71,7 +71,7 @@ export default class Size extends PureComponent {
     }else if(this.state.sizeLibraryModalType === 'edit') {
       this.props.dispatch({type:'size/editSizeLibrarySingle',payload:value}).then(()=>{
         if(result.code != 0) {
-          message.error(`${result.message}`)
+          message.error(result.message)
         }else {
           this.props.dispatch({type:'size/getSizeLibrary'})
         }
@@ -82,8 +82,12 @@ export default class Size extends PureComponent {
   handleSizeLibraryDeleteSingle = (item) => {
     this.props.dispatch({type:'size/deleteSizeLibrarySingle',payload:{
       id:item.id
-    }}).then(()=>{
-      this.props.dispatch({type:'size/getSizeLibrary'})
+    }}).then((result)=>{
+      if(result.code != 0) {
+        message.error(result.message)
+      }else {
+        this.props.dispatch({type:'size/getSizeLibrary'})
+      }
     })
   }
 
@@ -158,13 +162,6 @@ export default class Size extends PureComponent {
     this.props.dispatch({type:'size/editSort',payload:this.props.size.sizeLibrarys}).then(()=>{
       this.handleSortCancel()
     })
-  }
-
-  handleMouseMove = (record) => {
-    return {
-      onMouseEnter:() => {
-      }
-    }
   }
 
   render() {
@@ -253,14 +250,13 @@ export default class Size extends PureComponent {
     return (
       <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} tabList={tabList} activeTabKey={activeTabKey} onTabChange={this.handleTabChange}>
         <div style={{display:activeTabKey == 'sizeLibrary' ? 'block' : 'none'}}>
-          <Card bordered={false} title='尺码库列表' extra={sizeLibraryAction}>
+          <Card bordered={false} title='尺码库列表' extra={sizeLibraryAction} className={styles.cardHeader}>
             <Table dataSource={sizeLibrarys} columns={sizeLibraryColumns} rowKey='id' pagination={false}/>
           </Card>
         </div>
         <div style={{display:activeTabKey == 'sizeGroup' ? 'block' : 'none'}}>
-          <Card bordered={false} title='尺码组列表' extra={sizeGroupAction}>
-            <Table 
-              dataSource={sizeGroups} columns={sizeGroupColumns} rowKey='id' pagination={false} onRow={this.handleMouseMove} />
+          <Card bordered={false} title='尺码组列表' extra={sizeGroupAction} className={styles.cardBody}>
+            <Table dataSource={sizeGroups} columns={sizeGroupColumns} rowKey='id' pagination={false} />
           </Card>
         </div>       
         <SizeLibraryModal type={sizeLibraryModalType} visible={sizeLibraryModalVisibel} formValue={sizeLibraryModalFormValue} onOk={this.handleSizeLibraryModalOk} onCancel={this.handleSizeLibraryModalCancel} sortLength={sizeLibrarys.length}/>

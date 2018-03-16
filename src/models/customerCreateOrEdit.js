@@ -13,9 +13,6 @@ export default  {
 
   subscriptions: {
     setup({ dispatch, history }) {
-      history.listen(() => {
-        dispatch({type:'setState',payload:{showData:{}}})
-      })
     },
   },
 
@@ -95,7 +92,6 @@ export default  {
           state.serverData.customergroups.push(payload[key])
         }
       }
-      state.serverData.addresses = [];
       state.serverData.addresses = (payload.addresses || []).map( item => {
         return {
           ...{sid:{id: item.sid}}[((item.uid).toString()).indexOf('_') > -1 ? 'sid' : ''],

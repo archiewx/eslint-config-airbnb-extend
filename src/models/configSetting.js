@@ -1,5 +1,4 @@
 import * as configSettingService from '../services/configSetting'
-import {message} from 'antd'
 import _ from 'lodash'
 export default  {
 

@@ -15,75 +15,55 @@ const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const sortOptions = [{
   name:'创建时间降序',
-  id:1,
   sorts: {
     created_at: 'desc'
   }
 },{
   name:'创建时间升序',
-  id:2,
   sorts: {
     created_at: 'asc'
   }
 },{
   name:'更新时间降序',
-  id:3,
   sorts: {
     updated_at: 'desc'
   }
 },{
   name:'更新时间升序',
-  id:4,
   sorts: {
     updated_at: 'asc'
   }
 },{
   name:'交易笔数降序',
-  id:5,
   sorts: {
     trade_count: 'desc'
   }
 },{
   name:'交易笔数升序',
-  id:6,
   sorts: {
     trade_count: 'asc'
   }
 },{
   name:'交易金额降序',
-  id:7,
   sorts: {
     trade_amount: 'desc'
   }
 },{
   name:'交易金额升序',
-  id:8,
   sorts: {
     trade_amount: 'asc'
   }
 },{
   name:'他欠我金额降序',
-  id:9,
   sorts: {
     balance : 'desc'
   }
 },{
   name:'他欠我金额升序',
-  id:10,
   sorts: {
     balance : 'asc'
   }
 }]
-const condition = {
-  sorts: {
-    created_at: 'desc'
-  },
-  page:1,
-  per_page:10,
-  date_type:'custom',
-  sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-  eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
-}
 const breadcrumbList = [{
   title:'关系',
 },{
@@ -111,7 +91,7 @@ export default class SupplierList extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.dispatch({type:'supplierList/getList',payload:{...condition}})
+    this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
     this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
   }
 
@@ -127,7 +107,7 @@ export default class SupplierList extends PureComponent {
 
   handleChangeSupplierStatus = (id,status) => {
     this.props.dispatch({type:'supplierList/changeSupplierStatus',payload:{
-      id: id,
+      id,
       freeze: status
     }}).then(()=>{
        this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
@@ -143,7 +123,7 @@ export default class SupplierList extends PureComponent {
   }
 
   handleSelectSort = (value) => {
-    let sorts = sortOptions.find( item => item.name == value.slice(6,value.length)).sorts;
+    const sorts = sortOptions.find( item => item.name == value.slice(6,value.length)).sorts;
     this.setState({sorts})
     this.handleGetList(this.state.filter,this.state.pages,sorts)
   }
@@ -189,27 +169,23 @@ export default class SupplierList extends PureComponent {
     )
   }
 
-  handleHeaderExtra = () => {
-    return (
+  render() {
+    const {supplierList: {supplierList,supplierPagination} , form: {getFieldDecorator}} = this.props;
+    const {sorts,pages,filter} = this.state;
+
+    const headerExtra = (
       <Button type='primary' onClick={this.handleToSupplierCreate}>新建供应商</Button>
     )
-  }
 
-  handleTableSortExtra = () => {
-    return (
+    const tableSortExtra = (
       <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSort} optionLabelProp='value'>
         {
-          sortOptions.map( item => {
-            return <Option key={item.id} value={`排序方式: ${item.name}`}>{item.name}</Option>
+          sortOptions.map( (item,index) => {
+            return <Option key={index} value={`排序方式: ${item.name}`}>{item.name}</Option>
           })
         }
       </Select>
     )
-  }
-
-  render() {
-    const {supplierList: {supplierList,supplierPagination} , form: {getFieldDecorator}} = this.props;
-    const {sorts,pages,filter} = this.state;
 
     const columns = [{
       title: '姓名',
@@ -264,7 +240,7 @@ export default class SupplierList extends PureComponent {
 
     return (
       <PageHeaderLayout
-        extraContent={this.handleHeaderExtra()}
+        extraContent={headerExtra}
         className={styles.supplierListExtra}
         breadcrumbList={breadcrumbList}
         >
@@ -279,7 +255,7 @@ export default class SupplierList extends PureComponent {
             </FormItem>
           </Form>
         </Card>
-        <Card bordered={false} title='供应商列表' extra={this.handleTableSortExtra()}>
+        <Card bordered={false} title='供应商列表' extra={tableSortExtra}>
           <Table 
             rowKey='id'
             columns={columns} 

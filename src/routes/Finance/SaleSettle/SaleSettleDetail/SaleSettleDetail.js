@@ -19,12 +19,19 @@ export default class SaleSettleDetail extends PureComponent {
 
   }
 
+  handlePrint = (id) => {
+    this.props.dispatch({type:'saleSettleDetail/printSettle',payload:{
+      id:id,
+      round:1
+    }})
+  }
+
   render() {
     const {singleData} = this.props.saleSettleDetail;
     const breadcrumbList = [{
       title:'单据',
     },{
-      title:'流水',
+      title:'销售结算',
     },{
       title:`#${singleData.number  || ''}`
     }]
@@ -32,14 +39,19 @@ export default class SaleSettleDetail extends PureComponent {
     const menu = (
       <Menu>
         <Menu.Item key='1'>
-          <Popconfirm title="确认删除此销售单?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}>删除</Popconfirm>
+          <Popconfirm title="确认删除此结算单?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}>删除</Popconfirm>
         </Menu.Item>
       </Menu>
     )
 
     const action = (
       <div>
-        <Button>删除</Button>
+        <ButtonGroup>
+          <Popconfirm title='确认打印结算单' placement='bottom' onConfirm={this.handlePrint.bind(null,singleData.id)}><Button >打印</Button></Popconfirm>
+          <Dropdown overlay={menu} placement="bottomRight">
+            <Button><Icon type="ellipsis" /></Button>
+          </Dropdown>
+        </ButtonGroup>
       </div>
     )
 
@@ -47,15 +59,15 @@ export default class SaleSettleDetail extends PureComponent {
       <Row>
         <Col span='8'>
           <div className={styles.textSecondary}>单据数量</div>
-          <div className={styles.heading}>{singleData.count || ''}</div>
+          <div className={styles.heading}>{singleData.order_quantity || ''}</div>
         </Col>
         <Col span='8'>
           <div className={styles.textSecondary}>商品数量</div>
-          <div className={styles.heading}>{singleData.quantity || ''}</div>
+          <div className={styles.heading}>{singleData.item_quantity_one || ''}</div>
         </Col>
         <Col span='8'>
           <div className={styles.textSecondary}>总额</div>
-          <div className={styles.heading}>{singleData.due_fee || ''}</div>
+          <div className={styles.heading}>{singleData.value || ''}</div>
         </Col>
       </Row>
     );
@@ -65,6 +77,32 @@ export default class SaleSettleDetail extends PureComponent {
         <Description term="交易客户">{singleData.customer || ''}</Description>
       </DescriptionList>
     );
+
+    const settleColumns = [{
+      title:'单号',
+      dataIndex:'type',
+      width:'15%',
+      render:(text,record) => `#${record.number}`
+    },{
+      title:'商品数量',
+      dataIndex:'quantity',
+      className: styles['numberRightMove'],
+      render:(text,record) => NCNI(record.quantity).format(true)
+    },{
+      title:'总额',
+      dataIndex:'due_fee',
+      className: styles['numberRightMove'],
+      render:(text,record) => NCNF(record.due_fee).format(true)
+    },{
+      title:'操作时间',
+      dataIndex:'created_at',
+      width:'25%'
+    },{
+      title:'操作',
+      width:172,
+      dataIndex:'operation',
+      render: () => <div><a>查看</a></div>
+    }]
 
     const operationColumns = [{
       title:'操作类型',
@@ -94,9 +132,18 @@ export default class SaleSettleDetail extends PureComponent {
           <Row>
             <Col span='10'>
               <label className={styles.labelTitle}>支付方式：</label>
-              <span>{`${singleData.paymentWays && singleData.paymentWays.name}`}</span>
+              {
+                singleData.pay_status == 1 ? <span style={{color:'red'}}>{singleData.paymentWays && singleData.paymentWays[0]}</span> : (
+                  singleData.paymentWays && singleData.paymentWays.map( (n,index) => {
+                    return index == 0 ? <span key={index}><span>{`${n.name}：`}</span><span>{`${n.value || ''}`}</span></span> : <div key={index} style={{paddingLeft:69}}><span>{`${n.name}：`}</span><span>{`${n.value || ''}`}</span></div>
+                  })
+                )
+              }
             </Col>
           </Row>
+        </Card>
+        <Card bordered={false} title='结算清单' style={{marginBottom:30}}>
+          <Table columns={settleColumns} rowKey='id' dataSource={singleData.orders || []} pagination={false} />
         </Card>
         <Card title='操作记录' bordered={false}>
           <Table columns={operationColumns} rowKey='id' dataSource={singleData.operationSource || []} pagination={false} />

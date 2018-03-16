@@ -52,7 +52,7 @@ export default class GoodsGroup extends PureComponent {
     })
     this.props.dispatch({type:`goodsGroup/${ this.state.modalType.indexOf('Create') > -1 ? 'createSingle' : 'editSingle'}`,payload:value}).then((result)=>{
       if(result.code != 0 ) {
-        message.error(`${result.message}`)
+        message.error(result.message)
       }
       this.props.dispatch({type:'goodsGroup/getList'})
     })
@@ -61,8 +61,12 @@ export default class GoodsGroup extends PureComponent {
   handleDeleteSingle = (item) => {
     this.props.dispatch({type:`goodsGroup/deleteSingle`,payload:{
       id: item.uid ? item.uid : item.id
-    }}).then(()=>{
-      this.props.dispatch({type:'goodsGroup/getList'})
+    }}).then((result)=>{
+      if(result.code != 0) {
+        message.error(result.message)
+      }else {
+        this.props.dispatch({type:'goodsGroup/getList'})
+      }
     })
   }
 

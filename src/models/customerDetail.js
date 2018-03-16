@@ -13,6 +13,7 @@ export default  {
     singleCustomerPaymentHistory:[],
     singleCustomerSalesorders:[],
     singleCustomerStatements:[],
+    singleCustomerPayments:[],
     saleHistoryFilter:[],
     goodsHistoryFilter:[],
     paymentHistoryFilter:[],
@@ -60,14 +61,15 @@ export default  {
         },
         id:payload.id
       }
-      const [data1,data2,data3,data4,data5,data6,data7] = yield all([
+      const [data1,data2,data3,data4,data5,data6,data7,data8] = yield all([
         call(customerService.getSingle,payload),
         call(customerService.getCustomerSaleHistory,condition),
         call(customerService.getCustomerGoodsHistory,conditionWTwo),
         call(customerService.getCustomerPaymentHistory,condition),
         call(customerService.getSalesordersNeedPay,conditionWThree),
         call(customerService.getStatementsNeedPay,conditionWThree),
-        call(customerService.getCustomerfinance,payload)
+        call(customerService.getCustomerfinance,payload),
+        call(customerService.getCustomerPayments,conditionWThree)
       ])
 
       yield put({type:'setShowData',payload:data1.result.data})
@@ -81,7 +83,8 @@ export default  {
         singleCustomerSalesorders: data5.result.data,
         singleCustomerStatements: data6.result.data,
         currentId: payload,
-        singleCustomerFinance:data7.result.data
+        singleCustomerFinance:data7.result.data,
+        singleCustomerPayments:data8.result.data,
       }})
     },
 
@@ -122,6 +125,13 @@ export default  {
       const data = yield call(customerService.getStatementsNeedPay,payload)
       yield put({type:'setState',payload:{
         singleCustomerStatements: data.result.data
+      }})
+    },
+
+    *getPayments({payload},{call,put}) {
+      const data = yield call(customerService.getCustomerPayments,payload)
+      yield put({type:'setState',payload:{
+        singleCustomerPayments: data.result.data
       }})
     },
 

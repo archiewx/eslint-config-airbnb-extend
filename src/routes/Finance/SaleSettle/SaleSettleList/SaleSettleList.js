@@ -136,7 +136,7 @@ export default class SaleSettleList extends PureComponent {
   handleMoreOperation = (item) => {
     return (
       <div>
-        <Link to={`/relationship/customer-detail/${item.id}`}>查看</Link>
+        <Link to={`/finance/sale-settle-detail/${item.id}`}>查看</Link>
         <Divider  type='vertical' />
         <Dropdown overlay={    
           <Menu>

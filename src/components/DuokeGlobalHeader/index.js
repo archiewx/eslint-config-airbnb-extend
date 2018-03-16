@@ -3,6 +3,7 @@ import { Layout, Menu, Icon, Spin, Tag, Dropdown, Avatar, Divider } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import Debounce from 'lodash-decorators/debounce';
+import HeaderSearch from '../antd-pro/HeaderSearch'
 import { Link } from 'dva/router';
 import styles from './index.less';
 
@@ -57,10 +58,10 @@ export default class GlobalHeader extends PureComponent {
     } = this.props;
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
-        <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
+{/*        <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
         <Menu.Item disabled><Icon type="setting" />设置</Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="logout"><Icon type="logout" />退出登录</Menu.Item>
+        <Menu.Divider />*/}
+        <Menu.Item key="logout">退出登录</Menu.Item>
       </Menu>
     );
     const noticeData = this.getNoticeData();
@@ -72,15 +73,25 @@ export default class GlobalHeader extends PureComponent {
           onClick={this.toggle}
         />
         <div className={styles.right}>
-        Hello
-{/*          {currentUser.name ? (
+{/*        <HeaderSearch
+          className={`${styles.action} ${styles.search}`}
+          placeholder="站内搜索"
+          dataSource={['搜索提示一', '搜索提示二', '搜索提示三']}
+          onSearch={(value) => {
+            console.log('input', value); // eslint-disable-line
+          }}
+          onPressEnter={(value) => {
+            console.log('enter', value); // eslint-disable-line
+          }}
+        />*/}
+          {true ? (
             <Dropdown overlay={menu}>
               <span className={`${styles.action} ${styles.account}`}>
-                <Avatar size="small" className={styles.avatar} src={currentUser.avatar} />
-                {currentUser.name}
+                <Avatar size="small" className={styles.avatar}  style={{background:'#f56a00',color:'#fff'}} icon="user"></Avatar>
+                hello
               </span>
             </Dropdown>
-          ) : <Spin size="small" style={{ marginLeft: 8 }} />}*/}
+          ) : <Spin size="small" style={{ marginLeft: 8 }} />}
         </div>
       </Header>
     );

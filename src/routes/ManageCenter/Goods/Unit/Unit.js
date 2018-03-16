@@ -50,7 +50,7 @@ export default class Unit extends PureComponent {
     })
     this.props.dispatch({type:`unit/createSingle${this.state.modalType === 'create' ? 'createSingle' : 'editSingle'}`,payload:value}).then((result)=>{
       if(result.code != 0) {
-        message.error(`${result.message}`)
+        message.error(result.message)
       }else {
         this.props.dispatch({type:'unit/getList'})
       }
@@ -60,8 +60,12 @@ export default class Unit extends PureComponent {
   handleDeleteSingle = (item) => {
     this.props.dispatch({type:'unit/deleteSingle',payload:{
       id:item.id
-    }}).then(()=>{
-      this.props.dispatch({type:'unit/getList'})
+    }}).then((result)=>{
+      if(result.code != 0) {
+        message.error(result.message)
+      }else {
+        this.props.dispatch({type:'unit/getList'})
+      }
     })
   }
 

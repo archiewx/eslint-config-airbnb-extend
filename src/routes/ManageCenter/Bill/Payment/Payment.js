@@ -48,8 +48,12 @@ export default class Payment extends PureComponent {
     this.setState({
       modalVisibel:false,
     })
-    this.props.dispatch({type:`payment/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then(()=>{
-      this.props.dispatch({type:'payment/getList'})
+    this.props.dispatch({type:`payment/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(result.message)
+      }else {
+        this.props.dispatch({type:'payment/getList'})
+      }
     })
   }
 

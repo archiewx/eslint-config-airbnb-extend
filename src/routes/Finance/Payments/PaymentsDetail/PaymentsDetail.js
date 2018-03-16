@@ -32,7 +32,7 @@ export default class PaymentsDetail extends PureComponent {
     const menu = (
       <Menu>
         <Menu.Item key='1'>
-          <Popconfirm title="确认删除此销售单?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}>删除</Popconfirm>
+          <Popconfirm title="确认删除此流水?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}>删除</Popconfirm>
         </Menu.Item>
       </Menu>
     )
@@ -45,24 +45,32 @@ export default class PaymentsDetail extends PureComponent {
 
     const extra = (
       <Row>
-        <Col span='8'>
-          <div className={styles.textSecondary}>单据数量</div>
-          <div className={styles.heading}>{singleData.count || ''}</div>
-        </Col>
-        <Col span='8'>
-          <div className={styles.textSecondary}>商品数量</div>
-          <div className={styles.heading}>{singleData.quantity || ''}</div>
-        </Col>
-        <Col span='8'>
-          <div className={styles.textSecondary}>总额</div>
-          <div className={styles.heading}>{singleData.due_fee || ''}</div>
+        <Col span='8' offset='16'>
+          <div className={styles.textSecondary}>金额</div>
+          <div className={styles.heading}>{singleData.value || ''}</div>
         </Col>
       </Row>
     );
 
     const description = (
       <DescriptionList className={styles.headerList} size="small" col="2">
-        <Description term="交易客户">{singleData.customer || ''}</Description>
+        <Description term="交易对象">{singleData.customer || ''}</Description>
+        <Description term="入账店铺">{singleData.shop || ''}</Description>
+        <Description term="收银员工">{singleData.user || ''}</Description>
+        <Description term="关联单据" >
+          {singleData.orderNumber && singleData.orderNumber.map( (n,i) => {
+            return (
+              <div key={`${i}`}>
+                {n.orderType}
+                {
+                  n.orderType == '销售单' ? <Link to={`/bill/sale-detail/${n.id}`}>{`#${n.number}`}</Link> : (
+                    n.orderType == '进货单' ? <Link to={`/bill/purchase-detail/${n.id}`}>{`#${n.number}`}</Link> : <Link to={`/finance/purchase-settle-detail/${n.id}`}>{`#${n.number}`}</Link>
+                  )
+                }
+              </div>
+            )
+          })}
+        </Description>
       </DescriptionList>
     );
 

@@ -37,6 +37,16 @@ export async function getSingle (params) {
   }) 
 }
 
+export async function getCustomerPayments(params) {
+  let current = {...params};
+  delete current.id
+  return request(`${apiBase}/api/customers/${params.id}/balance/record`,{
+    method:'POST',
+    headers: {'Authorization':token()},
+    body: current
+  })
+}
+
 export async function getCustomerfinance (params) {
   return request(`${apiBase}/api/customers/${params.id}/finance`,{
     headers: { "Authorization": token() },

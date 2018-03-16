@@ -50,7 +50,7 @@ export default class Color extends PureComponent {
     })
     this.props.dispatch({type:`color/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then((result)=>{
       if(result.code != 0) {
-        message.error(`${result.message}`)
+        message.error(result.message)
       }else {
         this.props.dispatch({type:'color/getList'})
       }
@@ -60,8 +60,12 @@ export default class Color extends PureComponent {
   handleDeleteSingle = (item) => {
     this.props.dispatch({type:'color/deleteSingle',payload:{
       id:item.id
-    }}).then(()=>{
-      this.props.dispatch({type:'color/getList'})
+    }}).then((result)=>{
+      if(result.code != 0) {
+        message.error(result.message)
+      }else {
+        this.props.dispatch({type:'color/getList'})
+      }
     })
   }
 

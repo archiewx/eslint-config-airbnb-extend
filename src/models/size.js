@@ -49,7 +49,8 @@ export default  {
     },
 
     *deleteSizeLibrarySingle({payload},{call,put}) {
-      yield call(sizeLibraryService.deleteSingle,payload)
+      const data = yield call(sizeLibraryService.deleteSingle,payload)
+      return data
     },
 
     *editSort ({payload},{call,put}) {

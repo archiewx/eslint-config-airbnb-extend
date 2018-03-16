@@ -332,7 +332,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             barcode: showData.barcodes.barcode || ''
           }
         }else {
-          if(!this.state.selectColors.length) {
+          if(!showData.selectColors.length) {
             showData.selectColors.forEach( item => {
               skuBarcodes[`${item.id}`] = {
                 barcode: showData.barcodes[`${item.id}`].barcode || ''

@@ -60,7 +60,7 @@ export default class PageHeader extends PureComponent {
     const {
       title, logo, action, content, extraContent,
       breadcrumbList, tabList, className, linkElement = 'a',
-      activeTabKey,
+      activeTabKey,status
     } = this.props;
     const clsString = classNames(styles.pageHeader, className);
     let breadcrumb;
@@ -134,7 +134,7 @@ export default class PageHeader extends PureComponent {
           {logo && <div className={styles.logo}>{logo}</div>}
           <div className={styles.main}>
             <div className={styles.row}>
-              {title && <h1 className={styles.title}>{title}</h1>}
+              {title && <div><h1 className={styles.title} style={{display:'inline-block'}}>{title}</h1>{status && <div style={{display:'inline-block',marginLeft:30}}>{status}</div>}</div>}
               {action && <div className={styles.action}>{action}</div>}
             </div>
             <div className={styles.row}>

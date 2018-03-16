@@ -24,11 +24,11 @@ export default  {
     },
 
     *deleteSingle({payload},{call,put}) {
-      const data = yield call(supplierService.deleteSingle,payload)
+      yield call(supplierService.deleteSingle,payload)
     },
 
     *changeSupplierStatus({payload},{call,put}) {
-      const data = yield call(supplierService.changeSupplierStatus,payload)
+      yield call(supplierService.changeSupplierStatus,payload)
     }
   },
 

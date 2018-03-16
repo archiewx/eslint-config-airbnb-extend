@@ -17,7 +17,7 @@ export default  {
           dispatch({type:'setState',payload:{
             singleData:{}
           }})
-          dispatch({type:'getPurchaseList',payload:{
+          dispatch({type:'getSingle',payload:{
             id:match[1]
           }})
         }
@@ -26,8 +26,8 @@ export default  {
   },
 
   effects: {
-    *getPurchaseList ({payload},{call,put,take}) {
-      const data = yield call(settleService.getPurchaseList,payload)
+    *getSingle ({payload},{call,put,take}) {
+      const data = yield call(settleService.getSingle,payload)
       yield put({type:'setShowData',payload:data.result.data})
     },
 

@@ -3,16 +3,13 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import moment from 'moment';
 import currency from 'currency.js'
-import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker,Spin} from 'antd';
+import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Spin} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
-import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
-import TagSelect from '../../../../components/DuokeTagSelect';
+import FilterDatePick from '../../../../components/FilterDatePick'
 import styles from './CustomerList.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
 const NCNI = value => currency(value, { symbol: "", precision: 0});
 const Option = Select.Option;
-const FormItem = Form.Item;
-const { RangePicker } = DatePicker;
 const breadcrumbList = [{
   title:'关系',
 },{
@@ -20,79 +17,58 @@ const breadcrumbList = [{
 }]
 const sortOptions = [{
   name:'创建时间降序',
-  id:1,
   sorts: {
     created_at: 'desc'
   }
 },{
   name:'创建时间升序',
-  id:2,
   sorts: {
     created_at: 'asc'
   }
 },{
   name:'更新时间降序',
-  id:3,
   sorts: {
     updated_at: 'desc'
   }
 },{
   name:'更新时间升序',
-  id:4,
   sorts: {
     updated_at: 'asc'
   }
 },{
   name:'交易笔数降序',
-  id:5,
   sorts: {
     trade_count: 'desc'
   }
 },{
   name:'交易笔数升序',
-  id:6,
   sorts: {
     trade_count: 'asc'
   }
 },{
   name:'交易金额降序',
-  id:7,
   sorts: {
     trade_amount: 'desc'
   }
 },{
   name:'交易金额升序',
-  id:8,
   sorts: {
     trade_amount: 'asc'
   }
 },{
   name:'欠款金额降序',
-  id:9,
   sorts: {
     debt: 'desc'
   }
 },{
   name:'欠款金额升序',
-  id:10,
   sorts: {
     debt: 'asc'
   }
 }]
-const condition = {
-  sorts: {
-    created_at: 'desc'
-  },
-  page:1,
-  per_page:10,
-  date_type:'custom',
-  sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-  eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
-}
-@Form.create()
-@connect(state => ({
-  customerList:state.customerList,
-  layoutFilter:state.layoutFilter
+@connect(({customerList,layoutFilter}) => ({
+  customerList,
+  layoutFilter,
 }))
 export default class CustomerList extends PureComponent {
 
@@ -112,7 +88,7 @@ export default class CustomerList extends PureComponent {
   }
 
   componentDidMount() {
-    this.props.dispatch({type:'customerList/getList',payload:{...condition}})
+    this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
     this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
   }
 
@@ -128,7 +104,7 @@ export default class CustomerList extends PureComponent {
 
   handleChangeCustomerStatus = (id,status) => {
     this.props.dispatch({type:'customerList/changeCustomerStatus',payload:{
-      id: id,
+      id,
       freeze: status
     }}).then(()=>{
        this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
@@ -144,27 +120,20 @@ export default class CustomerList extends PureComponent {
   }
 
   handleSelectSort = (value) => {
-    let sorts = sortOptions.find( item => item.name == value.slice(6,value.length)).sorts;
+    const sorts = sortOptions.find( item => item.name == value.slice(6,value.length)).sorts;
     this.setState({sorts})
     this.handleGetList(this.state.filter,this.state.pages,sorts)
   }
 
-  handleCustomerFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err,value) => {
-        if(!err) {
-          this.props.dispatch({type:'customerList/setFilterCustomerServerData',payload:{
-            ...value,
-            datePick: value['datePick'] ? [value['datePick'][0].format('YYYY-MM-DD'),value['datePick'][1].format('YYYY-MM-DD')] : undefined
-          }})
-          const filter = {...this.props.customerList.fifterCustomerServerData}
-          const pages = {...this.state.pages,page:1}
-          this.setState({filter,pages})
-          this.handleGetList(filter,pages,this.state.sorts)
-        }
-      })
-    }, 0)
+  handleFilter = (value) => {
+    this.props.dispatch({type:'customerList/setFilterCustomerServerData',payload:{
+      ...value,
+      datePick: value['datePick'] ? [value['datePick'][0].format('YYYY-MM-DD'),value['datePick'][1].format('YYYY-MM-DD')] : undefined
+    }})
+    const filter = this.props.customerList.fifterCustomerServerData;
+    const pages = {...this.state.pages,page:1};
+    this.setState({filter,pages});
+    this.handleGetList(filter,pages,this.state.sorts)
   }
 
   handleMoreOperation = (item) => {
@@ -190,24 +159,22 @@ export default class CustomerList extends PureComponent {
     )
   }
 
-  handleTableSortExtra = () => {
-    return (
-      <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSort} optionLabelProp='value'>
-        {
-          sortOptions.map( item => {
-            return <Option key={item.id} value={`排序方式: ${item.name}`}>{item.name}</Option>
-          })
-        }
-      </Select>
-    )
-  }
-
   render() {
-    const {customerList: {customerList,customerPagination} , layoutFilter: {customerFilter} , form: {getFieldDecorator}} = this.props;
+    const {customerList: {customerList,customerPagination} , layoutFilter: {customerFilter}} = this.props;
     const {sorts,pages,filter} = this.state;
 
     const headerExtra = (
       <Button type='primary' onClick={this.handleToCustomerCreate}>新建客户</Button>
+    )
+
+    const tableSortExtra = (
+      <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSort} optionLabelProp='value'>
+        {
+          sortOptions.map( (item,index) => {
+            return <Option key={index} value={`排序方式: ${item.name}`}>{item.name}</Option>
+          })
+        }
+      </Select>
     )
 
     const columns = [{
@@ -268,36 +235,9 @@ export default class CustomerList extends PureComponent {
         breadcrumbList={breadcrumbList}
         >
         <Card bordered={false} className={styles.bottomCardDivided}>
-          <Form layout='inline'>
-            {
-              customerFilter.map( (item,index) => {
-                return item.options.length == 0 ? null : (
-                  <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                    <FormItem>
-                      {getFieldDecorator(`${item.code}`)(
-                        <TagSelect  expandable onChange={this.handleCustomerFormSubmit}>
-                          {
-                            item.options.map( (subItem,subIndex) => {
-                              return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
-                            })
-                          }
-                        </TagSelect>
-                      )}
-                    </FormItem>
-                  </StandardFormRow>
-                )
-              })
-            }
-            <FormItem label='选择日期' >
-              {getFieldDecorator('datePick',{
-                initialValue:[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
-              })(
-                <RangePicker style={{width:542}} onChange={this.handleCustomerFormSubmit}/>
-              )}
-            </FormItem>
-          </Form>
+          <FilterDatePick onChange={this.handleFilter} filterOptions = {customerFilter} defaultDate = {[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]}  />
         </Card>
-        <Card bordered={false} title='客户列表' extra={this.handleTableSortExtra()}>
+        <Card bordered={false} title='客户列表' extra={tableSortExtra}>
           <Table 
             rowKey='id'
             columns={columns} 

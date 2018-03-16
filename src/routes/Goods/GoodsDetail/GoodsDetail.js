@@ -46,6 +46,11 @@ const supplierPagination = {
   showQuickJumper:true,
   showSizeChanger:true,
 }
+const datePick = {
+  date_type:'custom',
+  sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+  eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+}
 @Form.create()
 @connect( state => ({
   goodsDetail: state.goodsDetail,
@@ -63,27 +68,15 @@ export default class GoodsDetail extends PureComponent {
     sortSale: {
       sorts:{}
     },
-    filterSale: {
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
+    filterSale: datePick,
     sortPurchase:{
       sorts:{}
     },
-    filterPurchase:{
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
+    filterPurchase:datePick,
     sortCustomer:{
       sorts:{},
     },
-    filterCustomer:{
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
+    filterCustomer:datePick,
     pageCustomer: {
       page: 1,
       per_page:10
@@ -91,19 +84,11 @@ export default class GoodsDetail extends PureComponent {
     sortSupplier: {
       sorts:{}
     },
-    filterSupplier:{
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
+    filterSupplier:datePick,
     sortStock:{
       sorts:{}
     },
-    filterStock:{
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
+    filterStock:datePick,
   }
 
   componentDidMount() {
@@ -132,7 +117,9 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleDeleteSingleGoods = (id,{item,key,keyPath}) => {
-    this.props.dispatch({type:'goodsDetail/deleteSingleGoods',payload:id})
+    this.props.dispatch({type:'goodsDetail/deleteSingleGoods',payload:id}).then(()=>{
+      this.prop.dispatch(routerRedux.push('/goods-list'));
+    })
   }
 
   handleToGoodsEdit = (id) => {
@@ -357,6 +344,7 @@ export default class GoodsDetail extends PureComponent {
     const {goodsDetailFilter} = this.props.layoutFilter
     const {getFieldDecorator,getFieldValue} = this.props.form;
     const {usePricelelvel,priceModel} = this.props.configSetting;
+
     const description = (
       <DescriptionList col='2' size="small" className={styles.descriptionPostion} >
         <Description term='进货价'>{`${singleGoodsDetail.purchase_price || ''}`}</Description>
@@ -374,7 +362,7 @@ export default class GoodsDetail extends PureComponent {
 
     const menu = (
       <Menu style={{width: 109}}> 
-        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement='bottom' onConfirm={this.handleDeleteSingleGoods.bind(null,currentId)}>删除</Popconfirm></Menu.Item>
+        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement='bottom' onConfirm={this.handleDeleteSingleGoods.bind(null,currentId)}><span  style={{width:'100%'}}>删除</span></Popconfirm></Menu.Item>
       </Menu>
     );
 
@@ -444,21 +432,15 @@ export default class GoodsDetail extends PureComponent {
       )
     }
 
-    const status = (
+    const status = singleGoodsDetail.not_sale == 0 ? (
       <div>
-        {
-          singleGoodsDetail.not_sale == 0 ? (
-            <div>
-              <span className={styles.onSaleStatus}>• </span>
-              <span style={{color: 'rgba(0, 0, 0, 0.85)'}}>在售</span>
-            </div>
-          ) : (
-            <div>
-              <span className={styles.stopSaleStatus}>• </span>
-              <span style={{color: 'rgba(0, 0, 0, 0.85)'}}>停售</span>
-            </div>
-          )
-        }
+        <span className={styles.onSaleStatus}>• </span>
+        <span style={{color: 'rgba(0, 0, 0, 0.85)'}}>在售</span>
+      </div>
+    ) : (
+      <div>
+        <span className={styles.stopSaleStatus}>• </span>
+        <span style={{color: 'rgba(0, 0, 0, 0.85)'}}>停售</span>
       </div>
     )
 

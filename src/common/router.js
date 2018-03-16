@@ -116,6 +116,9 @@ export const getRouterData = (app) => {
     '/finance/sale-settle':{
       component: dynamicWrapper(app, ['saleSettleList','layoutFilter'], () => import('../routes/Finance/SaleSettle/SaleSettleList/SaleSettleList'))
     },
+    '/finance/sale-settle-detail/:id':{
+      component: dynamicWrapper(app, ['saleSettleDetail'], () => import('../routes/Finance/SaleSettle/SaleSettleDetail/SaleSettleDetail'))
+    },
     '/finance/purchase-settle':{
       component: dynamicWrapper(app, ['purchaseSettleList','layoutFilter'], () => import('../routes/Finance/PurchaseSettle/PurchaseSettleList/PurchaseSettleList'))
     },

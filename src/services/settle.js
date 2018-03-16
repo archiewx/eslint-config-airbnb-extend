@@ -9,7 +9,7 @@ export async function getList (params) {
   })
 }
 
-export async function getPurchaseList (params) {
+export async function getSingle (params) {
   return request(`${apiBase}/api/statements/${params.id}`,{
     headers: { "Authorization": token() },
   })

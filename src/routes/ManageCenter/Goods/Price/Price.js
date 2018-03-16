@@ -61,8 +61,12 @@ export default class Size extends PureComponent {
     this.setState({
       priceGradeModalVisibel:false
     })
-    this.props.dispatch({type:`priceGrade/${this.state.priceGradeModalType == 'create' ? 'createSingle' : 'editSingle'}`,payload: value}).then(()=>{
-      this.props.dispatch({type:'priceGrade/getList'})
+    this.props.dispatch({type:`priceGrade/${this.state.priceGradeModalType == 'create' ? 'createSingle' : 'editSingle'}`,payload: value}).then((result)=>{
+      if(result.code != 0) {
+        message.error(result.message)
+      }else {
+        this.props.dispatch({type:'priceGrade/getList'})
+      }
     })
   }
 

@@ -39,7 +39,7 @@ export default class PurchaseSettleDetail extends PureComponent {
     const menu = (
       <Menu>
         <Menu.Item key='1'>
-          <Popconfirm title="确认删除此销售单?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}>删除</Popconfirm>
+          <Popconfirm title="确认删除此结算单?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}>删除</Popconfirm>
         </Menu.Item>
       </Menu>
     )
@@ -47,7 +47,7 @@ export default class PurchaseSettleDetail extends PureComponent {
     const action = (
       <div>
         <ButtonGroup>
-          <Popconfirm title='确认打印销售单' placement='bottom' onConfirm={this.handlePrint.bind(null,singleData.id)}><Button >打印</Button></Popconfirm>
+          <Popconfirm title='确认打印结算单' placement='bottom' onConfirm={this.handlePrint.bind(null,singleData.id)}><Button >打印</Button></Popconfirm>
           <Dropdown overlay={menu} placement="bottomRight">
             <Button><Icon type="ellipsis" /></Button>
           </Dropdown>

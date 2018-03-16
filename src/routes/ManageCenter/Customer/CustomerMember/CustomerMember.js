@@ -52,7 +52,7 @@ export default class CustomerMember extends PureComponent {
     })
     this.props.dispatch({type:`customerMember/${value.id ? 'editSingle':'createSingle' }`,payload:value}).then((result)=>{
       if(result.code != 0) {
-        message.error(`${result.message}`)
+        message.error(result.message)
       }else {
         this.props.dispatch({type:'customerMember/getList'})  
       }

@@ -42,9 +42,27 @@ export default  {
     setShowData(state,{payload}) {
       state.singleData.id = payload.id;
       state.singleData.number = payload.number;
+      state.singleData.value = payload.value;
       state.singleData.customer = payload.payer.data.name;
-      state.singleData.operationSource = payload.docactionables.data;
+      state.singleData.shop = payload.shop.data.name;
+      state.singleData.user = payload.user.data.name;
+      state.singleData.orderNumber = !payload.docs.data.length ? '' : payload.docs.data.map( n => {
+        let orderType;
+        if((n.number).indexOf('J') > -1) {
+          orderType = '结算单'
+        }else if((n.number).indexOf('S') > -1) {
+          orderType = '销售单'
+        }else if((n.number).indexOf('P') > -1) {
+          orderType = '进货单'
+        }
+        return {
+          number: n.number,
+          id: n.id,
+          orderType
+        }
+      })
       state.singleData.paymentWays = payload.paymentmethod.data;
+      state.singleData.operationSource = payload.docactionables.data;
       
       return {...state}
     }

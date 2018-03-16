@@ -38,7 +38,9 @@ export default  {
       state.priceQuantitySteps = payload.map((item)=>{
         return {
           id: `${item.id}`,
-          name: `${item.name}`,
+          name: item.quantityranges.data.map((item)=>{
+                  return item.min + '~';
+                }).join(''),
           quantityranges: item.quantityranges.data
         }
       })

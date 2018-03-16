@@ -146,6 +146,19 @@ const sortPurchaseOptions = [{
     stock_quantity: 'asc'
   }
 }]
+const datePick = {
+  date_type:'custom',
+  sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+  eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
+}
+const condition = {
+  sorts: {
+    created_at: 'desc'
+  },
+  page:1,
+  per_page:10,
+  ...datePick
+};
 @Form.create()
 @connect(state => ({
   goodsList:state.goodsList,
@@ -169,21 +182,13 @@ export default class GoodsList extends PureComponent {
       per_page:10,
       page:1,
     },
-    filterSale: {
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
-    filterPurchase: {
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    }
+    filterSale: datePick,
+    filterPurchase: datePick
   }
 
   componentDidMount() {
-    this.props.dispatch({type:'goodsList/getGoodsList'})
-    this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
+    this.props.dispatch({type:'goodsList/getGoodsList',payload:condition})
+    this.props.dispatch({type:'layoutFilter/getLayoutFilter',payload:condition})
   }
   
   handleTabChange = (key) => {
@@ -197,14 +202,18 @@ export default class GoodsList extends PureComponent {
   handleSelectGoodStatus = (item) => {
     this.props.dispatch({type:'goodsList/changeGoodsStatus',payload:{
       id: item.id,
-      not_sale: item.not_sale === '1' ? 0 : 1
-    }})
+      not_sale: item.not_sale == '1' ? 0 : 1
+    }}).then(()=>{
+      this.props.dispatch({type:'goodsList/getGoodsList',payload:condition})
+    })
   }
 
   handleDeleteSingleGoods = (item) => {
     this.props.dispatch({type:'goodsList/deleteSingleGoods',payload:{
       id:item.id
-    }})
+    }}).then(()=>{
+      this.props.dispatch({type:'goodsList/getGoodsList',payload:condition})
+    })
   }
 
   handleGetSaleList = (filter,pages,sorts) => {
@@ -447,20 +456,20 @@ export default class GoodsList extends PureComponent {
           per_page:pageSize,
           page:pageNumber
         }
-        this.setState({pagesSale})
         this.handleGetSaleList(filterSale,pagesSale,sortSale)
+        this.setState({pagesSale})
       },
        onShowSizeChange: (current,size) => {
         const pagesSale = {
           per_page:size,
           page:1
         }
-        this.setState({pagesSale})
         this.handleGetSaleList(filterSale,pagesSale,sortSale)
+        this.setState({pagesSale})
       },
     }
 
-    const putchasePagination = {
+    const purchasePagination = {
       pageSize:pagesPurchase.per_page,
       total:goodsPurchasePagination.total,
       showQuickJumper:true,
@@ -470,16 +479,16 @@ export default class GoodsList extends PureComponent {
           per_page:pageSize,
           page:pageNumber
         }
-        this.setState({pagesPurchase})
         this.handleGetPurchaseList(filterPurchase,pagesPurchase,sortPurchase)
+        this.setState({pagesPurchase})
       },
       onShowSizeChange: (current,size) => {
         const pagesPurchase = {
           per_page:size,
           page:1
         }
-        this.setState({pagesPurchase})
         this.handleGetPurchaseList(filterPurchase,pagesPurchase,sortPurchase)
+        this.setState({pagesPurchase})
       }
     }
 
@@ -571,7 +580,7 @@ export default class GoodsList extends PureComponent {
               rowKey='id'
               columns={purchaseColumns} 
               dataSource={goodsListPurchases} 
-              pagination={putchasePagination}
+              pagination={purchasePagination}
             >
             </Table>
             <div style={{marginTop:-43,width:300}}>

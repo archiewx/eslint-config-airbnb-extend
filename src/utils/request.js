@@ -21,8 +21,9 @@ const codeMessage = {
 };
 function checkStatus(response) {
   if(response.status == 401) {
-    window.location = '#user'
-    throw new Error('token过期，请重新授权');
+    window.location = '#user';
+    sessionStorage.clear();
+    throw new Error('token已失效，请重新扫码');
   }
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -63,7 +64,7 @@ export default function request(url, options) {
     .then(checkStatus)
     .then((response) => {
       if (newOptions.method === 'DELETE' || response.status === 204) {
-        return response.text();
+        return response.json();
       }
       return response.json();
     });

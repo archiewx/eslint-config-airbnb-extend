@@ -84,7 +84,7 @@ export default class SaleOrder extends PureComponent {
     })
     this.props.dispatch({type:`adjustPrice/${value.id ? 'editSingle' : 'createSingle'}`,payload:value}).then((result)=>{
       if(result.code != 0) {
-        message.error(`${result.message}`)
+        message.error(result.message)
       }else {
         this.props.dispatch({type:'adjustPrice/getList'})
       }

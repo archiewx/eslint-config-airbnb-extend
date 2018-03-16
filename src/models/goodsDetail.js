@@ -1,4 +1,5 @@
 import * as goodsService from '../services/goods'
+import {message} from 'antd'
 import * as customerGroupService from '../services/customerGroup'
 import {imageApiBase} from '../common/index.js'
 export default  {
@@ -38,27 +39,30 @@ export default  {
         call(customerGroupService.getList),
       ])
       const {usePricelelvel,priceModel,itemImageLevel} = yield select(({configSetting}) => (configSetting))
-      yield put({type:'setsingleGoodsDetail',payload:{
-        value: data1.result.data,
-        itemimage: data1.result.itemimage_names,
-        usePricelelvel,
-        priceModel,
-        itemImageLevel,
-      }})
-      yield put({type:'setShowSaleList',payload:data2.result.data.list})
-      yield put({type:'setShowPurchaseList',payload:data3.result.data.list})
-      yield put({type:'setShowStockList',payload:data6.result.data.list})
-      yield put({type:'setShowCustomerList',payload:data4.result.data})
-      yield put({type:'setState',payload:{
-        singleGoodsSuppliers:data5.result.data.list,
-        currentId:payload
-      }})
-      yield put({type:'setShowCustomerMode',payload:data7.result.data})
+      if(data1.code && data1.code != 0) {
+        message.error(data1.message)
+      }else {
+        yield put({type:'setsingleGoodsDetail',payload:{
+          value: data1.result.data,
+          itemimage: data1.result.itemimage_names || [],
+          usePricelelvel,
+          priceModel,
+          itemImageLevel,
+        }})
+        yield put({type:'setShowSaleList',payload:data2.result.data.list})
+        yield put({type:'setShowPurchaseList',payload:data3.result.data.list})
+        yield put({type:'setShowStockList',payload:data6.result.data.list})
+        yield put({type:'setShowCustomerList',payload:data4.result.data})
+        yield put({type:'setState',payload:{
+          singleGoodsSuppliers:data5.result.data.list,
+          currentId:payload
+        }})
+        yield put({type:'setShowCustomerMode',payload:data7.result.data})
+      }
     },
 
     *deleteSingleGoods({payload},{call,put}) {
-      const data = yield call(goodsService.deleteSingleGoods,payload)
-      yield put(routerRedux.push('/goods-list'));
+      yield call(goodsService.deleteSingleGoods,payload)
     },
 
     *changeGoodsStatus({payload},{call,put}) {
@@ -120,87 +124,91 @@ export default  {
       let priceMatrix = [...value.itemprices.data];
       state.singleGoodsDetail.prices = {};
       let flag = false;
-      if(usePricelelvel == 'yes') {
-        if(priceModel == '') {
-          priceMatrix.forEach( item => {
-            if(item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-              state.singleGoodsDetail.prices[`${item.pricelevel_id}`] = {
-                price:item.price
+      if(priceMatrix.length) {
+        if(usePricelelvel == 'yes') {
+          if(priceModel == '') {
+            priceMatrix.forEach( item => {
+              if(item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+                state.singleGoodsDetail.prices[`${item.pricelevel_id}`] = {
+                  price:item.price
+                }
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              else {
+                flag = true;    
               }
-            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
-            else {
-              flag = true;    
-            }
-          })
-        }else if(priceModel == 'shop') {
-          priceMatrix.forEach( item => {
-            if(item.pricelevel_id && item.shop_id && item.unit_id == null && item.quantityrange_id == null) {
-              state.singleGoodsDetail.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
-                price:item.price
+            })
+          }else if(priceModel == 'shop') {
+            priceMatrix.forEach( item => {
+              if(item.pricelevel_id && item.shop_id && item.unit_id == null && item.quantityrange_id == null) {
+                state.singleGoodsDetail.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
+                  price:item.price
+                }
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              else {
+                flag = true;    
               }
-            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
-            else {
-              flag = true;    
-            }
-          })
-        }else if(priceModel == 'unit') {
-          priceMatrix.forEach( item => {
-            if(item.pricelevel_id && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
-              stata.singleGoodsDetail.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
-                price:item.price
+            })
+          }else if(priceModel == 'unit') {
+            priceMatrix.forEach( item => {
+              if(item.pricelevel_id && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
+                stata.singleGoodsDetail.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
+                  price:item.price
+                }
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              else {
+                flag = true;    
               }
-            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
-            else {
-              flag = true;    
-            }
-          })
-        }else if(priceModel == 'quantityrange') {
-          priceMatrix.forEach( item => {
-            if(item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id) {
-              state.singleGoodsDetail.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
-                price:item.price
+            })
+          }else if(priceModel == 'quantityrange') {
+            priceMatrix.forEach( item => {
+              if(item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id) {
+                state.singleGoodsDetail.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
+                  price:item.price
+                }
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              else {
+                flag = true;    
               }
-            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
-            else {
-              flag = true;    
-            }
-          })
+            })
+          }
+        }else {
+          if(priceModel == 'shop') {
+            priceMatrix.forEach( item => {
+              if(item.pricelevel_id == null && item.shop_id  && item.unit_id == null && item.quantityrange_id == null) {
+                state.singleGoodsDetail.prices[`${item.shop_id}`] = {
+                  price: item.price
+                } 
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              else {
+                flag = true;    
+              }
+            })
+          }else if(priceModel == 'unit') {
+            priceMatrix.forEach( item => {
+              if(item.pricelevel_id == null && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
+                state.singleGoodsDetail.prices[`${item.unit_id}`] = {
+                  price: item.price
+                }
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              else {
+                flag = true;    
+              }
+            })
+          }else if(priceModel == 'quantityrange') {
+            priceMatrix.forEach( item => {
+              if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id ) {
+                state.singleGoodsDetail.prices[`${item.quantityrange_id}`] = {
+                  price: item.price
+                }
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              else {
+                flag = true;    
+              }
+            })
+          }
         }
       }else {
-        if(priceModel == 'shop') {
-          priceMatrix.forEach( item => {
-            if(item.pricelevel_id == null && item.shop_id  && item.unit_id == null && item.quantityrange_id == null) {
-              state.singleGoodsDetail.prices[`${item.shop_id}`] = {
-                price: item.price
-              } 
-            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
-            else {
-              flag = true;    
-            }
-          })
-        }else if(priceModel == 'unit') {
-          priceMatrix.forEach( item => {
-            if(item.pricelevel_id == null && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
-              state.singleGoodsDetail.prices[`${item.unit_id}`] = {
-                price: item.price
-              }
-            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
-            else {
-              flag = true;    
-            }
-          })
-        }else if(priceModel == 'quantityrange') {
-          priceMatrix.forEach( item => {
-            if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id ) {
-              state.singleGoodsDetail.prices[`${item.quantityrange_id}`] = {
-                price: item.price
-              }
-            }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
-            else {
-              flag = true;    
-            }
-          })
-        }
+        flag = true;
       }
       if(flag) {
         state.singleGoodsDetail.hidePriceTable = false;

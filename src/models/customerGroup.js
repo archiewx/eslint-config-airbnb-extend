@@ -31,7 +31,8 @@ export default  {
     },
 
     *deleteSingle ({payload},{call,put}) {
-      yield call(customerGroupService.deleteSingle,payload)
+      const data = yield call(customerGroupService.deleteSingle,payload)
+      return data;
     },
 
     *editSort ({payload},{call,put}) {

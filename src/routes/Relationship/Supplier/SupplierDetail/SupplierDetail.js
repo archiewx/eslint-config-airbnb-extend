@@ -517,7 +517,7 @@ export default class SupplierDetail extends PureComponent {
 
     return (
       <PageHeaderLayout
-        title={`单号：${singleSupplierDetail.name || ''}`}
+        title={`姓名：${singleSupplierDetail.name || ''}`}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         breadcrumbList={breadcrumbList}
         content={description}

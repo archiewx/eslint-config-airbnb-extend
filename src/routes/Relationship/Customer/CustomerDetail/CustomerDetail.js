@@ -5,6 +5,7 @@ import moment from 'moment';
 import currency from 'currency.js'
 import { Row, Col, Card, Button,Icon,Menu,Dropdown,Popconfirm,Divider,Radio,Table,Form,DatePicker} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
+import FilterDatePick from '../../../../components/FilterDatePick'
 import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
 import LightBoxImage from '../../../../components/LightBoxImage/LightBoxImage'
@@ -43,25 +44,14 @@ const tabListNoTitle = [{
   key: 'settle',
   tab: '未付款结算单',
 }];
-const salePagination = {
+const pagination = {
   showQuickJumper: true,
   showSizeChanger: true,
 }
-const goodsPagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
-}
-const paymentPagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
-}
-const salesorderPagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
-}
-const settlesorderPagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
+const dataPick = {
+  date_type:'custom',
+  sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
+  eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
 }
 @Form.create()
 @connect(state => ({
@@ -77,11 +67,7 @@ export default class CustomerDetail extends PureComponent {
         created_at:'desc'
       }
     },
-    filterSaleHistory: {
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
+    filterSaleHistory: dataPick,
     pageSaleHistory: {
       page:1,
       per_page:10
@@ -91,11 +77,7 @@ export default class CustomerDetail extends PureComponent {
         purchase_time: 'desc'
       }
     },
-    filterGoodsHistory: {
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
+    filterGoodsHistory: dataPick,
     pageGoodsHistory: {
       page:1,
       per_page:10
@@ -105,11 +87,7 @@ export default class CustomerDetail extends PureComponent {
         created_at:'desc'
       }
     },
-    filterPaymentHistory: {
-      date_type:'custom',
-      sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
-      eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
-    },
+    filterPaymentHistory: dataPick,
     pagePaymentHistory: {
       page:1,
       per_page:10
@@ -121,6 +99,10 @@ export default class CustomerDetail extends PureComponent {
     pageStatement: {
       page:1,
       per_page:10
+    },
+    pagePayments :{
+      page: 1,
+      per_page: 10
     }
   }
 
@@ -140,7 +122,7 @@ export default class CustomerDetail extends PureComponent {
 
   handleChangeCustomerStatus = (id,status) => {
     this.props.dispatch({type:'customerDetail/changeCustomerStatus',payload:{
-      id: id,
+      id,
       freeze: status == 1 ? 0 : 1
     }})
   }
@@ -150,7 +132,7 @@ export default class CustomerDetail extends PureComponent {
   }
 
   handleSaleHistorySort = (pagination,filter,sorter) => {
-    let pageSaleHistory = {
+    const pageSaleHistory = {
       page:pagination.current,
       per_page:pagination.pageSize
     }
@@ -173,29 +155,22 @@ export default class CustomerDetail extends PureComponent {
     }})
   }
 
-  handleSaleFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err,value) => {
-        if(!err) {
-          this.props.dispatch({type:'customerDetail/setFilterSaleServerData',payload:{
-            ...value,
-            sale_datePick: value['sale_datePick'] ? [value['sale_datePick'][0].format('YYYY-MM-DD'),value['sale_datePick'][1].format('YYYY-MM-DD')] : undefined
-          }})
-          const filterSaleHistory = this.props.customerDetail.filterSaleServerData;
-          this.setState({filterSaleHistory})
-          this.props.dispatch({type:'customerDetail/getSaleHistory',payload:{
-            ...filterSaleHistory,
-            ...this.state.sortSaleHistory,
-            id:this.props.customerDetail.currentId.id,
-          }})
-        }
-      })
-    }, 0)
+  handleSaleFilter = (value) => {
+    this.props.dispatch({type:'customerDetail/setFilterSaleServerData',payload:{
+      ...value,
+      sale_datePick: value['sale_datePick'] ? [value['sale_datePick'][0].format('YYYY-MM-DD'),value['sale_datePick'][1].format('YYYY-MM-DD')] : undefined
+    }})
+    const filterSaleHistory = this.props.customerDetail.filterSaleServerData;
+    this.setState({filterSaleHistory})
+    this.props.dispatch({type:'customerDetail/getSaleHistory',payload:{
+      ...filterSaleHistory,
+      ...this.state.sortSaleHistory,
+      id:this.props.customerDetail.currentId.id,
+    }})
   }
 
   handleGoodsHistorySort = (pagination,filter,sorter) => {
-    let pageGoodsHistory = {
+    const pageGoodsHistory = {
       page:pagination.current,
       per_page:pagination.pageSize
     }
@@ -218,29 +193,22 @@ export default class CustomerDetail extends PureComponent {
     }})
   }
 
-  handleGoodsFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err,value) => {
-        if(!err) {
-          this.props.dispatch({type:'customerDetail/setFilterGoodsServerData',payload:{
-            ...value,
-            goods_datePick: value['goods_datePick'] ? [value['goods_datePick'][0].format('YYYY-MM-DD'),value['goods_datePick'][1].format('YYYY-MM-DD')] : undefined
-          }})
-          const filterGoodsHistory = this.props.customerDetail.filterGoodsServerData;
-          this.setState({filterGoodsHistory})
-          this.props.dispatch({type:'customerDetail/getGoodsHistory',payload:{
-            ...filterGoodsHistory,
-            ...this.state.sortGoodsHistory,
-            id:this.props.customerDetail.currentId.id,
-          }})
-        }
-      })
-    }, 0)
+  handleGoodsFilter = (value) => {
+    this.props.dispatch({type:'customerDetail/setFilterGoodsServerData',payload:{
+      ...value,
+      goods_datePick: value['goods_datePick'] ? [value['goods_datePick'][0].format('YYYY-MM-DD'),value['goods_datePick'][1].format('YYYY-MM-DD')] : undefined
+    }})
+    const filterGoodsHistory = this.props.customerDetail.filterGoodsServerData;
+    this.setState({filterGoodsHistory})
+    this.props.dispatch({type:'customerDetail/getGoodsHistory',payload:{
+      ...filterGoodsHistory,
+      ...this.state.sortGoodsHistory,
+      id:this.props.customerDetail.currentId.id,
+    }})
   }
 
   handlePaymentHistorySort = (pagination,filter,sorter) => {
-    let pagePaymentHistory = {
+    const pagePaymentHistory = {
       page:pagination.current,
       per_page:pagination.pageSize
     }
@@ -263,74 +231,83 @@ export default class CustomerDetail extends PureComponent {
     }})
   }
 
-  handlePaymentFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err,value) => {
-        if(!err) {
-          this.props.dispatch({type:'customerDetail/setFilterPurchaseServerData',payload:{
-            ...value,
-            payment_datePick: value['payment_datePick'] ? [value['payment_datePick'][0].format('YYYY-MM-DD'),value['payment_datePick'][1].format('YYYY-MM-DD')] : undefined
-          }})
-          const filterPaymentHistory = this.props.customerDetail.filterPaymentServerData
-          this.setState({filterPaymentHistory})
-          this.props.dispatch({type:'customerDetail/getPaymentHistory',payload:{
-            ...filterPaymentHistory,
-            ...this.state.sortPaymentHistory,
-            id:this.props.customerDetail.currentId.id,
-          }})
-        }
-      })
-    }, 0)
+  handlePaymentFilter = (value) => {
+    this.props.dispatch({type:'customerDetail/setFilterPurchaseServerData',payload:{
+      ...value,
+      payment_datePick: value['payment_datePick'] ? [value['payment_datePick'][0].format('YYYY-MM-DD'),value['payment_datePick'][1].format('YYYY-MM-DD')] : undefined
+    }})
+    const filterPaymentHistory = this.props.customerDetail.filterPaymentServerData
+    this.setState({filterPaymentHistory})
+    this.props.dispatch({type:'customerDetail/getPaymentHistory',payload:{
+      ...filterPaymentHistory,
+      ...this.state.sortPaymentHistory,
+      id:this.props.customerDetail.currentId.id,
+    }})
+  }
+
+  handlePaymentsSort = (pagination,filter,sorter) => {
+    const pagePayments = {
+      page:pagination.current,
+      per_page:pagination.pageSize
+    }
+    this.setState({pagePayments})
+    let sorts = {}
+    if(sorter.field) {
+      sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+    }else {
+      sorts = {
+        created_at: 'desc'
+      }
+    }
+    this.props.dispatch({type:'customerDetail/getPayments',payload:{
+      sorts,
+      id: this.props.customerDetail.currentId.id
+    }})
   }
 
   handleSalesorderSort = (pagination,filter,sorter) => {
-    let pageSalesorder = {
+    const pageSalesorder = {
       page:pagination.current,
       per_page:pagination.pageSize
     }
     this.setState({pageSalesorder})
-    let salesorderSort = {
-      sorts:{}
-    }
+    let sorts = {}
     if(sorter.field) {
-      salesorderSort.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+      sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
     }else {
-      salesorderSort.sorts = {
+      sorts = {
         created_at: 'desc'
       }
     }
     this.props.dispatch({type:'customerDetail/getSalesorder',payload:{
-      ...salesorderSort,
+      sorts,
       id:this.props.customerDetail.currentId.id,
     }})
   }
 
   handleStatementSort = (pagination,filter,sorter) => {
-    let pageStatement = {
+    const pageStatement = {
       page:pagination.current,
       per_page:pagination.pageSize
     }
     this.setState({pageStatement})
-    let statementSort = {
-      sorts: {}
-    }
+    let sorts = {};
     if(sorter.field) {
-      statementSort.sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
+      sorts[sorter.field] = sorter.order.slice(0,sorter.order.length-3)
     }else {
-      statementSort.sorts = {
+      sorts = {
         created_at: 'desc'
       }
     }
     this.props.dispatch({type:'customerDetail/getStatement',payload:{
-      ...statementSort,
+      sorts,
       id:this.props.customerDetail.currentId.id,
     }})
   }
 
   render() {
-    const {singleCustomerDetail,singleCustomerFinance,singleCustomerSaleHistory,singleCustomerGoodsHistory,singleCustomerPaymentHistory,singleCustomerSalesorders,singleCustomerStatements,saleHistoryFilter,goodsHistoryFilter,paymentHistoryFilter,currentId} = this.props.customerDetail;
-    const {activeTabKey,activeBlanceTabKey,pageSaleHistory,pageGoodsHistory,pagePaymentHistory,pageSalesorder,pageStatement} = this.state;
+    const {singleCustomerDetail,singleCustomerFinance,singleCustomerSaleHistory,singleCustomerGoodsHistory,singleCustomerPaymentHistory,singleCustomerSalesorders,singleCustomerStatements,saleHistoryFilter,goodsHistoryFilter,paymentHistoryFilter,currentId,singleCustomerPayments} = this.props.customerDetail;
+    const {activeTabKey,activeBlanceTabKey,pageSaleHistory,pageGoodsHistory,pagePaymentHistory,pageSalesorder,pageStatement,pagePayments} = this.state;
     const {getFieldDecorator} = this.props.form
     const description = (
       <DescriptionList size="small" col="2" className={styles.descriptionPostion}>
@@ -524,6 +501,35 @@ export default class CustomerDetail extends PureComponent {
       render:(text,record) => (<a>查看</a>)
     }]
 
+    const purchasesColumns = [{
+      title:'单号',
+      dataIndex: 'number',
+      width:'20%',
+      render:(text,record) => (`#${record.number}`)
+    },{
+      title:'支付方式',
+      dataIndex: 'paymentWay',
+      sorter:true,
+      render: (text,record) => record.paymentmethod.data.name
+    },{
+      title:'金额',
+      dataIndex: 'value',
+      width:'20%',
+      className: styles['numberRightMove'],
+      sorter:true,
+      render: (text,record) => NCNF(record.value).format(true)
+    },{
+      title:'创建时间',
+      width:'30%',
+      dataIndex:'created_at',
+      sorter:true,
+    },{
+      title:'操作',
+      width:'10%',
+      dataIndex: 'operation',
+      render:(text,record) => (<a>查看</a>)
+    }]
+
     const Info = ({ title, value, bordered }) => (
       <div className={styles.headerInfo}>
         <span>{title}</span>
@@ -534,7 +540,7 @@ export default class CustomerDetail extends PureComponent {
 
     return (
       <PageHeaderLayout
-        title={`单号：${singleCustomerDetail.name || ''}`}
+        title={`姓名：${singleCustomerDetail.name || ''}`}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         breadcrumbList={breadcrumbList}
         content={description}
@@ -605,16 +611,19 @@ export default class CustomerDetail extends PureComponent {
           </Card>
           <Card bordered={false} tabList={tabListNoTitle} onTabChange={this.handleBlanceTabChange}>
             <div style={{display: activeBlanceTabKey == 'balance' ? 'block' : 'none'}}>
-             {`emmmm………`}
+              <Table columns={purchasesColumns} dataSource={singleCustomerPayments} onChange={this.handlePaymentsSort} pagination={pagination} rowKey='id' />
+              <div style={{marginTop:-43,width:300}}>
+                <span>{`共 ${singleCustomerPayments.length || ''} 条流水 第 ${pagePayments.page} / ${Math.ceil(Number(singleCustomerPayments.length)/Number(pagePayments.per_page))} 页`}</span>
+              </div>
             </div>
             <div style={{display: activeBlanceTabKey == 'sale' ? 'block' : 'none'}}>
-              <Table columns={salesorderColumns} dataSource={singleCustomerSalesorders} onChange={this.handleSalesorderSort} pagination={salesorderPagination} rowKey='id' />
+              <Table columns={salesorderColumns} dataSource={singleCustomerSalesorders} onChange={this.handleSalesorderSort} pagination={pagination} rowKey='id' />
               <div style={{marginTop:-43,width:300}}>
                 <span>{`共 ${singleCustomerSalesorders.length || ''} 条销售单 第 ${pageSalesorder.page} / ${Math.ceil(Number(singleCustomerSalesorders.length)/Number(pageSalesorder.per_page))} 页`}</span>
               </div>
             </div>
             <div style={{display: activeBlanceTabKey == 'settle' ? 'block' : 'none'}}>
-              <Table columns={statementColumns} dataSource={singleCustomerStatements} onChange={this.handleStatementSort} pagination={settlesorderPagination} rowKey='id' />
+              <Table columns={statementColumns} dataSource={singleCustomerStatements} onChange={this.handleStatementSort} pagination={pagination} rowKey='id' />
               <div style={{marginTop:-43,width:300}}>
                 <span>{`共 ${singleCustomerStatements.length || ''} 条结算单 第 ${pageStatement.page} / ${Math.ceil(Number(singleCustomerStatements.length)/Number(pageStatement.per_page))} 页`}</span>
               </div>
@@ -623,37 +632,10 @@ export default class CustomerDetail extends PureComponent {
         </div>
         <div style={{display: activeTabKey == 'sale' ? 'block' : 'none'}}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout='inline'>
-              {
-                saleHistoryFilter.map( (item,index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`sale_${item.code}`)(
-                          <TagSelect expandable onChange={this.handleSaleFormSubmit}>
-                            {
-                              item.options.map( (subItem,subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  )
-                })
-              }
-              <FormItem label='选择日期' >
-                {getFieldDecorator('sale_datePick',{
-                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
-                })(
-                  <RangePicker style={{width:542}} onChange={this.handleSaleFormSubmit}/>
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handleSaleFilter} filterOptions={saleHistoryFilter} tagLabel={'sale'} dateLabel={'sale'}/>
           </Card>
           <Card bordered={false}>
-            <Table columns={saleColumns} dataSource={singleCustomerSaleHistory} onChange={this.handleSaleHistorySort} pagination={salePagination} rowKey='id' />
+            <Table columns={saleColumns} dataSource={singleCustomerSaleHistory} onChange={this.handleSaleHistorySort} pagination={pagination} rowKey='id' />
             <div style={{marginTop:-43,width:300}}>
               <span>{`共 ${singleCustomerSaleHistory.length || ''} 条销售单 第 ${pageSaleHistory.page} / ${Math.ceil(Number(singleCustomerSaleHistory.length)/Number(pageSaleHistory.per_page))} 页`}</span>
             </div>
@@ -661,37 +643,10 @@ export default class CustomerDetail extends PureComponent {
         </div>
         <div style={{display: activeTabKey == 'goods' ? 'block' : 'none'}}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout='inline'>
-              {
-                goodsHistoryFilter.map( (item,index) => {
-                  return  item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`goods_${item.code}`)(
-                          <TagSelect expandable onChange={this.handleGoodsFormSubmit}>
-                            {
-                              item.options.map( (subItem,subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  )
-                })
-              }
-              <FormItem label='选择日期' >
-                {getFieldDecorator('goods_datePick',{
-                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
-                })(
-                  <RangePicker style={{width:542}} onChange={this.handleGoodsFormSubmit}/>
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handleGoodsFilter} filterOptions={goodsHistoryFilter} tagLabel={'goods'} dateLabel={'goods'}/>
           </Card>
           <Card bordered={false}>
-            <Table columns={goodsColumns} dataSource={singleCustomerGoodsHistory} onChange={this.handleGoodsHistorySort} pagination={goodsPagination} rowKey='id' />
+            <Table columns={goodsColumns} dataSource={singleCustomerGoodsHistory} onChange={this.handleGoodsHistorySort} pagination={pagination} rowKey='id' />
             <div style={{marginTop:-43,width:300}}>
               <span>{`共 ${singleCustomerGoodsHistory.length || ''} 件商品 第 ${pageGoodsHistory.page} / ${Math.ceil(Number(singleCustomerGoodsHistory.length)/Number(pageGoodsHistory.per_page))} 页`}</span>
             </div>
@@ -699,37 +654,10 @@ export default class CustomerDetail extends PureComponent {
         </div>
         <div style={{display: activeTabKey == 'payment' ? 'block' : 'none'}}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout='inline'>
-              {
-                paymentHistoryFilter.map( (item,index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem expandable>
-                        {getFieldDecorator(`payment_${item.code}`)(
-                          <TagSelect expandable onChange={this.handlePaymentFormSubmit}>
-                            {
-                              item.options.map( (subItem,subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  )
-                })
-              }
-              <FormItem label='选择日期' >
-                {getFieldDecorator('payment_datePick',{
-                  initialValue:[moment(agoSevenDays,'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
-                })(
-                  <RangePicker style={{width:542}} onChange={this.handlePaymentFormSubmit}/>
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handlePaymentFilter} filterOptions={paymentHistoryFilter} tagLabel={'payment'} dateLabel={'payment'}/>
           </Card>
           <Card bordered={false}>
-            <Table columns={paymentColumns} dataSource={singleCustomerPaymentHistory} onChange={this.handlePaymentHistorySort} pagination={paymentPagination} rowKey='id' />
+            <Table columns={paymentColumns} dataSource={singleCustomerPaymentHistory} onChange={this.handlePaymentHistorySort} pagination={pagination} rowKey='id' />
             <div style={{marginTop:-43,width:300}}>
               <span>{`共 ${singleCustomerPaymentHistory.length || ''} 条流水 第 ${pagePaymentHistory.page} / ${Math.ceil(Number(singleCustomerPaymentHistory.length)/Number(pagePaymentHistory.per_page))} 页`}</span>
             </div>
