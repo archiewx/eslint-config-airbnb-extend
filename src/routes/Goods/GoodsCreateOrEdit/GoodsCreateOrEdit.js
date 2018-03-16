@@ -12,14 +12,14 @@ import SelectMultiple from '../../../components/SelectMultiple/SelectMultiple'
 import GoodsPictureModal from '../../../components/GoodsPictureModal/GoodsPictureModal'
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import styles from './GoodsCreateOrEdit.less'
-import { DelayRunner } from '@crow/util';
+import {DelayRunner} from '../../../utils/utils'
+let validateDelay = new DelayRunner()
 const breadcrumbList = [{
   title:'商品',
 }]
 const FormItem = Form.Item;
 const Option = Select.Option;
 let cx = classNames.bind(styles);
-let validateDelay = new DelayRunner();
 const formItemLayout = {
   labelCol: {
     span: 1

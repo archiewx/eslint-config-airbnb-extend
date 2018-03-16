@@ -4,6 +4,19 @@ export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
 }
 
+export class DelayRunner {
+
+  run( callback, timeout ){
+    clearTimeout( this.timer );
+    this.timer = setTimeout( callback || function(){}, timeout || 0);
+  }
+
+  clear(){
+    clearTimeout( this.timer );
+  }
+
+}
+
 export function getTimeDistance(type) {
   const now = new Date();
   const oneDay = 1000 * 60 * 60 * 24;
