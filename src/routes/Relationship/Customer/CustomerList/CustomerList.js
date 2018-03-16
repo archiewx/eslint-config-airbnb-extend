@@ -235,7 +235,7 @@ export default class CustomerList extends PureComponent {
         breadcrumbList={breadcrumbList}
         >
         <Card bordered={false} className={styles.bottomCardDivided}>
-          <FilterDatePick onChange={this.handleFilter} filterOptions = {customerFilter} defaultDate = {[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]}  />
+          <FilterDatePick onChange={this.handleFilter} filterOptions = {customerFilter}   />
         </Card>
         <Card bordered={false} title='客户列表' extra={tableSortExtra}>
           <Table 

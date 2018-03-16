@@ -5,13 +5,11 @@ import moment from 'moment';
 import currency from 'currency.js'
 import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker,Spin} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
-import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
-import TagSelect from '../../../../components/DuokeTagSelect';
+import FilterDatePick from '../../../../components/FilterDatePick'
 import styles from './PaymentsList.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
 const NCNI = value => currency(value, { symbol: "", precision: 0});
 const Option = Select.Option;
-const FormItem = Form.Item;
 const { RangePicker } = DatePicker;
 const breadcrumbList = [{
   title:'财务',
@@ -53,7 +51,6 @@ const condition = {
   sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
   eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
 }
-@Form.create()
 @connect(state => ({
   paymentsList:state.paymentsList,
   layoutFilter:state.layoutFilter
@@ -100,22 +97,15 @@ export default class PaymentsList extends PureComponent {
     this.handleGetList(this.state.filter,this.state.pages,sorts)
   }
 
-  handlepaymentsListFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err,value) => {
-        if(!err) {
-          this.props.dispatch({type:'paymentsList/setFilterpaymentsListServerData',payload:{
-            ...value,
-            datePick: value['datePick'] ? [value['datePick'][0].format('YYYY-MM-DD'),value['datePick'][1].format('YYYY-MM-DD')] : undefined
-          }})
-          const filter = {...this.props.paymentsList.fifterpaymentsListServerData}
-          const pages = {...this.state.pages,page:1}
-          this.setState({filter,pages})
-          this.handleGetList(filter,pages,this.state.sorts)
-        }
-      })
-    }, 0)
+  handleFilter = (value) => {
+    this.props.dispatch({type:'paymentsList/setFilterpaymentsListServerData',payload:{
+      ...value,
+      datePick: value['datePick'] ? [value['datePick'][0].format('YYYY-MM-DD'),value['datePick'][1].format('YYYY-MM-DD')] : undefined
+    }})
+    const filter = this.props.paymentsList.fifterpaymentsListServerData;
+    const pages = {...this.state.pages,page:1}
+    this.setState({filter,pages})
+    this.handleGetList(filter,pages,this.state.sorts)
   }
 
   handleMoreOperation = (item) => {
@@ -125,7 +115,7 @@ export default class PaymentsList extends PureComponent {
         <Divider  type='vertical' />
         <Dropdown overlay={    
           <Menu>
-              <Menu.Item key="1"><Popconfirm title="确认删除此流水单?" onConfirm={this.handleDeleteSingle.bind(null,item.id)}>删除</Popconfirm></Menu.Item>
+              <Menu.Item key="1"><Popconfirm title="确认删除此流水?" onConfirm={this.handleDeleteSingle.bind(null,item.id)}>删除</Popconfirm></Menu.Item>
           </Menu>
         }>
         <a className="ant-dropdown-link">更多<Icon type="down" /></a>
@@ -147,7 +137,7 @@ export default class PaymentsList extends PureComponent {
   }
 
   render() {
-    const {paymentsList: {paymentsList,paymentsPagination}  , layoutFilter: {paymentsFilter}, form: {getFieldDecorator}} = this.props;
+    const {paymentsList: {paymentsList,paymentsPagination}  , layoutFilter: {paymentsFilter}} = this.props;
     const {sorts,pages,filter} = this.state;
 
     const columns = [{
@@ -193,16 +183,16 @@ export default class PaymentsList extends PureComponent {
           per_page:pageSize,
           page:page
         }
-        this.setState({pages})
         this.handleGetList(filter,pages,sorts)
+        this.setState({pages})
       },
       onShowSizeChange: ( current,size) => {
         const pages = {
           per_page:size,
           page:1
         }
-        this.setState({pages})
         this.handleGetList(filter,pages,sorts)
+        this.setState({pages})
       }
     }
 
@@ -211,34 +201,7 @@ export default class PaymentsList extends PureComponent {
         breadcrumbList={breadcrumbList}
         >
         <Card bordered={false} className={styles.bottomCardDivided}>
-          <Form layout='inline'>
-            {
-              paymentsFilter.map( (item,index) => {
-                return (
-                  <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                    <FormItem>
-                      {getFieldDecorator(`${item.code}`)(
-                        <TagSelect expandable onChange={this.handlepaymentsListFormSubmit}>
-                          {
-                            item.options.map( (subItem,subIndex) => {
-                              return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
-                            })
-                          }
-                        </TagSelect>
-                      )}
-                    </FormItem>
-                  </StandardFormRow>
-                )
-              })
-            }
-            <FormItem label='选择日期' >
-              {getFieldDecorator('datePick',{
-                initialValue:[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
-              })(
-                <RangePicker style={{width:542}} onChange={this.handlepaymentsListFormSubmit}/>
-              )}
-            </FormItem>
-          </Form>
+          <FilterDatePick onChange={this.handleFilter} filterOptions = {paymentsFilter}/>
         </Card>
         <Card bordered={false} title='流水列表' extra={this.handleTableSortExtra()}>
           <Table 
