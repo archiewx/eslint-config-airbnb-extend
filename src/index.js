@@ -4,7 +4,7 @@ import createLoading from 'dva-loading';
 import 'moment/locale/zh-cn';
 import {message} from 'antd'
 import FastClick from 'fastclick';
-import './g2';
+// import './g2';
 import './rollbar';
 // import browserHistory from 'history/createBrowserHistory';
 import './index.less';
