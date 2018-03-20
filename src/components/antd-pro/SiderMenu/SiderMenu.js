@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import pathToRegexp from 'path-to-regexp';
 import { Link } from 'dva/router';
+import DuokeIcon from '../../DuokeIcon'
 import styles from './index.less';
 
 const { Sider } = Layout;
@@ -16,7 +17,7 @@ const getIcon = (icon) => {
     return <img src={icon} alt="icon" className={styles.icon} />;
   }
   if (typeof icon === 'string') {
-    return <Icon type={icon} />;
+    return <DuokeIcon type={icon} />;
   }
   return icon;
 };
@@ -108,7 +109,7 @@ export default class SiderMenu extends PureComponent {
     if (/^https?:\/\//.test(itemPath)) {
       return (
         <a href={itemPath} target={target}>
-          {icon}<span>{name}</span>
+          {icon}<span style={{marginLeft:10}}>{name}</span>
         </a>
       );
     }
@@ -119,7 +120,7 @@ export default class SiderMenu extends PureComponent {
         replace={itemPath === this.props.location.pathname}
         onClick={this.props.isMobile ? () => { this.props.onCollapse(true); } : undefined}
       >
-        {icon}<span>{name}</span>
+        {icon}<span style={{marginLeft:10}}>{name}</span>
       </Link>
     );
   }
@@ -134,7 +135,7 @@ export default class SiderMenu extends PureComponent {
             item.icon ? (
               <span>
                 {getIcon(item.icon)}
-                <span>{item.name}</span>
+                <span style={{marginLeft:10}}>{item.name}</span>
               </span>
             ) : item.name
             }

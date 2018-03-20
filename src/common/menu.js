@@ -1,10 +1,10 @@
 const menuData = [{
   name: '商品',
-  icon: 'dashboard',
+  icon: 'unselected_com',
   path: 'goods-list',
 },{
   name: '关系',
-  icon: 'form',
+  icon: 'unselected_rel',
   path: 'relationship',
   children: [{
     name: '客户',
@@ -15,7 +15,7 @@ const menuData = [{
   }]
 },{
   name:'单据',
-  icon:'table',
+  icon:'unselected_doc',
   path:'bill',
   children:[{
     name:'销售单',
@@ -33,7 +33,7 @@ const menuData = [{
 },{
   name:'财务',
   path:'finance',
-  icon:'profile',
+  icon:'unselected_fin',
   children:[{
     name:'流水',
     path:'payments'
@@ -46,7 +46,7 @@ const menuData = [{
   }]
 },{
   name:'管理中心',
-  icon:'check-circle-o',
+  icon:'unselected_con',
   path:'manage-center',
   children: [{
     name:'商品',
@@ -124,7 +124,8 @@ const menuData = [{
   }]
 },{
   name:'version：0.0.3',
-  icon:'smile-o',
+  icon:'version_number',
+  path: 'test',
 }];
 
 function formatter(data, parentPath = '') {

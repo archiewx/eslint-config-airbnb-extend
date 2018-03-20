@@ -150,7 +150,7 @@ export default class Color extends PureComponent {
       <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} action={action} className={styles.actionExtra}>
         <Card>
           <Table dataSource={colors} columns={columns} rowKey='id' pagination={false}/>
-        </Card>
+        </Card>*
         <ColorModal type={modalType} visible={modalVisibel} formValue={formValue} onOk={this.handleModalOk} onCancel={this.handleModalCancel} sortLength={colors.length}/>
       </PageHeaderLayout>
     );
