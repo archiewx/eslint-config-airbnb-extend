@@ -33,6 +33,10 @@ export default  {
 
     *printSaleOrder({payload},{call,put}) {
       const data = yield call(printService.printSaleOrder,payload)
+    },
+
+    *deleteSingle({payload},{call,put}) {
+      yield call(saleOrderService.deleteSingle,payload)
     }
   },
 
@@ -43,12 +47,16 @@ export default  {
     },
 
     setShowData (state,{payload}) {
-      console.log(payload)
       state.singleOrderDetail.id = payload.id;
+      // 单号
       state.singleOrderDetail.number = payload.number;
+      // 创建店铺
       state.singleOrderDetail.createShop = payload.shop.data.name;
+      // 业绩归属
       state.singleOrderDetail.seller = payload.seller.data.name;
+      // 交易客户
       state.singleOrderDetail.customer = payload.customer.data.name;
+      // 发货方式
       if(payload.delivery_way == '1') {
         state.singleOrderDetail.deliverWay = '立即自提';
         state.singleOrderDetail.deliverStatus = '';
@@ -76,12 +84,18 @@ export default  {
           state.singleOrderDetail.deliverStatus = '(已拼包)';
         }
       }
+      // 发货状态
       state.singleOrderDetail.delivery_status = payload.delivery_status
-      state.singleOrderDetail.label = payload.doctags.data.length ? payload.doctags.data.map( n => n.name).join('、') : '「无」'
-      state.singleOrderDetail.remark = payload.remark;
-      state.singleOrderDetail.count = payload.salesorderskus.data.length;
-      state.singleOrderDetail.quantity = payload.quantity;
-      state.singleOrderDetail.due_fee = payload.due_fee;
+      // 标签
+      state.singleOrderDetail.label = payload.doctags.data.length ? payload.doctags.data.map( n => n.name).join('、') : '无'
+      // 备注
+      state.singleOrderDetail.remark = payload.remark || '无';
+      // 商品项数
+      state.singleOrderDetail.count = payload.salesorderskus.data.length || '0';
+      // 商品数量
+      state.singleOrderDetail.quantity = payload.quantity || '0';
+      // 单据总额
+      state.singleOrderDetail.due_fee = payload.due_fee || '0';
       state.singleOrderDetail.address_id = payload.address_id;
       if(payload.address_id) {
         state.singleOrderDetail.name = payload.address.data.name;
@@ -111,6 +125,7 @@ export default  {
           }
         }
       })
+      // 支付方式
       state.singleOrderDetail.paymentWays = [];
       state.singleOrderDetail.settle_way = payload.settle_way;
       state.singleOrderDetail.pay_status = payload.pay_status;
@@ -128,7 +143,7 @@ export default  {
             value: '(未结算)'
           })
         }else if(payload.pay_status == 3) {
-          staet.singleOrderDetail.paymentWays.push({
+          state.singleOrderDetail.paymentWays.push({
             name: '赊账',
             value: '(已结算)'
           })
@@ -278,7 +293,7 @@ export default  {
           }
         }
       })
-
+    
       state.singleOrderDetail.operationSource = payload.docactionables.data;
       return {...state}
     }

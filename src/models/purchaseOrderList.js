@@ -25,12 +25,9 @@ export default  {
     },
 
     *deleteSingle({payload},{call,put}) {
-      const data = yield call(purchaseOrderService.deleteSingle,payload)
+      yield call(purchaseOrderService.deleteSingle,payload)
     },
 
-    // *changeCustomerStatus({payload},{call,put}) {
-    //   const data = yield call(purchaseOrderService.changeCustomerStatus,payload)
-    // }
   },
 
   reducers: {

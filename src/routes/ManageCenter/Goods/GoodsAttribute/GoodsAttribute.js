@@ -63,11 +63,11 @@ export default class GoodsAttribute extends PureComponent {
         </Card>
         <Divider className={styles.dividerStyle}/>
         <Card bordered={false} className={styles.barcodePosition}>
-          <div><span className={styles.spanTitle}>颜色</span><Switch onClick={this.handleConfirm.bind(null,2)} checked={itemAttribute.some( n => n == 'skuattributetype_1')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
+          <div><span className={styles.spanTitle}>匹号</span><Switch onClick={this.handleConfirm.bind(null,2)} checked={itemAttribute.some( n => n == 'skuattributetype_1')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
         </Card>
         <Divider className={styles.dividerStyle}/>
         <Card bordered={false} className={styles.barcodePosition}>
-          <div><span className={styles.spanTitle}>尺码</span><Switch onClick={this.handleConfirm.bind(null,3)} checked={itemAttribute.some( n => n == 'skuattributetype_2')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
+          <div><span className={styles.spanTitle}>规格</span><Switch onClick={this.handleConfirm.bind(null,3)} checked={itemAttribute.some( n => n == 'skuattributetype_2')} className={styles.switchPosition} checkedChildren="开" unCheckedChildren="关"/></div>
         </Card>
         <Divider className={styles.dividerStyle}/>
         <Card bordered={false} className={styles.barcodePosition}>

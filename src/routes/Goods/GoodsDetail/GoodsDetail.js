@@ -585,7 +585,6 @@ export default class GoodsDetail extends PureComponent {
       className: styles['numberRightMove'],
       render:(text,record) => NCNF(record.purchase_amount).format(true)
     }]
-
     return (
       <PageHeaderLayout
         title={`货号：${singleGoodsDetail.item_ref || ''}`}

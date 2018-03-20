@@ -1,5 +1,5 @@
 
-export  const apiBase = 'http://duoke3api.duoke.net' 
+export  const apiBase = 'http://duoke3api-beta.duoke.net' 
 export  const imageApiBase = 'http://duoke3-image.oss-cn-hangzhou.aliyuncs.com'
 // 'http://duoke3api-beta.duoke.net'
 //'http://duoke3api.duoke.net' 

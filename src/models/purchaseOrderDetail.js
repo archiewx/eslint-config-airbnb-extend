@@ -33,6 +33,10 @@ export default  {
 
     *printPurchaseOrder({payload},{call,put}) {
       const data = yield call(printService.printPurchaseOrder,payload)
+    },
+
+    *deleteSingle({payload},{call,put}) {
+      yield call(purchaseOrderService.deleteSingle,payload)
     }
   },
 
@@ -43,7 +47,6 @@ export default  {
     },
 
     setShowData (state,{payload}) {
-      console.log(payload)
       state.singleOrderDetail.id = payload.id;
       state.singleOrderDetail.number = payload.number;
       state.singleOrderDetail.intoWarehouse = payload.warehouse.data.name;
@@ -60,8 +63,8 @@ export default  {
         }
       }
       state.singleOrderDetail.delivery_status = payload.delivery_status
-      state.singleOrderDetail.label = payload.doctags.data.length ? payload.doctags.data.map( n => n.name).join('、') : '「无」'
-      state.singleOrderDetail.remark = payload.remark;
+      state.singleOrderDetail.label = payload.doctags.data.length ? payload.doctags.data.map( n => n.name).join('、') : '无'
+      state.singleOrderDetail.remark = payload.remark || '无';
       state.singleOrderDetail.count = payload.purchaseorderskus.data.length;
       state.singleOrderDetail.quantity = payload.quantity;
       state.singleOrderDetail.due_fee = payload.due_fee;
@@ -82,7 +85,7 @@ export default  {
             value: '(未结算)'
           })
         }else if(payload.pay_status == 3) {
-          staet.singleOrderDetail.paymentWays.push({
+          state.singleOrderDetail.paymentWays.push({
             name: '赊账',
             value: '(已结算)'
           })

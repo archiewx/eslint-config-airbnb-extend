@@ -14,3 +14,13 @@ export async function getSingle (params) {
     headers: { "Authorization": token() },
   })
 }
+
+export async function deleteSingle(params) {
+  const current = {...params}
+  delete current.id;
+  return request(`${apiBase}/api/statements/${params.id}`,{
+    method: 'DELETE',
+    headers: {'Authorization':token()},
+    body: current
+  })
+}

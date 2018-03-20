@@ -3,16 +3,14 @@ import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import moment from 'moment';
 import currency from 'currency.js'
-import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Form,DatePicker,Spin,Modal} from 'antd';
+import { Row, Col, Card, Button, Table,Icon,Select,Menu,Dropdown,Popconfirm,Divider,Spin,Modal} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
-import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
-import TagSelect from '../../../../components/DuokeTagSelect';
+import FilterDatePick from '../../../../components/FilterDatePick'
 import styles from './SaleOrderList.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
 const NCNI = value => currency(value, { symbol: "", precision: 0});
 const Option = Select.Option;
-const FormItem = Form.Item;
-const { RangePicker } = DatePicker;
+let confirmModal;
 const {againModalConfirm} = styles;
 const breadcrumbList = [{
   title:'单据',
@@ -24,37 +22,43 @@ const sortOptions = [{
   id:1,
   sorts: {
     created_at: 'desc'
-  }
+  },
+  type: 'created_at'
 },{
   name:'创建时间升序',
   id:2,
   sorts: {
     created_at: 'asc'
-  }
+  },
+  type: 'created_at'
 },{
   name:'商品数量降序',
   id:3,
   sorts: {
     total_quantity: 'desc'
-  }
+  },
+  type: 'total_quantity'
 },{
   name:'商品数量升序',
   id:4,
   sorts: {
     total_quantity: 'asc'
-  }
+  },
+  type: 'total_quantity'
 },{
   name:'总额降序',
   id:5,
   sorts: {
     due_fee: 'desc'
-  }
+  },
+  type: 'due_fee'
 },{
   name:'总额升序',
   id:6,
   sorts: {
     due_fee: 'asc'
-  }
+  },
+  type: 'due_fee'
 }]
 const condition = {
   sorts: {
@@ -66,7 +70,6 @@ const condition = {
   sday:moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
   eday:moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD')
 }
-@Form.create()
 @connect(state => ({
   saleOrderList:state.saleOrderList,
   layoutFilter:state.layoutFilter
@@ -86,6 +89,10 @@ export default class SaleOrderList extends PureComponent {
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     },
+    sortOrder: {
+      created_at: 'descend'
+    },
+    sortValue: '排序方式: 创建时间降序'
   }
 
   componentDidMount() {
@@ -93,12 +100,7 @@ export default class SaleOrderList extends PureComponent {
     this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
   }
 
-  handleDeleteSingle = (id) => {
-    // this.props.dispatch({type:'saleOrderList/deleteSingle',payload:id}).then(()=>{
-    //   this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
-    // })
-  }
-
+  // 获取
   handleGetList = ( filter,pages,sorts ) => {
     this.props.dispatch({type:'saleOrderList/getList',payload:{
       ...filter,
@@ -107,76 +109,90 @@ export default class SaleOrderList extends PureComponent {
     }})
   }
 
+  // 删除
+  handleDeleteSingle = (id,deal) => {
+    if(deal != -1) {
+      confirmModal.destroy()
+      this.props.dispatch({type:'saleOrderList/deleteSingle',payload:{
+        id,
+        deal_payments:deal,
+      }}).then(()=>{
+        this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
+      })
+    }else {
+      this.props.dispatch({type:'saleOrderList/deleteSingle',payload:{
+        id,
+      }}).then(()=>{
+        this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
+      })
+    }
+  }
+
+  // 排序Table
   handlSortTable = (pagination, filters, sorter) => {
+    const pages = {
+      per_page: pagination.pageSize,
+      page: pagination.current,
+    }
     if(sorter.order) {
-      let sorts = {
+      const sorts = {
         [`${sorter.field}`] : sorter.order.slice(0,sorter.order.length-3)
-      }
-      this.setState({sorts})
-      this.handleGetList(this.state.filter,this.state.pages,sorts)
+      };
+      const sortOrder = {
+        [`${sorter.field}`] : sorter.order
+      };
+      const sortValue = `排序方式: ${sortOptions.find( n => n.type == sorter.field && n['sorts'][sorter.field] == sorter.order.slice(0,sorter.order.length-3) ).name}`;
+      this.setState({sorts,sortOrder,sortValue,pages})
+      this.handleGetList(this.state.filter,pages,sorts)
     }else {
       const sorts = {
         created_at: 'desc'
       };
-      this.setState({sorts})
-      this.handleGetList(this.state.filter,this.state.pages,sorts)
+      const sortOrder = {
+        created_at: 'descend'
+      };
+      const sortValue = '排序方式: 创建时间降序';
+      this.setState({sorts,sortOrder,sortValue,pages})
+      this.handleGetList(this.state.filter,pages,sorts)
     }
   }
 
+  // 排序选择
   handleSelectSort = (value) => {
-    const sorts = sortOptions.find( item => item.name == value.slice(6,value.length)).sorts;
-    this.setState({sorts})
+    const sortOption = sortOptions.find( item => item.name == value.slice(6,value.length))
+    const sorts = sortOption.sorts;
+    const sortValue = `排序方式: ${sortOption.name}`;
+    const sortOrder = {...sorts};
+    sortOrder[sortOption.type] += 'end';
+    this.setState({sorts,sortOrder,sortValue});
     this.handleGetList(this.state.filter,this.state.pages,sorts)
   }
 
-  handleFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err,value) => {
-        if(!err) {
-          this.props.dispatch({type:'saleOrderList/setFilterSaleOrderServerData',payload:{
-            ...value,
-            datePick: value['datePick'] ? [value['datePick'][0].format('YYYY-MM-DD'),value['datePick'][1].format('YYYY-MM-DD')] : undefined
-          }})
-          const filter = {...this.props.saleOrderList.fifterSaleOrderServerData}
-          const pages = {...this.state.pages,page:1}
-          this.setState({filter,pages})
-          this.handleGetList(filter,pages,this.state.sorts)
-        }
-      })
-    }, 0)
+  // 筛选
+  handleFilter = (value) => {
+    this.props.dispatch({type:'saleOrderList/setFilterSaleOrderServerData',payload:{
+      ...value,
+      datePick: value['datePick'] ? [value['datePick'][0].format('YYYY-MM-DD'),value['datePick'][1].format('YYYY-MM-DD')] : undefined
+    }})
+    const filter = {...this.props.saleOrderList.fifterSaleOrderServerData}
+    const pages = {...this.state.pages,page:1}
+    this.setState({filter,pages})
+    this.handleGetList(filter,pages,this.state.sorts)
   }
 
-  handleMoreOperation = (item) => {
-    return (
-      <div>
-        <Link to={`/bill/sale-detail/${item.id}`}>查看</Link>
-        {/*<Divider type='vertical' />
-        <Link to={`/bill/sale-order/${item.id}`}>编辑</Link>*/}
-        <Divider  type='vertical' />
-        <Dropdown overlay={    
-          <Menu>
-            <Menu.Item key="1">{this.handleDeletePopConfirm(item.settle_way,item.pay_status,item.delivery_way)}</Menu.Item>
-          </Menu>
-        }>
-        <a className="ant-dropdown-link">更多<Icon type="down" /></a>
-        </Dropdown>
-      </div>
-    )
-  }
-
-  handleDeletePopConfirm = (settleWay,payStatus,deliveryStatus) => {
+  // 删除一次选择
+  handleDeletePopConfirm = (settleWay,payStatus,deliveryStatus,id) => {
     let popconfirmModal;
     if(settleWay == 1) {
       if(deliveryStatus == 1) {
         popconfirmModal = (
-          <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的流水将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm}>
+          <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的流水也将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm.bind(null,id)}>
             删除
           </Popconfirm>
         )
       }else {
         popconfirmModal = (
-          <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的发货单与流水将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm}>
+          <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的发货单与流水也将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm.bind(null,id)}>
             删除
           </Popconfirm>
         )
@@ -185,13 +201,13 @@ export default class SaleOrderList extends PureComponent {
       if(payStatus == 1) {
         if(deliveryStatus == 1) {
           popconfirmModal = (
-            <Popconfirm title='确认删除结算单' onConfirm={this.handleAgianPopConfirm} okText='继续'>
+            <Popconfirm title='确认删除结算单' onConfirm={this.handleDeleteSingle.bind(null,id,-1)} okText='确认'>
               删除
             </Popconfirm>
           )
         }else {
           popconfirmModal = (
-            <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的发货单将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm}>
+            <Popconfirm title={<div><span>确认删除此销售单?</span><div style={{color:'red'}}>关联的发货单也将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm.bind(null,id)}>
               删除
             </Popconfirm>
           )
@@ -207,18 +223,41 @@ export default class SaleOrderList extends PureComponent {
     return popconfirmModal;
   }
 
-  handleAgianPopConfirm = () => {
-    Modal.confirm({
+  // 删除二次选择
+  handleAgianPopConfirm = (id) => {
+    confirmModal =  Modal.confirm({
       className: againModalConfirm,
       title: '关联的流水将如何处理',
-      content: <Button type='primary' className={styles.paymentsPositon}>充值到流水</Button>,
+      content: <Button type='primary' className={styles.paymentsPositon} onClick={this.handleDeleteSingle.bind(null,id,2)}>充值到余额</Button>,
       okText: '删除流水',
+      onOk:() => {
+        this.handleDeleteSingle(id,1)
+      }
     })
   }
 
-  handleTableSortExtra = () => {
+  handleMoreOperation = (item) => {
     return (
-      <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSort} optionLabelProp='value'>
+      <div>
+        <Link to={`/bill/sale-detail/${item.id}`}>查看</Link>
+        <Divider  type='vertical' />
+        <Dropdown overlay={    
+          <Menu>
+            <Menu.Item key="1">{this.handleDeletePopConfirm(item.settle_way,item.pay_status,item.delivery_status,item.id)}</Menu.Item>
+          </Menu>
+        }>
+        <a className="ant-dropdown-link">更多<Icon type="down" /></a>
+        </Dropdown>
+      </div>
+    )
+  }
+
+  render() {
+    const {saleOrderList: {saleOrderList,saleOrderPagination}, layoutFilter:{saleOrderFilter}} = this.props;
+    const {sorts,pages,filter,sortOrder,sortValue} = this.state;
+
+    const tableSortExtra = (
+      <Select style={{ width: 200 }}  value={sortValue} onChange={this.handleSelectSort} optionLabelProp='value'>
         {
           sortOptions.map( item => {
             return <Option key={item.id} value={`排序方式: ${item.name}`}>{item.name}</Option>
@@ -226,11 +265,6 @@ export default class SaleOrderList extends PureComponent {
         }
       </Select>
     )
-  }
-
-  render() {
-    const {saleOrderList: {saleOrderList,saleOrderPagination}, layoutFilter:{saleOrderFilter}  , form: {getFieldDecorator}} = this.props;
-    const {sorts,pages,filter} = this.state;
 
     const columns = [{
       title: '单号',
@@ -248,18 +282,21 @@ export default class SaleOrderList extends PureComponent {
       width:'15%',
       className: styles['numberRightMove'],
       sorter:true,
+      sortOrder: sortOrder.total_quantity || false,
       render: (text,record) => NCNI(record.total_quantity).format(true)
     }, {
       title: '总额',
       dataIndex: 'due_fee',
       className: styles['numberRightMove'],
       sorter:true,
+      sortOrder: sortOrder.due_fee || false,
       render: (text,record) => NCNF(record.due_fee).format(true)
     }, {
       title:'创建时间',
       dataIndex:'created_at',
       width:'20%',
-      sorter:true
+      sorter:true,
+      sortOrder: sortOrder.created_at || false,
     },{
       title: '操作',
       dataIndex: 'operation',
@@ -273,59 +310,14 @@ export default class SaleOrderList extends PureComponent {
       total:saleOrderPagination.total,
       showQuickJumper:true,
       showSizeChanger:true,
-      onChange:( page,pageSize ) => {
-        const pages = {
-          per_page:pageSize,
-          page:page
-        }
-        this.setState({pages})
-        this.handleGetList(filter,pages,sorts)
-      },
-      onShowSizeChange: ( current,size) => {
-        const pages = {
-          per_page:size,
-          page:1
-        }
-        this.setState({pages})
-        this.handleGetList(filter,pages,sorts)
-      }
     }
 
     return (
-      <PageHeaderLayout
-        breadcrumbList={breadcrumbList}
-        >
+      <PageHeaderLayout breadcrumbList={breadcrumbList}>
         <Card bordered={false} className={styles.bottomCardDivided}>
-          <Form layout='inline'>
-            {
-              saleOrderFilter.map( (item,index) => {
-                return (
-                  <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                    <FormItem>
-                      {getFieldDecorator(`${item.code}`)(
-                        <TagSelect expandable onChange={this.handleFormSubmit}>
-                          {
-                            item.options.map( (subItem,subIndex) => {
-                              return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>
-                            })
-                          }
-                        </TagSelect>
-                      )}
-                    </FormItem>
-                  </StandardFormRow>
-                )
-              })
-            }
-            <FormItem label='选择日期' >
-              {getFieldDecorator('datePick',{
-                initialValue:[moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD'),moment(new Date(),'YYYY-MM-DD')]
-              })(
-                <RangePicker style={{width:542}} onChange={this.handleFormSubmit}/>
-              )}
-            </FormItem>
-          </Form>
+          <FilterDatePick onChange={this.handleFilter} filterOptions = {saleOrderFilter}/>
         </Card>
-        <Card bordered={false} title='销售单列表' extra={this.handleTableSortExtra()}>
+        <Card bordered={false} title='销售单列表' extra={tableSortExtra}>
           <Table 
             rowKey='id'
             columns={columns} 

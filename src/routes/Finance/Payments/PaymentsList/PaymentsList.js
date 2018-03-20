@@ -8,7 +8,6 @@ import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import FilterDatePick from '../../../../components/FilterDatePick'
 import styles from './PaymentsList.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
-const NCNI = value => currency(value, { symbol: "", precision: 0});
 const Option = Select.Option;
 const { RangePicker } = DatePicker;
 const breadcrumbList = [{
@@ -21,25 +20,29 @@ const sortOptions = [{
   id:1,
   sorts: {
     created_at: 'desc'
-  }
+  },
+  type: 'created_at',
 },{
   name:'创建时间升序',
   id:2,
   sorts: {
     created_at: 'asc'
-  }
+  },
+  type: 'created_at',
 },{
   name:'金额降序',
   id:3,
   sorts: {
     value: 'desc'
-  }
+  },
+  type: 'value',
 },{
   name:'金额升序',
   id:4,
   sorts: {
     value: 'asc'
-  }
+  },
+  type: 'value',
 }]
 const condition = {
   sorts: {
@@ -70,6 +73,10 @@ export default class PaymentsList extends PureComponent {
       sday: moment(new Date((new Date).getTime() - 7*24*60*60*1000),'YYYY-MM-DD').format('YYYY-MM-DD'),
       eday: moment(new Date(),'YYYY-MM-DD').format('YYYY-MM-DD'),
     },
+    sortOrder: {
+      created_at: 'descend'
+    },
+    sortValue: '排序方式: 创建时间降序'
   }
 
   componentDidMount() {
@@ -77,12 +84,7 @@ export default class PaymentsList extends PureComponent {
     this.props.dispatch({type:'layoutFilter/getLayoutFilter'})
   }
 
-  handleDeleteSingle = (id) => {
-    // this.props.dispatch({type:'paymentsList/deleteSingle',payload:id}).then(()=>{
-    //   this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
-    // })
-  }
-
+  // 获取
   handleGetList = ( filter,pages,sorts ) => {
     this.props.dispatch({type:'paymentsList/getList',payload:{
       ...filter,
@@ -91,12 +93,53 @@ export default class PaymentsList extends PureComponent {
     }})
   }
 
+  // 删除
+  handleDeleteSingle = (id) => {
+    this.props.dispatch({type:'paymentsList/deleteSingle',payload:id}).then(()=>{
+      this.handleGetList(this.state.filter,this.state.pages,this.state.sorts)
+    })
+  }
+
+  handlSortTable = (pagination, filters, sorter) => {
+    const pages = {
+      per_page: pagination.pageSize,
+      page: pagination.current,
+    }
+    if(sorter.order) {
+      const sorts = {
+        [`${sorter.field}`] : sorter.order.slice(0,sorter.order.length-3)
+      };
+      const sortOrder = {
+        [`${sorter.field}`] : sorter.order
+      };
+      const sortValue = `排序方式: ${sortOptions.find( n => n.type == sorter.field && n['sorts'][sorter.field] == sorter.order.slice(0,sorter.order.length-3) ).name}`;
+      this.setState({sorts,sortOrder,sortValue,pages})
+      this.handleGetList(this.state.filter,pages,sorts)
+    }else {
+      const sorts = {
+        created_at: 'desc'
+      };
+      const sortOrder = {
+        created_at: 'descend'
+      };
+      const sortValue = '排序方式: 创建时间降序';
+      this.setState({sorts,sortOrder,sortValue,pages})
+      this.handleGetList(this.state.filter,pages,sorts)
+    }
+  }
+
+  // 排序
   handleSelectSort = (value) => {
-    let sorts = sortOptions.find( item => item.name == value.slice(6,value.length)).sorts;
-    this.setState({sorts})
+    const sortOption = sortOptions.find( item => item.name == value.slice(6,value.length))
+    const sorts = sortOption.sorts;
+    const sortValue = `排序方式: ${sortOption.name}`;
+    const sortOrder = {...sorts};
+    sortOrder[sortOption.type] += 'end';
+    this.setState({sorts,sortOrder,sortValue});
     this.handleGetList(this.state.filter,this.state.pages,sorts)
   }
 
+  // 筛选
   handleFilter = (value) => {
     this.props.dispatch({type:'paymentsList/setFilterpaymentsListServerData',payload:{
       ...value,
@@ -124,9 +167,12 @@ export default class PaymentsList extends PureComponent {
     )
   }
 
-  handleTableSortExtra = () => {
-    return (
-      <Select style={{ width: 200 }}  defaultValue={'排序方式: 创建时间降序'} onChange={this.handleSelectSort} optionLabelProp='value'>
+  render() {
+    const {paymentsList: {paymentsList,paymentsPagination}  , layoutFilter: {paymentsFilter}} = this.props;
+    const {sorts,pages,filter,sortOrder,sortValue} = this.state;
+
+    const tableSortExtra = (
+      <Select style={{ width: 200 }}  value={sortValue} onChange={this.handleSelectSort} optionLabelProp='value'>
         {
           sortOptions.map( item => {
             return <Option key={item.id} value={`排序方式: ${item.name}`}>{item.name}</Option>
@@ -134,15 +180,10 @@ export default class PaymentsList extends PureComponent {
         }
       </Select>
     )
-  }
-
-  render() {
-    const {paymentsList: {paymentsList,paymentsPagination}  , layoutFilter: {paymentsFilter}} = this.props;
-    const {sorts,pages,filter} = this.state;
 
     const columns = [{
-      title: '流水',
-      dataIndex: 'name',
+      title: '流水号',
+      dataIndex: 'number',
       render: (text,record) => `#${record.number}`
     }, {
       title: '交易对象',
@@ -158,12 +199,14 @@ export default class PaymentsList extends PureComponent {
       title: '金额',
       dataIndex: 'value',
       sorter:true,
+      sortOrder: sortOrder.value || false,
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.value).format(true)
     }, {
       title: '创建时间',
       width:'20%',
       sorter:true,
+      sortOrder: sortOrder.created_at || false,
       dataIndex: 'created_at',
     }, {
       title: '操作',
@@ -178,37 +221,20 @@ export default class PaymentsList extends PureComponent {
       total:paymentsPagination.total,
       showQuickJumper:true,
       showSizeChanger:true,
-      onChange:( page,pageSize ) => {
-        const pages = {
-          per_page:pageSize,
-          page:page
-        }
-        this.handleGetList(filter,pages,sorts)
-        this.setState({pages})
-      },
-      onShowSizeChange: ( current,size) => {
-        const pages = {
-          per_page:size,
-          page:1
-        }
-        this.handleGetList(filter,pages,sorts)
-        this.setState({pages})
-      }
     }
 
     return (
-      <PageHeaderLayout
-        breadcrumbList={breadcrumbList}
-        >
+      <PageHeaderLayout breadcrumbList={breadcrumbList}>
         <Card bordered={false} className={styles.bottomCardDivided}>
           <FilterDatePick onChange={this.handleFilter} filterOptions = {paymentsFilter}/>
         </Card>
-        <Card bordered={false} title='流水列表' extra={this.handleTableSortExtra()}>
+        <Card bordered={false} title='流水列表' extra={tableSortExtra}>
           <Table 
             rowKey='id'
             columns={columns} 
             dataSource={paymentsList} 
             pagination={pagination}
+            onChange={this.handlSortTable}
           />
           <div style={{marginTop:-43,width:300}}>
             <span>{`共 ${paymentsPagination.total || ''} 条流水 第 ${pages.page} / ${Math.ceil(Number(paymentsPagination.total)/Number(pages.per_page))} 页`}</span>

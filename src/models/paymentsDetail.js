@@ -13,9 +13,7 @@ export default  {
       history.listen(({pathname}) => {
         const match = pathToRegexp('/finance/payments-detail/:id').exec(pathname)
         if(match) {
-          dispatch({type:'setState',payload:{
-            singleData:{}
-          }})
+          dispatch({type:'setState',payload:{singleData:{}}})
           dispatch({type:'getSingle',payload:{
             id:match[1]
           }})
@@ -27,9 +25,12 @@ export default  {
   effects: {
     *getSingle ({payload},{call,put,take}) {
       const data = yield call(paymentsService.getSingle,payload)
-      console.log(data.result.data)
       yield put({type:'setShowData',payload:data.result.data})
     },
+
+    *deleteSingle({payload},{call,put}) {
+      yield call(paymentsService.deleteSingle,payload)
+    }
 
   },
 
@@ -41,12 +42,18 @@ export default  {
 
     setShowData(state,{payload}) {
       state.singleData.id = payload.id;
+      // 单号
       state.singleData.number = payload.number;
+      // 金额
       state.singleData.value = payload.value;
+      // 交易对象
       state.singleData.customer = payload.payer.data.name;
+      // 入账店铺
       state.singleData.shop = payload.shop.data.name;
+      // 收银员工
       state.singleData.user = payload.user.data.name;
-      state.singleData.orderNumber = !payload.docs.data.length ? '' : payload.docs.data.map( n => {
+      // 关联单据
+      state.singleData.orderNumber = payload.docs && payload.docs.data.length ? payload.docs.data.map( n => {
         let orderType;
         if((n.number).indexOf('J') > -1) {
           orderType = '结算单'
@@ -60,8 +67,10 @@ export default  {
           id: n.id,
           orderType
         }
-      })
+      }) : ''
+      // 支付方式
       state.singleData.paymentWays = payload.paymentmethod.data;
+      // 操作记录
       state.singleData.operationSource = payload.docactionables.data;
       
       return {...state}

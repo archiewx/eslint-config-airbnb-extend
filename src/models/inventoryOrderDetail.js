@@ -47,10 +47,9 @@ export default  {
     },
 
     setShowData (state,{payload}) {
-      console.log(payload)
       state.singleOrderDetail.id = payload.id;
       state.singleOrderDetail.number = payload.number;
-      state.singleOrderDetail.remark = payload.remark;
+      state.singleOrderDetail.remark = payload.remark || '无';
       state.singleOrderDetail.losses_quantity = payload.losses_quantity;
       state.singleOrderDetail.losses_amount = payload.losses_amount;
       state.singleOrderDetail.profit_quantity = payload.profit_quantity;

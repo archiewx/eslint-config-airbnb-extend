@@ -51,7 +51,7 @@ export default class DeliverOrderDetail extends PureComponent {
       dataIndex:'remark',
     }]
     if(record.colorId) {
-      if(Object.prototype.toString.call(itemExtraList) === '[object Array]') return <div>无</div>
+      if(!itemExtraList.length) return <div>无</div>
       else {
         return (
           <table style={{width:'84.5%',float:'right'}}>

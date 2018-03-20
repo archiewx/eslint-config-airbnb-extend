@@ -118,8 +118,8 @@ export default  {
       state.singleGoodsDetail.not_sale = value.not_sale;
       state.singleGoodsDetail.purchase_price = value.purchase_price;
       state.singleGoodsDetail.standard_price = value.standard_price;
-      state.singleGoodsDetail.name = value.name;
-      state.singleGoodsDetail.desc = value.desc;
+      state.singleGoodsDetail.name = value.name || '无';
+      state.singleGoodsDetail.desc = value.desc || '无';
 
       let priceMatrix = [...value.itemprices.data];
       state.singleGoodsDetail.prices = {};
@@ -132,7 +132,9 @@ export default  {
                 state.singleGoodsDetail.prices[`${item.pricelevel_id}`] = {
                   price:item.price
                 }
-              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+                flag = true;
+              }
               else {
                 flag = true;    
               }
@@ -143,7 +145,9 @@ export default  {
                 state.singleGoodsDetail.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
                   price:item.price
                 }
-              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+                flag = true;
+              }
               else {
                 flag = true;    
               }
@@ -151,10 +155,12 @@ export default  {
           }else if(priceModel == 'unit') {
             priceMatrix.forEach( item => {
               if(item.pricelevel_id && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
-                stata.singleGoodsDetail.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
+                state.singleGoodsDetail.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
                   price:item.price
                 }
-              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+                flag = true;
+              }
               else {
                 flag = true;    
               }
@@ -165,7 +171,9 @@ export default  {
                 state.singleGoodsDetail.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
                   price:item.price
                 }
-              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+                flag = true;   
+              }
               else {
                 flag = true;    
               }
@@ -178,7 +186,9 @@ export default  {
                 state.singleGoodsDetail.prices[`${item.shop_id}`] = {
                   price: item.price
                 } 
-              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+                flag = true;
+              }
               else {
                 flag = true;    
               }
@@ -189,7 +199,9 @@ export default  {
                 state.singleGoodsDetail.prices[`${item.unit_id}`] = {
                   price: item.price
                 }
-              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+                flag = true;
+              }
               else {
                 flag = true;    
               }
@@ -200,7 +212,9 @@ export default  {
                 state.singleGoodsDetail.prices[`${item.quantityrange_id}`] = {
                   price: item.price
                 }
-              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+              }else if(item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+                flag = true;
+              }
               else {
                 flag = true;    
               }
@@ -565,7 +579,7 @@ export default  {
               })
             }else {
               state.singleGoodsPurchases.push({
-                id:item.id,
+                id:item.skuattributes[0].id,
                 name:item.skuattributes[0].name,
                 purchase_quantity:item.purchase_quantity,
                 purchase_amount:item.purchase_amount,
@@ -584,6 +598,7 @@ export default  {
           }
         })
         if(Object.values(expandedRowRender).length != 0) {
+          console.log(expandedRowRender)
           state.singleGoodsPurchases.forEach( item => {
             item.children = expandedRowRender[item.id];
             item.purchase_quantity = expandedRowRender[item.id].reduce((sum,item) => (sum,Number(item.purchase_quantity)), 0)
@@ -628,15 +643,15 @@ export default  {
               })
             }else {
               state.singleGoodsStocks.push({
-                id: item.id,
+                id: item.skuattributes[0].id,
                 name:item.skuattributes[0].name,
                 sales_quantity:item.sales_quantity,
                 purchase_quantity:item.purchase_quantity,
                 stock_quantity:item.stock_quantity,
                 children:[]
               })
-              expandedRowRender[`${item.id}`] = [];
-              expandedRowRender[`${item.id}`].push({
+              expandedRowRender[`${item.skuattributes[0].id}`] = [];
+              expandedRowRender[`${item.skuattributes[0].id}`].push({
                 id:`${item.skuattributes[1].id}_${index}`,
                 name: item.skuattributes[1].name,
                 sales_quantity:item.sales_quantity,

@@ -23,6 +23,10 @@ export default  {
       }})
     },
 
+    *deleteSingle({payload},{call,put}) {
+      yield call(paymentsService.deleteSingle,payload)
+    }
+
   },
 
   reducers: {

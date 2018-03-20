@@ -61,38 +61,42 @@ export default class InventoryOrderDetail extends PureComponent {
       width:'18%',
     }]
     if(record.colorId) {
-      return (
-        <table style={{width:'84.5%',float:'right'}}>
-          <thead className={styles.tableHead}>
-            <tr>
-              <th><span></span></th>
+      if(itemExtraList.length) {
+        return (
+          <table style={{width:'84.5%',float:'right'}}>
+            <thead className={styles.tableHead}>
+              <tr>
+                <th><span></span></th>
+                {
+                  itemExtraList[0].map( (n,index) => {
+                    return <th key={index}><span>{n.name}</span></th>
+                  })
+                }
+              </tr>
+            </thead>
+            <tbody className={styles.tableBody}>
               {
-                itemExtraList[0].map( (n,index) => {
-                  return <th key={index}><span>{n.name}</span></th>
+                itemExtraList.map( (n,index) => {
+                  return index == 0 ? null : (
+                    <tr key={index}>
+                      <td>{n.name}</td>
+                      {
+                        n.children.map( (m,i) => {
+                          return (
+                            <td key={i}><Popover content={<div><p>{`备注：${m.remark}`}</p></div>}>{m.name}</Popover></td>
+                          )
+                        })
+                      }
+                    </tr>
+                  )
                 })
               }
-            </tr>
-          </thead>
-          <tbody className={styles.tableBody}>
-            {
-              itemExtraList.map( (n,index) => {
-                return index == 0 ? null : (
-                  <tr key={index}>
-                    <td>{n.name}</td>
-                    {
-                      n.children.map( (m,i) => {
-                        return (
-                          <td key={i}><Popover content={<div><p>{`备注：${m.remark}`}</p></div>}>{m.name}</Popover></td>
-                        )
-                      })
-                    }
-                  </tr>
-                )
-              })
-            }
-          </tbody>
-        </table>
-      )
+            </tbody>
+          </table>
+        )
+      }else {
+        return <div>空</div>
+      }
     }else {
       if(itemExtraList.length) {
         return <Table columns={expandDetailColumns} rowKey='id' dataSource={itemExtraList || []} pagination={false} showHeader={false} />

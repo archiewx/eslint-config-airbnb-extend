@@ -2,21 +2,37 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import currency from 'currency.js'
-import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Menu,Dropdown,Popover} from 'antd';
+import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Menu,Dropdown,Popover,Modal} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
 import styles from './PurchaseOrderDetail.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
 const NCNI = value => currency(value, { symbol: "", precision: 0});
 const ButtonGroup = Button.Group;
+let confirmModal;
+const {againModalConfirm} = styles;
 const { Description } = DescriptionList;
 @connect(state => ({
   purchaseOrderDetail:state.purchaseOrderDetail,
 }))
 export default class PurchaseOrderDetail extends PureComponent {
 
-  handleDeleteSingle = (id) => {
-
+  handleDeleteSingle = (id,deal) => {
+    if(deal != -1) {
+      confirmModal.destroy()
+      this.props.dispatch({type:'purchaseOrderDetail/deleteSingle',payload:{
+        id,
+        deal_payments:deal,
+      }}).then(()=>{
+        this.props.dispatch(routerRedux.push('/bill/purchase-order'))
+      })
+    }else {
+      this.props.dispatch({type:'purchaseOrderDetail/deleteSingle',payload:{
+        id,
+      }}).then(()=>{
+        this.props.dispatch(routerRedux.push('/bill/purchase-order'))
+      })
+    }
   }
 
   handlePrint = (id) => {
@@ -36,15 +52,12 @@ export default class PurchaseOrderDetail extends PureComponent {
     },{
       title:'颜色',
       dataIndex:'color',
-      // width:'12.9%',
     },{
       title:'尺码',
       dataIndex:'size',
-      // width:'11.5%',
     },{
       title:'价格',
       dataIndex:'price',
-      // width:'12%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.price).format(true)
     },{
@@ -54,51 +67,52 @@ export default class PurchaseOrderDetail extends PureComponent {
     },{
       title:'总额',
       dataIndex:'total',
-      // width:'12%',
       className: styles['numberRightMove'],
       render: (text,record) => NCNF(record.total).format(true)
     },{
       title:'标签',
       dataIndex:'label',
-      // width:'12.8%',
     },{
       title:'备注',
       dataIndex:'remark',
-      // width:'11.5%',
     }]
     if(record.colorId) {
-      return (
-        <table style={{width:'84.5%',float:'right'}}>
-          <thead className={styles.tableHead}>
-            <tr>
-              <th><span></span></th>
+      if(itemExtraList.length) {
+        return (
+          <table style={{width:'84.5%',float:'right'}}>
+            <thead className={styles.tableHead}>
+              <tr>
+                <th><span></span></th>
+                {
+                  itemExtraList[0].map( (n,index) => {
+                    return <th key={index}><span>{n.name}</span></th>
+                  })
+                }
+              </tr>
+            </thead>
+            <tbody className={styles.tableBody}>
               {
-                itemExtraList[0].map( (n,index) => {
-                  return <th key={index}><span>{n.name}</span></th>
+                itemExtraList.map( (n,index) => {
+                  return index == 0 ? null : (
+                    <tr key={index}>
+                      <td>{n.name}</td>
+                      {
+                        n.children.map( (m,i) => {
+                          return (
+                            <td key={i}><Popover content={<div><p>{`标签：${m.label}`}</p><p>{`备注：${m.remark}`}</p></div>}>{m.quantity}</Popover></td>
+                          )
+                        })
+                      }
+                    </tr>
+                  )
                 })
               }
-            </tr>
-          </thead>
-          <tbody className={styles.tableBody}>
-            {
-              itemExtraList.map( (n,index) => {
-                return index == 0 ? null : (
-                  <tr key={index}>
-                    <td>{n.name}</td>
-                    {
-                      n.children.map( (m,i) => {
-                        return (
-                          <td key={i}><Popover content={<div><p>{`标签：${m.label}`}</p><p>{`备注：${m.remark}`}</p></div>}>{m.quantity}</Popover></td>
-                        )
-                      })
-                    }
-                  </tr>
-                )
-              })
-            }
-          </tbody>
-        </table>
-      )
+            </tbody>
+          </table>
+        )
+      }else {
+        return <div>空</div>
+      }
     }else {
       if(itemExtraList.length) {
         return <Table columns={expandDetailColumns} rowKey='id' dataSource={itemExtraList || []} pagination={false} showHeader={false} />
@@ -106,6 +120,44 @@ export default class PurchaseOrderDetail extends PureComponent {
         return <div>无</div>
       }
     }
+  }
+
+  handleDeletePopConfirm = (settleWay,payStatus,id) => {
+    let popconfirmModal;
+    if(settleWay == 1) {
+      popconfirmModal = (
+        <Popconfirm title={<div><span>确认删除此进货单?</span><div style={{color:'red'}}>关联的流水也将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm.bind(null,id)}>
+          删除
+        </Popconfirm>
+      )
+    }else {
+      if(payStatus == 1) {
+        popconfirmModal = (
+          <Popconfirm title={<div><span>确认删除此进货单?</span></div>} okText='确认' onConfirm={this.handleDeleteSingle.bind(null,id,-1)}>
+            删除
+          </Popconfirm>
+        )
+      }else if(payStatus == 3) {
+        popconfirmModal = (
+          <Popconfirm title={<div><span>进货单已结算，无法删除</span></div>} okText='确认' >
+            删除
+          </Popconfirm>
+        )
+      }
+    }
+    return popconfirmModal;
+  }
+
+  handleAgianPopConfirm = (id) => {
+    confirmModal =  Modal.confirm({
+      className: againModalConfirm,
+      title: '关联的流水将如何处理',
+      content: <Button type='primary' className={styles.paymentsPositon} onClick={this.handleDeleteSingle.bind(null,id,2)}>充值到余额</Button>,
+      okText: '删除流水',
+      onOk:() => {
+        this.handleDeleteSingle(id,1)
+      }
+    })
   }
 
   render() {
@@ -122,7 +174,7 @@ export default class PurchaseOrderDetail extends PureComponent {
     const menu = (
       <Menu>
         <Menu.Item key='1'>
-          <Popconfirm title="确认删除此销售单?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleOrderDetail.id)}>删除</Popconfirm>
+          {this.handleDeletePopConfirm(singleOrderDetail.settle_way,singleOrderDetail.pay_status,singleOrderDetail.id)}
         </Menu.Item>
       </Menu>
     )
@@ -232,9 +284,13 @@ export default class PurchaseOrderDetail extends PureComponent {
             <Col span='10'>
               <label className={styles.labelTitle}>支付方式：</label>
               {
-                singleOrderDetail.paymentWays && singleOrderDetail.paymentWays.map( (n,index) => {
-                  return index == 0 ? <span key={index}><span>{`${n.name}：`}</span><span style={{color: singleOrderDetail.settle_way == 2 && singleOrderDetail.pay_status == 1 ? 'red' : 'rgba(0, 0, 0, 0.65)'}}>{`${n.value || ''}`}</span></span> : <div key={index} style={{paddingLeft:69}}><span>{`${n.name}：`}</span><span>{`${n.value || ''}`}</span></div>
-                })
+                singleOrderDetail.paymentWays ? (
+                  singleOrderDetail.paymentWays.length ? (
+                    singleOrderDetail.paymentWays.map( (n,index) => {
+                      return index == 0 ? <span key={index}><span>{`${n.name}：`}</span><span style={{color: singleOrderDetail.settle_way == 2 && singleOrderDetail.pay_status == 1 ? 'red' : 'rgba(0, 0, 0, 0.65)'}}>{`${n.value || ''}`}</span></span> : <div key={index} style={{paddingLeft:69}}><span>{`${n.name}：`}</span><span>{`${n.value || ''}`}</span></div>
+                    })
+                  ) : <span>无</span>
+                ) : null
               }
             </Col>
           </Row>

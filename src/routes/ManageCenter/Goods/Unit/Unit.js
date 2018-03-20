@@ -48,7 +48,7 @@ export default class Unit extends PureComponent {
     this.setState({
       modalVisibel:false,
     })
-    this.props.dispatch({type:`unit/createSingle${this.state.modalType === 'create' ? 'createSingle' : 'editSingle'}`,payload:value}).then((result)=>{
+    this.props.dispatch({type:`unit/${this.state.modalType === 'create' ? 'createSingle' : 'editSingle'}`,payload:value}).then((result)=>{
       if(result.code != 0) {
         message.error(result.message)
       }else {

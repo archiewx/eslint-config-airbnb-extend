@@ -16,12 +16,12 @@ export async function getSingle (params) {
 }
 
 
-// export async function deleteSingle (params) {
-//   return request(`${apiBase}/api/skuattributes/${params.id}`,{
-//     method: 'DELETE',
-//     headers: { "Authorization": token() },
-//   })
-// }
+export async function deleteSingle (params) {
+  return request(`${apiBase}/api/payments/${params}`,{
+    method: 'DELETE',
+    headers: { "Authorization": token() },
+  })
+}
 
 // export async function createSingle (params) {
 //   params.name = params.name.trim();

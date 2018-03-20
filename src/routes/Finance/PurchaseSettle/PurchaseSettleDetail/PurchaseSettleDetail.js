@@ -2,32 +2,81 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import currency from 'currency.js'
-import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Menu,Dropdown,Popover} from 'antd';
+import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Menu,Dropdown,Popover,Modal} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
 import styles from './PurchaseSettleDetail.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
 const NCNI = value => currency(value, { symbol: "", precision: 0});
 const ButtonGroup = Button.Group;
+let confirmModal;
+const {againModalConfirm} = styles;
 const { Description } = DescriptionList;
 @connect(state => ({
   purchaseSettleDetail:state.purchaseSettleDetail,
 }))
 export default class PurchaseSettleDetail extends PureComponent {
 
-  handleDeleteSingle = (id) => {
-
+  // 删除
+  handleDeleteSingle = (id,deal) => {
+    if(deal != -1) {
+      confirmModal.destroy();
+      this.props.dispatch({type:'purchaseSettleDetail/deleteSingle',payload:{
+        id,
+        deal_payments: deal,
+      }}).then(()=>{
+        this.props.dispatch(routerRedux.push('/finance/purchase-settle'))
+      })
+    }else {
+      this.props.dispatch({type:'purchaseSettleDetail/deleteSingle',payload:{
+        id,
+      }}).then(()=>{
+        this.props.dispatch(routerRedux.push('/finance/purchase-settle'))
+      })
+    }
   }
 
+  // 打印
   handlePrint = (id) => {
     this.props.dispatch({type:'purchaseSettleDetail/printSettle',payload:{
-      id:id,
+      id,
       round:1
     }})
   }
 
+  handleDeletePopConfirm = (payStatus,id) => {
+    let popconfirmModal;
+    if(payStatus == 1) {
+      popconfirmModal = (
+        <Popconfirm title={<div><span>确认删除此进货结算单?</span></div>} okText='确认' onConfirm={this.handleDeleteSingle.bind(null,id,-1)}>
+          删除
+        </Popconfirm>
+      )
+    }else if(payStatus == 3) {
+      popconfirmModal = (
+        <Popconfirm title={<div><span>确认删除此进货结算单?</span><div style={{color:'red'}}>关联的流水也将一同删除</div></div>} okText='继续' onConfirm={this.handleAgianPopConfirm.bind(null,id)}>
+          删除
+        </Popconfirm>
+      )
+    }
+    return popconfirmModal;
+  }
+
+  handleAgianPopConfirm = (id) => {
+    confirmModal =  Modal.confirm({
+      className: againModalConfirm,
+      title: '关联的流水将如何处理',
+      content: <Button type='primary' className={styles.paymentsPositon} onClick={this.handleDeleteSingle.bind(null,id,2)}>充值到余额</Button>,
+      okText: '删除流水',
+      onOk:() => {
+        this.handleDeleteSingle(id,1)
+      }
+    })
+  }
+
   render() {
     const {singleData} = this.props.purchaseSettleDetail;
+
     const breadcrumbList = [{
       title:'单据',
     },{
@@ -39,7 +88,7 @@ export default class PurchaseSettleDetail extends PureComponent {
     const menu = (
       <Menu>
         <Menu.Item key='1'>
-          <Popconfirm title="确认删除此结算单?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}>删除</Popconfirm>
+          {this.handleDeletePopConfirm(singleData.pay_status,singleData.id)}
         </Menu.Item>
       </Menu>
     )
@@ -59,15 +108,15 @@ export default class PurchaseSettleDetail extends PureComponent {
       <Row>
         <Col span='8'>
           <div className={styles.textSecondary}>单据数量</div>
-          <div className={styles.heading}>{singleData.order_quantity || ''}</div>
+          <div className={styles.heading}>{NCNI(singleData.order_quantity).format(true) || ''}</div>
         </Col>
         <Col span='8'>
           <div className={styles.textSecondary}>商品数量</div>
-          <div className={styles.heading}>{singleData.item_quantity_one || ''}</div>
+          <div className={styles.heading}>{NCNI(singleData.item_quantity_one).format(true) || ''}</div>
         </Col>
         <Col span='8'>
           <div className={styles.textSecondary}>总额</div>
-          <div className={styles.heading}>{singleData.value || ''}</div>
+          <div className={styles.heading}>{NCNF(singleData.value).format(true) || ''}</div>
         </Col>
       </Row>
     );
@@ -101,7 +150,7 @@ export default class PurchaseSettleDetail extends PureComponent {
       title:'操作',
       width:172,
       dataIndex:'operation',
-      render: () => <div><a>查看</a></div>
+      render: (text,record) => <Link to={`/bill/purchase-detail/${record.id}`}>查看</Link>
     }]
 
     const operationColumns = [{
@@ -134,9 +183,11 @@ export default class PurchaseSettleDetail extends PureComponent {
               <label className={styles.labelTitle}>支付方式：</label>
               {
                 singleData.pay_status == 1 ? <span style={{color:'red'}}>{singleData.paymentWays && singleData.paymentWays[0]}</span> : (
-                  singleData.paymentWays && singleData.paymentWays.map( (n,index) => {
-                    return index == 0 ? <span key={index}><span>{`${n.name}：`}</span><span>{`${n.value || ''}`}</span></span> : <div key={index} style={{paddingLeft:69}}><span>{`${n.name}：`}</span><span>{`${n.value || ''}`}</span></div>
-                  })
+                  singleData.pay_status == 3 ? <span>全部付款</span> : (
+                    singleData.paymentWays && singleData.paymentWays.map( (n,index) => {
+                      return index == 0 ? <span key={index}><span>{`${n.name}：`}</span><span>{`${n.value || ''}`}</span></span> : <div key={index} style={{paddingLeft:69}}><span>{`${n.name}：`}</span><span>{`${n.value || ''}`}</span></div>
+                    })
+                  )
                 )
               }
             </Col>

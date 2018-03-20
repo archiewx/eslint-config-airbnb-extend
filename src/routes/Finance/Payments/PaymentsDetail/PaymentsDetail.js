@@ -2,12 +2,11 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux,Link } from 'dva/router';
 import currency from 'currency.js'
-import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Menu,Dropdown,Popover} from 'antd';
+import { Row, Col, Card, Button, message, Table,Icon,Popconfirm,Divider,Menu,Dropdown} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
 import styles from './PaymentsDetail.less'
 const NCNF = value => currency(value, { symbol: "", precision: 2 });
-const NCNI = value => currency(value, { symbol: "", precision: 0});
 const ButtonGroup = Button.Group;
 const { Description } = DescriptionList;
 @connect(state => ({
@@ -15,12 +14,16 @@ const { Description } = DescriptionList;
 }))
 export default class PaymentsDetail extends PureComponent {
 
+  // 删除
   handleDeleteSingle = (id) => {
-
+    this.props.dispatch({type:'paymentsDetail/deleteSingle',payload:id}).then(()=>{
+      this.props.dispatch(routerRedux.push('/finance/payments'))
+    })
   }
 
   render() {
     const {singleData} = this.props.paymentsDetail;
+
     const breadcrumbList = [{
       title:'单据',
     },{
@@ -29,17 +32,9 @@ export default class PaymentsDetail extends PureComponent {
       title:`#${singleData.number  || ''}`
     }]
 
-    const menu = (
-      <Menu>
-        <Menu.Item key='1'>
-          <Popconfirm title="确认删除此流水?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}>删除</Popconfirm>
-        </Menu.Item>
-      </Menu>
-    )
-
     const action = (
       <div>
-        <Button>删除</Button>
+        <Popconfirm title="确认删除此流水?" placement='bottom' onConfirm={this.handleDeleteSingle.bind(null,singleData.id)}><Button>删除</Button></Popconfirm>
       </div>
     )
 
@@ -47,7 +42,7 @@ export default class PaymentsDetail extends PureComponent {
       <Row>
         <Col span='8' offset='16'>
           <div className={styles.textSecondary}>金额</div>
-          <div className={styles.heading}>{singleData.value || ''}</div>
+          <div className={styles.heading}>{NCNF(singleData.value).format(true) || ''}</div>
         </Col>
       </Row>
     );
@@ -58,18 +53,18 @@ export default class PaymentsDetail extends PureComponent {
         <Description term="入账店铺">{singleData.shop || ''}</Description>
         <Description term="收银员工">{singleData.user || ''}</Description>
         <Description term="关联单据" >
-          {singleData.orderNumber && singleData.orderNumber.map( (n,i) => {
+          {singleData.orderNumber ? singleData.orderNumber.map( (n,i) => {
             return (
               <div key={`${i}`}>
                 {n.orderType}
                 {
-                  n.orderType == '销售单' ? <Link to={`/bill/sale-detail/${n.id}`}>{`#${n.number}`}</Link> : (
-                    n.orderType == '进货单' ? <Link to={`/bill/purchase-detail/${n.id}`}>{`#${n.number}`}</Link> : <Link to={`/finance/purchase-settle-detail/${n.id}`}>{`#${n.number}`}</Link>
+                  n.orderType == '销售单' ? <Link to={`/bill/sale-detail/${n.id}`}>{` #${n.number}`}</Link> : (
+                    n.orderType == '进货单' ? <Link to={`/bill/purchase-detail/${n.id}`}>{` #${n.number}`}</Link> : <Link to={`/finance/purchase-settle-detail/${n.id}`}>{` #${n.number}`}</Link>
                   )
                 }
               </div>
             )
-          })}
+          }) : '无'}
         </Description>
       </DescriptionList>
     );
@@ -102,7 +97,7 @@ export default class PaymentsDetail extends PureComponent {
           <Row>
             <Col span='10'>
               <label className={styles.labelTitle}>支付方式：</label>
-              <span>{`${singleData.paymentWays && singleData.paymentWays.name ||''}`}</span>
+              <span>{`${singleData.paymentWays && singleData.paymentWays.name ||'无'}`}</span>
             </Col>
           </Row>
         </Card>

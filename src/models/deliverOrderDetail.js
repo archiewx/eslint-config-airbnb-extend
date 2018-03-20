@@ -43,10 +43,9 @@ export default  {
     },
 
     setShowData (state,{payload}) {
-      console.log(payload)
       state.singleOrderDetail.id = payload.id;
       state.singleOrderDetail.number = payload.number;
-      state.singleOrderDetail.remark = payload.remark || '「无」';
+      state.singleOrderDetail.remark = payload.remark || '无';
       state.singleOrderDetail.total_quantity = payload.total_quantity;
       state.singleOrderDetail.total_count = payload.total_count;
       state.singleOrderDetail.fromwarehouse = payload.fromwarehouse.data.name;
