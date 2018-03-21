@@ -21,6 +21,7 @@ const app = dva({
 app.use(createLoading())
 // 3. Register global model
 app.model(require('./models/global'));
+// app.model(require('./models/currentUser'))
 app.model(require('./models/configSetting'))
 
 // 4. Router

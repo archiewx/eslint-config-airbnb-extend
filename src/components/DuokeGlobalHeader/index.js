@@ -9,6 +9,13 @@ import styles from './index.less';
 
 const { Header } = Layout;
 
+const current = () => {
+  return {
+    name: sessionStorage.getItem('currentname'),
+    avatar: sessionStorage.getItem('currentavatar')
+  }
+}
+
 export default class GlobalHeader extends PureComponent {
   componentWillUnmount() {
     this.triggerResizeEvent.cancel();
@@ -58,9 +65,6 @@ export default class GlobalHeader extends PureComponent {
     } = this.props;
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
-{/*        <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
-        <Menu.Item disabled><Icon type="setting" />设置</Menu.Item>
-        <Menu.Divider />*/}
         <Menu.Item key="logout">退出登录</Menu.Item>
       </Menu>
     );
@@ -73,27 +77,31 @@ export default class GlobalHeader extends PureComponent {
           onClick={this.toggle}
         />
         <div className={styles.right}>
-{/*        <HeaderSearch
-          className={`${styles.action} ${styles.search}`}
-          placeholder="站内搜索"
-          dataSource={['搜索提示一', '搜索提示二', '搜索提示三']}
-          onSearch={(value) => {
-            console.log('input', value); // eslint-disable-line
-          }}
-          onPressEnter={(value) => {
-            console.log('enter', value); // eslint-disable-line
-          }}
-        />*/}
-          {true ? (
-            <Dropdown overlay={menu}>
-              <span className={`${styles.action} ${styles.account}`}>
-                <Avatar size="small" className={styles.avatar}  style={{background:'#f56a00',color:'#fff'}} icon="user"></Avatar>
-                hello
-              </span>
-            </Dropdown>
-          ) : <Spin size="small" style={{ marginLeft: 8 }} />}
+{/*        {currentUser.name ? (
+          <Dropdown overlay={menu}>
+            <span className={`${styles.action} ${styles.account}`}>
+              <Avatar size="small" className={styles.avatar} src={currentUser.avatar} />
+              <span className={styles.name}>{currentUser.name}</span>
+            </span>
+          </Dropdown>
+        ) : <Spin size="small" style={{ marginLeft: 8 }} />}*/}
+
+          <Dropdown overlay={menu}>
+            <span className={`${styles.action} ${styles.account}`}>
+              <Avatar size="small" className={styles.avatar} src={current().avatar} />
+              <span className={styles.name}>{current().name}</span>
+            </span>
+          </Dropdown>
         </div>
       </Header>
     );
   }
 }
+
+          // <Dropdown overlay={menu}>
+          //   <span className={`${styles.action} ${styles.account}`}>
+          //     {<Avatar size="small" className={styles.avatar}  style={{background:'#f56a00',color:'#fff'}} icon="user"></Avatar>}
+          //     <Avatar size="small" className={styles.avatar} src={currentUser.avatar} />
+          //     <span className={styles.name}>{currentUser.name}</span>
+          //   </span>
+          // </Dropdown>

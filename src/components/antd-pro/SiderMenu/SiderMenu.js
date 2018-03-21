@@ -17,7 +17,7 @@ const getIcon = (icon) => {
     return <img src={icon} alt="icon" className={styles.icon} />;
   }
   if (typeof icon === 'string') {
-    return <DuokeIcon type={icon} />;
+    return <DuokeIcon type={icon} style={{marginRight:10}}/>;
   }
   return icon;
 };
@@ -109,7 +109,7 @@ export default class SiderMenu extends PureComponent {
     if (/^https?:\/\//.test(itemPath)) {
       return (
         <a href={itemPath} target={target}>
-          {icon}<span style={{marginLeft:10}}>{name}</span>
+          {icon}<span>{name}</span>
         </a>
       );
     }
@@ -120,7 +120,7 @@ export default class SiderMenu extends PureComponent {
         replace={itemPath === this.props.location.pathname}
         onClick={this.props.isMobile ? () => { this.props.onCollapse(true); } : undefined}
       >
-        {icon}<span style={{marginLeft:10}}>{name}</span>
+        {icon}<span>{name}</span>
       </Link>
     );
   }
@@ -135,7 +135,7 @@ export default class SiderMenu extends PureComponent {
             item.icon ? (
               <span>
                 {getIcon(item.icon)}
-                <span style={{marginLeft:10}}>{item.name}</span>
+                <span>{item.name}</span>
               </span>
             ) : item.name
             }

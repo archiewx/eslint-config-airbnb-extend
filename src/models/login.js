@@ -1,6 +1,7 @@
 import * as loginService from '../services/login'
 import { reloadAuthorized } from '../utils/Authorized'
 import * as configSettingService from '../services/configSetting'
+import { getSingle } from '../services/user';
 import { routerRedux } from 'dva/router';
 import {message} from 'antd'
 const delay = timeout => {
@@ -60,6 +61,11 @@ export default  {
             isQuerying:true,
             code:'',
           }})
+          // yield put({type:'currentUser/fetchCurrent'})
+          const user = yield call(getSingle);
+          sessionStorage.setItem('currentname',user.result.data.name)
+          sessionStorage.setItem('currentavatar',`http://duoke3-image.oss-cn-hangzhou.aliyuncs.com/${user.result.data.role.data.avatar}`)
+          // yield call(delay, 1000*1);
           reloadAuthorized();
           yield put(routerRedux.push('/goods-list'))
         }else {
@@ -70,6 +76,12 @@ export default  {
 
     *logout({payload},{call,put}) {
       yield put(routerRedux.push('/user'))
+    },
+
+    *getCurrentUser(_,{call,put}) {
+      const user = yield call(getSingle);
+      sessionStorage.setItem('currentname',user.result.data.name)
+      sessionStorage.setItem('currentavatar',`http://duoke3-image.oss-cn-hangzhou.aliyuncs.com/${user.result.data.role.data.avatar}`)
     }
   },
 

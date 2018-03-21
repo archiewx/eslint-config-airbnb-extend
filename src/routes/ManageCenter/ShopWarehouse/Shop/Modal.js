@@ -60,7 +60,7 @@ export default class ShopModal extends PureComponent {
           </FormItem>
           {
             goodsGroups.map( n => {
-              return (
+              return n.children ? (
                 <FormItem key={n.id} label={n.name} {...formItemLayout}>
                   {getFieldDecorator(`group_${n.id}`,{
                     initialValue: groupIds[`${n.id}`]
@@ -74,7 +74,7 @@ export default class ShopModal extends PureComponent {
                     </Select>
                   )}
                 </FormItem>
-              )
+              ) : null
             })
           }
         </Form>
