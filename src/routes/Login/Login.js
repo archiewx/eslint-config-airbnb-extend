@@ -8,7 +8,6 @@ import QRCode from 'qrcode'
 
 @connect(state => ({
   login: state.login,
-  // configSetting:state.configSetting
 }))
 export default class LoginPage extends Component {
 
