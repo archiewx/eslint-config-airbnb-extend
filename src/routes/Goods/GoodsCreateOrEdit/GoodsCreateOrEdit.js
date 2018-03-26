@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { Row, Col, Card, Button, Form, Input, InputNumber, Select, Menu, Dropdown, Icon, Popconfirm, Spin } from 'antd';
 import { routerRedux } from 'dva/router';
+import Debounce from 'lodash-decorators/debounce';
 import pathToRegexp from 'path-to-regexp';
 import classNames from 'classnames/bind';
 import FooterToolbar from '../../../components/antd-pro/FooterToolbar';
@@ -390,24 +391,24 @@ export default class GoodsCreateOrEdit extends PureComponent {
             itemImageLevel: this.props.configSetting.itemImageLevel,
           } });
         //提交
-        // if (this.props.goodsCreateOrEdit.showData.id) {
-        //   this.props.dispatch({ type: 'goodsCreateOrEdit/editSingleGoods',
-        //     payload: {
-        //       serverData: this.props.goodsCreateOrEdit.serverData,
-        //       id: this.props.goodsCreateOrEdit.showData.id,
-        //       imageFile: this.props.goodsCreateOrEdit.imageFile,
-        //     } }).then(() => {
-        //     this.props.history.goBack();
-        //   });
-        // } else {
-        //   this.props.dispatch({ type: 'goodsCreateOrEdit/createSingleGoods',
-        //     payload: {
-        //       serverData: this.props.goodsCreateOrEdit.serverData,
-        //       imageFile: this.props.goodsCreateOrEdit.imageFile,
-        //     } }).then(() => {
-        //     this.props.dispatch(routerRedux.push('/goods-list'));
-        //   });
-        // }
+        if (this.props.goodsCreateOrEdit.showData.id) {
+          this.props.dispatch({ type: 'goodsCreateOrEdit/editSingleGoods',
+            payload: {
+              serverData: this.props.goodsCreateOrEdit.serverData,
+              id: this.props.goodsCreateOrEdit.showData.id,
+              imageFile: this.props.goodsCreateOrEdit.imageFile,
+            } }).then(() => {
+            this.props.history.goBack();
+          });
+        } else {
+          this.props.dispatch({ type: 'goodsCreateOrEdit/createSingleGoods',
+            payload: {
+              serverData: this.props.goodsCreateOrEdit.serverData,
+              imageFile: this.props.goodsCreateOrEdit.imageFile,
+            } }).then(() => {
+            this.props.dispatch(routerRedux.push('/goods-list'));
+          });
+        }
       }
     });
   }
