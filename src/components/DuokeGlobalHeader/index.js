@@ -3,7 +3,7 @@ import { Layout, Menu, Icon, Spin, Tag, Dropdown, Avatar, Divider } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import Debounce from 'lodash-decorators/debounce';
-import HeaderSearch from '../antd-pro/HeaderSearch'
+import HeaderSearch from '../antd-pro/HeaderSearch';
 import { Link } from 'dva/router';
 import styles from './index.less';
 
@@ -12,9 +12,9 @@ const { Header } = Layout;
 const current = () => {
   return {
     name: sessionStorage.getItem('currentname'),
-    avatar: sessionStorage.getItem('currentavatar')
-  }
-}
+    avatar: sessionStorage.getItem('currentavatar'),
+  };
+};
 
 export default class GlobalHeader extends PureComponent {
   componentWillUnmount() {
@@ -77,15 +77,6 @@ export default class GlobalHeader extends PureComponent {
           onClick={this.toggle}
         />
         <div className={styles.right}>
-{/*        {currentUser.name ? (
-          <Dropdown overlay={menu}>
-            <span className={`${styles.action} ${styles.account}`}>
-              <Avatar size="small" className={styles.avatar} src={currentUser.avatar} />
-              <span className={styles.name}>{currentUser.name}</span>
-            </span>
-          </Dropdown>
-        ) : <Spin size="small" style={{ marginLeft: 8 }} />}*/}
-
           <Dropdown overlay={menu}>
             <span className={`${styles.action} ${styles.account}`}>
               <Avatar size="small" className={styles.avatar} src={current().avatar} />
@@ -98,10 +89,3 @@ export default class GlobalHeader extends PureComponent {
   }
 }
 
-          // <Dropdown overlay={menu}>
-          //   <span className={`${styles.action} ${styles.account}`}>
-          //     {<Avatar size="small" className={styles.avatar}  style={{background:'#f56a00',color:'#fff'}} icon="user"></Avatar>}
-          //     <Avatar size="small" className={styles.avatar} src={currentUser.avatar} />
-          //     <span className={styles.name}>{currentUser.name}</span>
-          //   </span>
-          // </Dropdown>

@@ -1,8 +1,8 @@
 import 'babel-polyfill';
 import dva from 'dva';
-import createLoading from 'dva-loading';
+// import createLoading from 'dva-loading';
 import 'moment/locale/zh-cn';
-import {message} from 'antd'
+import { message } from 'antd';
 import FastClick from 'fastclick';
 // import './g2';
 import './rollbar';
@@ -18,10 +18,10 @@ const app = dva({
 
 // 2. Plugins
 // app.use({});
-app.use(createLoading())
+// app.use(createLoading())
 // 3. Register global model
 app.model(require('./models/global'));
-app.model(require('./models/configSetting'))
+app.model(require('./models/configSetting'));
 
 // 4. Router
 app.router(require('./router'));
@@ -29,8 +29,8 @@ app.router(require('./router'));
 // 5. Start
 app.start('#root');
 
-window.onbeforeunload = function() {
-  sessionStorage.setItem('oncefetch',true)
-}
+window.onbeforeunload = function () {
+  sessionStorage.setItem('oncefetch', true);
+};
 
 FastClick.attach(document.body);

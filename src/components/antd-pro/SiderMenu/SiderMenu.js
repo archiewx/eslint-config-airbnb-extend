@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import pathToRegexp from 'path-to-regexp';
 import { Link } from 'dva/router';
-import DuokeIcon from '../../DuokeIcon'
+import DuokeIcon from '../../DuokeIcon';
 import styles from './index.less';
 
 const { Sider } = Layout;
@@ -17,7 +17,7 @@ const getIcon = (icon) => {
     return <img src={icon} alt="icon" className={styles.icon} />;
   }
   if (typeof icon === 'string') {
-    return <DuokeIcon type={icon} style={{marginRight:10}}/>;
+    return <DuokeIcon type={icon} style={{ marginRight: 10 }} />;
   }
   return icon;
 };

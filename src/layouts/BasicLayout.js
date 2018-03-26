@@ -9,14 +9,15 @@ import classNames from 'classnames';
 import { enquireScreen } from 'enquire-js';
 import GlobalHeader from '../components/DuokeGlobalHeader';
 import GlobalFooter from '../components/antd-pro/GlobalFooter';
-import SiderMenu from '../components/antd-pro/SiderMenu';
+import SiderMenu from '../components/DuokeSiderMenu';
 import NotFound from '../routes/Exception/404';
 import { getRoutes } from '../utils/utils';
 import Authorized from '../utils/Authorized';
 import { getMenuData } from '../common/menu';
 import logo from '../assets/logo.svg';
-import duokeLogo from '../assets/duoke_logo.png'
-import duokeLogo2 from '../assets/duoke_logo2.png'
+import duokeLogo from '../assets/duoke_logo.png';
+import duokeLogo2 from '../assets/duoke_logo2.png';
+
 const { AuthorizedRoute } = Authorized;
 /**
  * 根据菜单取得重定向地址.
@@ -85,9 +86,6 @@ class BasicLayout extends React.PureComponent {
         isMobile: mobile,
       });
     });
-    // this.props.dispatch({
-    //   type: 'user/fetchCurrent',
-    // });
   }
   getPageTitle() {
     const { routerData, location } = this.props;
@@ -115,7 +113,6 @@ class BasicLayout extends React.PureComponent {
     const {
       currentUser, collapsed, fetchingNotices, notices, routerData, match, location,
     } = this.props;
-    // const isLogin = sessionStorage.getItem('token')
     const layout = (
       <Layout>
         <SiderMenu
@@ -188,5 +185,5 @@ export default connect(state => ({
   collapsed: state.global.collapsed,
   fetchingNotices: state.global.fetchingNotices,
   notices: state.global.notices,
-  login:state.login
+  login: state.login,
 }))(BasicLayout);

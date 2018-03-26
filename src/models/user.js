@@ -1,4 +1,4 @@
-import { query as queryUsers, queryCurrent,getSingle } from '../services/user';
+import { query as queryUsers, queryCurrent, getSingle } from '../services/user';
 
 export default {
   namespace: 'user',
@@ -26,7 +26,6 @@ export default {
       });
     },
     *fetchCurrent(_, { call, put }) {
-
       const data = yield call(getSingle);
       yield put({
         type: 'saveCurrentUser',
@@ -50,9 +49,9 @@ export default {
     },
     saveCurrentUser(state, action) {
       state.currentUser.name = action.payload.name;
-      state.currentUser.avatar = 'http://duoke3-image.oss-cn-hangzhou.aliyuncs.com/' + action.payload.role.data.avatar;
-      console.log(state.currentUser)
-      return {...state};
+      state.currentUser.avatar = `http://duoke3-image.oss-cn-hangzhou.aliyuncs.com/${action.payload.role.data.avatar}`;
+      console.log(state.currentUser);
+      return { ...state };
     },
     changeNotifyCount(state, action) {
       return {

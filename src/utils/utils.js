@@ -5,16 +5,14 @@ export function fixedZero(val) {
 }
 
 export class DelayRunner {
-
-  run( callback, timeout ){
-    clearTimeout( this.timer );
-    this.timer = setTimeout( callback || function(){}, timeout || 0);
+  run(callback, timeout) {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(callback || (() => {}), timeout || 0);
   }
 
-  clear(){
-    clearTimeout( this.timer );
+  clear() {
+    clearTimeout(this.timer);
   }
-
 }
 
 export function getTimeDistance(type) {

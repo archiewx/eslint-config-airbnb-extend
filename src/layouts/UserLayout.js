@@ -1,11 +1,11 @@
 import React from 'react';
-import { Link, Route,Redirect,Switch } from 'dva/router';
+import { Link, Route, Redirect, Switch } from 'dva/router';
 import DocumentTitle from 'react-document-title';
 import { Icon } from 'antd';
 import GlobalFooter from '../components/antd-pro/GlobalFooter';
 import styles from './UserLayout.less';
 import logo from '../assets/logo.svg';
-import duokeLogo from '../assets/duoke_logo.png'
+import duokeLogo from '../assets/duoke_logo.png';
 import { getRoutes } from '../utils/utils';
 
 const links = [{
@@ -42,7 +42,7 @@ class UserLayout extends React.PureComponent {
                 <img alt="logo" className={styles.logo} src={duokeLogo} />
               </Link>
             </div>
-            <div className={styles.desc}></div>
+            <div className={styles.desc} />
           </div>
           <Switch>
             {
@@ -57,7 +57,7 @@ class UserLayout extends React.PureComponent {
                 )
               )
             }
-            <Redirect  from="/user" to="/user/login" />
+            <Redirect from="/user" to="/user/login" />
           </Switch>
           <GlobalFooter className={styles.footer} copyright={copyright} />
         </div>

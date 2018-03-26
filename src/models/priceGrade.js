@@ -1,68 +1,70 @@
-import * as priceGradeService from '../services/priceGrade'
-export default  {
+import * as priceGradeService from '../services/priceGrade';
+
+export default {
 
   namespace: 'priceGrade',
 
   state: {
-    priceGrades:[],
+    priceGrades: [],
   },
 
   subscriptions: {
     setup({ dispatch, history }) {
-      
+
     },
   },
 
   effects: {
-    *getList({payload},{call,put}) {
-      const data = yield call(priceGradeService.getList)
-      yield put({type:'setState',payload:{
-        priceGrades:data.result.data
-      }})
+    *getList({ payload }, { call, put }) {
+      const data = yield call(priceGradeService.getList);
+      yield put({ type: 'setState',
+        payload: {
+          priceGrades: data.result.data,
+        } });
     },
 
-    *createSingle({payload},{call,put}) {
-      const data = yield call(priceGradeService.createSingle,payload)
+    *createSingle({ payload }, { call, put }) {
+      const data = yield call(priceGradeService.createSingle, payload);
       return data;
     },
 
-    *editSingle({payload},{call,put}) {
-      const data = yield call(priceGradeService.editSingle,payload)
+    *editSingle({ payload }, { call, put }) {
+      const data = yield call(priceGradeService.editSingle, payload);
       return data;
     },
 
-    *deleteSingle({payload},{call,put}) {
-      yield call(priceGradeService.deleteSingle,payload)
+    *deleteSingle({ payload }, { call, put }) {
+      yield call(priceGradeService.deleteSingle, payload);
     },
 
-    *editSort ({payload},{call,put}) {
-      yield call(priceGradeService.editSort,payload)
-    }
+    *editSort({ payload }, { call, put }) {
+      yield call(priceGradeService.editSort, payload);
+    },
   },
 
   reducers: {
 
-    setState (state, action) {
-      return { ...state, ...action.payload }
+    setState(state, action) {
+      return { ...state, ...action.payload };
     },
 
-    setSortMove(state,{payload:{currentId,moveWay}}) {
+    setSortMove(state, { payload: { currentId, moveWay } }) {
       moveWay == 'up' ? null : state.priceGrades.reverse();
-      state.priceGrades.forEach( (n,i) => {
-        if(n.id == currentId) {
+      state.priceGrades.forEach((n, i) => {
+        if (n.id == currentId) {
           i == 0 ? '' : (
-            state.priceGrades.splice(i,1),
-            state.priceGrades.splice(i-1,0,n)
-          )
+            state.priceGrades.splice(i, 1),
+            state.priceGrades.splice(i - 1, 0, n)
+          );
         }
-      })
+      });
       moveWay == 'up' ? null : state.priceGrades.reverse();
-      state.priceGrades.forEach((item,index)=>{
+      state.priceGrades.forEach((item, index) => {
         item.sort = index;
-      })
-      console.log(state.priceGrades)
-      return {...state}
-    }
+      });
+      console.log(state.priceGrades);
+      return { ...state };
+    },
   },
 
 };

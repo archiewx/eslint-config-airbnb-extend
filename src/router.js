@@ -1,5 +1,5 @@
 import React from 'react';
-import { Router, Route, Switch ,Redirect,routerRedux} from 'dva/router';
+import { Router, Route, Switch, Redirect, routerRedux } from 'dva/router';
 import { LocaleProvider, Spin } from 'antd';
 import Authorized from './utils/Authorized';
 import zhCN from 'antd/lib/locale-provider/zh_CN';

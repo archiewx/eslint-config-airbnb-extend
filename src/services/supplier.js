@@ -1,131 +1,131 @@
-import {apiBase,token} from '../common/index'
+import { apiBase, token } from '../common/index';
 import request from '../utils/request';
 
-export async function getList (params) {
+export async function getList(params) {
   return request(`${apiBase}/api/suppliers/list`, {
     method: 'POST',
-    headers: { "Authorization": token() },
-    body: params
-  })
+    headers: { Authorization: token() },
+    body: params,
+  });
 }
 
-export async function deleteSingle (params) {
-  return request(`${apiBase}/api/suppliers/${params}`,{
+export async function deleteSingle(params) {
+  return request(`${apiBase}/api/suppliers/${params}`, {
     method: 'DELETE',
-    headers: { "Authorization": token() },
-  })
+    headers: { Authorization: token() },
+  });
 }
 
-export async function changeSupplierStatus (params) {
-  let current = {
-    freeze: params.freeze
-  }
-  return request(`${apiBase}/api/suppliers/${params.id}/freeze`,{
+export async function changeSupplierStatus(params) {
+  const current = {
+    freeze: params.freeze,
+  };
+  return request(`${apiBase}/api/suppliers/${params.id}/freeze`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
-    body:current
-  })
+    headers: { Authorization: token() },
+    body: current,
+  });
 }
 
-export async function createSingle (params) {
+export async function createSingle(params) {
   return request(`${apiBase}/api/suppliers`, {
     method: 'POST',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: params,
-  })
+  });
 }
 
-export async function getSingle (params) {
-  return request(`${apiBase}/api/suppliers/${params.id}`,{
-    headers: { "Authorization": token() },
-  })
+export async function getSingle(params) {
+  return request(`${apiBase}/api/suppliers/${params.id}`, {
+    headers: { Authorization: token() },
+  });
 }
 
-export async function editSingle (params) {
-  return request(`${apiBase}/api/suppliers/${params.id}`,{
+export async function editSingle(params) {
+  return request(`${apiBase}/api/suppliers/${params.id}`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: params.serverData,
-  })
+  });
 }
 
-export async function getSupplierFinance (params) {
-  return request(`${apiBase}/api/suppliers/${params.id}/finance`,{
-    headers: {'Authorization':token()}
-  })
+export async function getSupplierFinance(params) {
+  return request(`${apiBase}/api/suppliers/${params.id}/finance`, {
+    headers: { Authorization: token() },
+  });
 }
 
-export async function getPurchaseorderNeedPay (params) {
+export async function getPurchaseorderNeedPay(params) {
   const condition = {
-    sorts:params.sorts
-  }
-  return request(`${apiBase}/api/suppliers/${params.id}/purchaseorders/need_pay`,{
-    method:'POST',
-    headers:{'Authorization':token()},
-    body:condition
-  })
+    sorts: params.sorts,
+  };
+  return request(`${apiBase}/api/suppliers/${params.id}/purchaseorders/need_pay`, {
+    method: 'POST',
+    headers: { Authorization: token() },
+    body: condition,
+  });
 }
 
-export async function getStatementsNeedPay (params) {
+export async function getStatementsNeedPay(params) {
   const condition = {
-    sorts:params.sorts
-  }
-  return request(`${apiBase}/api/suppliers/${params.id}/statements/need_pay`,{
-    method:'POST',
-    headers:{'Authorization':token()},
-    body:condition
-  })
-}
-
-export async function getSupplierSaleHistory (params) {
-  let current = {...params};
-  delete current.id
-  return request(`${apiBase}/api/suppliers/${params.id}/purchaseorders`,{
+    sorts: params.sorts,
+  };
+  return request(`${apiBase}/api/suppliers/${params.id}/statements/need_pay`, {
     method: 'POST',
-    headers: {"Authorization":token()},
-    body: current
-  })
+    headers: { Authorization: token() },
+    body: condition,
+  });
 }
 
-export async function getSupplierGoodsHistory (params) {
-  let current = {...params};
-  delete current.id
-  return request(`${apiBase}/api/suppliers/${params.id}/items`,{
+export async function getSupplierSaleHistory(params) {
+  const current = { ...params };
+  delete current.id;
+  return request(`${apiBase}/api/suppliers/${params.id}/purchaseorders`, {
     method: 'POST',
-    headers: {"Authorization":token()},
-    body: current
-  })
+    headers: { Authorization: token() },
+    body: current,
+  });
 }
 
-export async function getSupplierPaymentHistory (params) {
-  let current = {...params};
-  delete current.id
-  return request(`${apiBase}/api/suppliers/${params.id}/payments`,{
+export async function getSupplierGoodsHistory(params) {
+  const current = { ...params };
+  delete current.id;
+  return request(`${apiBase}/api/suppliers/${params.id}/items`, {
     method: 'POST',
-    headers: {"Authorization":token()},
-    body: current
-  })
+    headers: { Authorization: token() },
+    body: current,
+  });
+}
+
+export async function getSupplierPaymentHistory(params) {
+  const current = { ...params };
+  delete current.id;
+  return request(`${apiBase}/api/suppliers/${params.id}/payments`, {
+    method: 'POST',
+    headers: { Authorization: token() },
+    body: current,
+  });
 }
 
 
-export async function getGoodsPurchaseDetail (params) {
+export async function getGoodsPurchaseDetail(params) {
   const condition = {
-    sorts:params.sorts
-  }
-  return request(`${apiBase}/api/suppliers/${params.id}/item/${params.subId}/statistics`,{
+    sorts: params.sorts,
+  };
+  return request(`${apiBase}/api/suppliers/${params.id}/item/${params.subId}/statistics`, {
     method: 'POST',
-    headers: {"Authorization":token()},
-    body:condition
-  })
+    headers: { Authorization: token() },
+    body: condition,
+  });
 }
 
-export async function getSkusPurchaseDetail (params) {
+export async function getSkusPurchaseDetail(params) {
   const condition = {
-    sorts:params.sorts
-  }
-  return request(`${apiBase}/api/suppliers/${params.id}/sku/${params.subId}/statistics`,{
+    sorts: params.sorts,
+  };
+  return request(`${apiBase}/api/suppliers/${params.id}/sku/${params.subId}/statistics`, {
     method: 'POST',
-    headers:{'Authorization':token()},
-    body: condition
-  })
+    headers: { Authorization: token() },
+    body: condition,
+  });
 }

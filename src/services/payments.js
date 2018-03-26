@@ -1,26 +1,26 @@
-import {apiBase,token} from '../common/index'
+import { apiBase, token } from '../common/index';
 import request from '../utils/request';
 
-export async function getList (params) {
-  return request(`${apiBase}/api/payments/list`,{
-    method:'POST',
-    headers: { "Authorization": token() },
-    body: params
-  })
+export async function getList(params) {
+  return request(`${apiBase}/api/payments/list`, {
+    method: 'POST',
+    headers: { Authorization: token() },
+    body: params,
+  });
 }
 
-export async function getSingle (params) {
-  return request(`${apiBase}/api/payments/${params.id}`,{
-    headers: { "Authorization": token() },
-  })
+export async function getSingle(params) {
+  return request(`${apiBase}/api/payments/${params.id}`, {
+    headers: { Authorization: token() },
+  });
 }
 
 
-export async function deleteSingle (params) {
-  return request(`${apiBase}/api/payments/${params}`,{
+export async function deleteSingle(params) {
+  return request(`${apiBase}/api/payments/${params}`, {
     method: 'DELETE',
-    headers: { "Authorization": token() },
-  })
+    headers: { Authorization: token() },
+  });
 }
 
 // export async function createSingle (params) {

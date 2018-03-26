@@ -1,10 +1,11 @@
-import * as paymentService from '../services/payment'
-export default  {
+import * as paymentService from '../services/payment';
+
+export default {
 
   namespace: 'payment',
 
   state: {
-    payments:[],
+    payments: [],
   },
 
   subscriptions: {
@@ -13,54 +14,55 @@ export default  {
   },
 
   effects: {
-    *getList ({payload},{call,put,take}) {
-      const data = yield call(paymentService.getList)
-      yield put({type:'setState',payload:{
-        payments:data.result.data
-      }})
+    *getList({ payload }, { call, put, take }) {
+      const data = yield call(paymentService.getList);
+      yield put({ type: 'setState',
+        payload: {
+          payments: data.result.data,
+        } });
     },
 
-    *createSingle ({payload},{call,put}) {
-      const data = yield call(paymentService.createSingle,payload)
+    *createSingle({ payload }, { call, put }) {
+      const data = yield call(paymentService.createSingle, payload);
       return data;
     },
 
-    *editSingle ({payload},{call,put}) {
-      const data = yield call(paymentService.editSingle,payload)
+    *editSingle({ payload }, { call, put }) {
+      const data = yield call(paymentService.editSingle, payload);
       return data;
     },
 
-    *deleteSingle ({payload},{call,put}) {
-      yield call(paymentService.deleteSingle,payload)
+    *deleteSingle({ payload }, { call, put }) {
+      yield call(paymentService.deleteSingle, payload);
     },
 
-    *editSort ({payload},{call,put}) {
-      yield call(paymentService.editSort,payload)
-    }
+    *editSort({ payload }, { call, put }) {
+      yield call(paymentService.editSort, payload);
+    },
   },
 
   reducers: {
 
-    setState (state, action) {
-      return { ...state, ...action.payload }
+    setState(state, action) {
+      return { ...state, ...action.payload };
     },
 
-    setSortMove(state,{payload:{currentId,moveWay}}) {
+    setSortMove(state, { payload: { currentId, moveWay } }) {
       moveWay == 'up' ? null : state.payments.reverse();
-      state.payments.forEach( (n,i) => {
-        if(n.id == currentId) {
+      state.payments.forEach((n, i) => {
+        if (n.id == currentId) {
           i == 0 ? '' : (
-            state.payments.splice(i,1),
-            state.payments.splice(i-1,0,n)
-          )
+            state.payments.splice(i, 1),
+            state.payments.splice(i - 1, 0, n)
+          );
         }
-      })
+      });
       moveWay == 'up' ? null : state.payments.reverse();
-      state.payments.forEach((item,index)=>{
+      state.payments.forEach((item, index) => {
         item.sort = index;
-      })
-      return {...state}
-    }
+      });
+      return { ...state };
+    },
 
   },
 

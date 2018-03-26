@@ -20,7 +20,7 @@ const codeMessage = {
   504: '网关超时',
 };
 function checkStatus(response) {
-  if(response.status == 401) {
+  if (response.status == 401) {
     window.location = '#user';
     sessionStorage.clear();
     throw new Error('token已失效，请重新扫码');

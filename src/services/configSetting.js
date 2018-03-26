@@ -1,99 +1,99 @@
-import {apiBase,token} from '../common/index'
+import { apiBase, token } from '../common/index';
 import request from '../utils/request';
 
-export async function getConfigSetting (params) {
-  return request(`${apiBase}/api/configs/list`,{
+export async function getConfigSetting(params) {
+  return request(`${apiBase}/api/configs/list`, {
     method: 'POST',
-    headers: { "Authorization": token() },
-  })
+    headers: { Authorization: token() },
+  });
 }
 
-export async function switchUsePrice (params) {
+export async function switchUsePrice(params) {
   const current = {
-    setting:[params],
+    setting: [params],
   };
-  return request( `${apiBase}/api/configs/use_pricelevel/setting`,{
+  return request(`${apiBase}/api/configs/use_pricelevel/setting`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: current,
-  })
+  });
 }
 
-export async function switchHistoryPrice (params) {
+export async function switchHistoryPrice(params) {
   const current = {
-    setting:[params],
+    setting: [params],
   };
-  return request(`${apiBase}/api/configs/use_history_price/setting`,{
+  return request(`${apiBase}/api/configs/use_history_price/setting`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: current,
-  })
+  });
 }
 
-export async function switchPriceModal (params) {
+export async function switchPriceModal(params) {
   const current = {
-    setting:[params],
+    setting: [params],
   };
-  return request(`${apiBase}/api/configs/price_model/setting`,{
+  return request(`${apiBase}/api/configs/price_model/setting`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: current,
-  })
+  });
 }
 
-export async function switchBarcode (params) {
+export async function switchBarcode(params) {
   const current = {
-    setting:[params],
+    setting: [params],
   };
-  return request(`${apiBase}/api/configs/item_barcode_level/setting`,{
+  return request(`${apiBase}/api/configs/item_barcode_level/setting`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: current,
-  })
+  });
 }
 
-export async function switchPicture (params) {
+export async function switchPicture(params) {
   const current = {
-    setting:[params],
+    setting: [params],
   };
-  return request(`${apiBase}/api/configs/item_image_level/setting`,{
+  return request(`${apiBase}/api/configs/item_image_level/setting`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: current,
-  })
+  });
 }
 
-export async function switchItemAttrite (params) {
+export async function switchItemAttrite(params) {
   const current = {
-    setting:params,
-  }
-  return request(`${apiBase}/api/configs/item_attribute/setting`,{
-    method: 'PUT',
-    headers: { "Authorization": token() },
-    body: current,
-  })
-}
-
-export async function switchShopShareCustomer (params) {
-  const current = {
-    setting:[params],
+    setting: params,
   };
-  return request(`${apiBase}/api/configs/shop_share_customer/setting`,{
+  return request(`${apiBase}/api/configs/item_attribute/setting`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: current,
-  })
+  });
 }
 
-export async function switchDefaultDeleiverWay (params) {
+export async function switchShopShareCustomer(params) {
   const current = {
-    setting:[params],
+    setting: [params],
   };
-  return request(`${apiBase}/api/configs/default_delivery_way/setting`,{
+  return request(`${apiBase}/api/configs/shop_share_customer/setting`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: current,
-  })
+  });
+}
+
+export async function switchDefaultDeleiverWay(params) {
+  const current = {
+    setting: [params],
+  };
+  return request(`${apiBase}/api/configs/default_delivery_way/setting`, {
+    method: 'PUT',
+    headers: { Authorization: token() },
+    body: current,
+  });
 }
 
 
@@ -134,14 +134,13 @@ export async function switchDefaultDeleiverWay (params) {
 // }
 
 
-
-export async function switchInventoryApprover (params) {
+export async function switchInventoryApprover(params) {
   const current = {
-    setting:params
-  }
-  return request(`${apiBase}/api/configs/inventory_approver/setting`,{
+    setting: params,
+  };
+  return request(`${apiBase}/api/configs/inventory_approver/setting`, {
     method: 'PUT',
-    headers: { "Authorization": token() },
+    headers: { Authorization: token() },
     body: current,
-  })
+  });
 }
