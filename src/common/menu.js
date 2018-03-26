@@ -124,8 +124,13 @@ const menuData = [{
   }],
 }, {
   name: 'version：0.0.4',
-  icon: 'version_number' ,
-}];
+  icon: 'version_number',
+},
+// {
+//   name: '测试',
+//   path: 'test'
+// }
+];
 
 function formatter(data, parentPath = '') {
   return data.map((item) => {
