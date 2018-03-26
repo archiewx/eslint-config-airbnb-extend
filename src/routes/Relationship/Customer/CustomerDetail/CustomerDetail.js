@@ -333,7 +333,7 @@ export default class CustomerDetail extends PureComponent {
     const menu = (
       <Menu style={{ width: 109 }}>
         <Menu.Item key="1">
-          <Popconfirm title="确认删除此客户?" placement="bottom" onConfirm={this.handleDeleteSingleCustomer.bind(null, currentId.id)}>删除</Popconfirm>
+          <Popconfirm title="确认删除此客户?" placement="bottom" onConfirm={this.handleDeleteSingleCustomer.bind(null, currentId.id)}><span style={{width: '100%',display:'inline-block'}}>删除</span></Popconfirm>
         </Menu.Item>
       </Menu>
     );

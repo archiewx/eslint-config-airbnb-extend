@@ -1,5 +1,6 @@
 import * as goodsService from '../services/goods';
 import { message } from 'antd';
+import moment from 'moment';
 import * as customerGroupService from '../services/customerGroup';
 import { imageApiBase } from '../common/index.js';
 
@@ -30,13 +31,26 @@ export default {
 
   effects: {
     *getSingle({ payload }, { call, put, select, all }) {
+      const condition = {
+        date_type: 'custom',
+        sday: moment(new Date((new Date()).getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        eday: moment(new Date(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        id: payload.id,
+      };
+      const condition2 = {
+        date_type: 'custom',
+        sday: moment(new Date((new Date()).getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        eday: moment(new Date(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        id: payload.id,
+        mode: 'customer',
+      };
       const [data1, data2, data3, data4, data5, data6, data7] = yield all([
         call(goodsService.getSingle, payload),
-        call(goodsService.getSingleSales, payload),
-        call(goodsService.getSinglePurchases, payload),
-        call(goodsService.getSingleCustomers, payload),
-        call(goodsService.getSingleSuppliers, payload),
-        call(goodsService.getSingleStocks, payload),
+        call(goodsService.getSingleSales, condition),
+        call(goodsService.getSinglePurchases, condition),
+        call(goodsService.getSingleCustomers, condition2),
+        call(goodsService.getSingleSuppliers, condition),
+        call(goodsService.getSingleStocks, condition),
         call(customerGroupService.getList),
       ]);
       const { usePricelelvel, priceModel, itemImageLevel } = yield select(({ configSetting }) => (configSetting));
