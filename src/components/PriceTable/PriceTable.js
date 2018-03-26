@@ -125,7 +125,7 @@ export default class PriceTable extends React.Component {
             )
           ) : (
             priceModel !== '' ? (
-              <div>
+              <div style={{width:'100%'}}>
                 <Row gutter={64}>
                   {
                     tableCol.map((item) => {

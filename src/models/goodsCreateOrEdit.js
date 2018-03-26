@@ -9,9 +9,9 @@ export default {
   namespace: 'goodsCreateOrEdit',
 
   state: {
-    serverData: {},
-    showData: {},
-    imageFile: [],
+    serverData: {}, // 服务端的数据
+    showData: {}, // 展示的数据
+    imageFile: [], // 图片的数据
   },
 
   subscriptions: {
@@ -65,15 +65,14 @@ export default {
     },
 
     setShowData(state, { payload: { value, itemimage, usePricelelvel, priceModel, itemBarcodeLevel, itemImageLevel } }) {
-      console.log(value);
-      state.showData.id = value.id;
-      state.showData.item_ref = value.item_ref;
-      state.showData.standard_price = (value.standard_price).toString();
-      state.showData.purchase_price = (value.purchase_price).toString();
+      state.showData.id = value.id; //商品id
+      state.showData.item_ref = value.item_ref; //货号
+      state.showData.standard_price = (value.standard_price).toString(); //标准价
+      state.showData.purchase_price = (value.purchase_price).toString(); //进货价就
       let priceMatrix = [...value.itemprices.data];
       priceMatrix = priceMatrix.splice(0, priceMatrix.length - 1);
-      state.showData.prices = {};
-      let flag = false;
+      state.showData.prices = {}; // 价格组成&价格等级
+      let flag = false; //判断当前的价格组成的策略与数据相符合
       if (priceMatrix.length) {
         if (usePricelelvel == 'yes') {
           if (priceModel == '') {
@@ -156,6 +155,7 @@ export default {
           price: (value.standard_price).toString(),
         };
       }
+      // 基本价格组成为quantityrange & 数据相符合，生成selectQuantityStep
       if (priceModel == 'quantityrange' && !flag) {
         state.showData.selectQuantityStep = value.quantityrangegroup.data.quantityranges.data.map((item, index) => {
           let name;
@@ -170,20 +170,22 @@ export default {
           };
         });
       }
+      // 选择的单位
       state.showData.selectUnits = value.units.data.map((item) => {
         return {
           id: item.id,
-          name: `${item.name} x ( ${item.number} )`,
+          name: `${item.name} x ( ${Number(item.number)} )`,
           number: item.number,
         };
       });
+      // 多选框的单位
       state.showData.units = value.units.data.map((item) => {
         return (item.id).toString();
       });
-      state.showData.name = value.name;
-      state.showData.desc = value.desc;
-      state.showData.goodsGroup = {};
-      const alreadyExitItemGroups = [];
+      state.showData.name = value.name; //名称
+      state.showData.desc = value.desc; //备注
+      state.showData.goodsGroup = {}; //商品分组
+      let alreadyExitItemGroups = [];
       value.itemgroups.data.forEach((item) => {
         if (alreadyExitItemGroups.some(n => n == item.parent_id)) {
           state.showData.goodsGroup[`${item.parent_id}`].push(item.id);
@@ -193,10 +195,10 @@ export default {
           state.showData.goodsGroup[`${item.parent_id}`].push(item.id);
         }
       });
-      state.showData.colors = [];
-      state.showData.sizes = [];
-      state.showData.selectColors = [];
-      state.showData.selectSizes = [];
+      state.showData.colors = []; // 多选框的颜色
+      state.showData.sizes = []; // 多选框的尺码
+      state.showData.selectColors = []; // 选择的颜色
+      state.showData.selectSizes = []; // 选择的尺码
       value.skus.data.forEach((item) => {
         item.skuattributes.data.forEach((subItem) => {
           if (subItem.skuattributetype_id == '1') {
@@ -218,10 +220,10 @@ export default {
           }
         });
       });
-      state.showData.imageFile = {};
-      state.showData.stocks = {};
-      state.showData.barcodes = {};
-      state.showData.barcodeId = {};
+      state.showData.imageFile = {}; //图片
+      state.showData.stocks = {}; //库存
+      state.showData.barcodes = {}; //条码
+      state.showData.barcodeId = {}; //skuId
       state.showData.imageFile = {};
       if (state.showData.colors.length == 0) {
         value.skus.data.forEach((item) => {
@@ -245,17 +247,20 @@ export default {
               colorId = subItem.id;
             }
           });
+          // 生成库存数据
           item.skustocks.data.forEach((subItem) => {
             state.showData.stocks[`${subItem.warehouse_id}_${colorId}`] = {
               store_quantity: subItem.store_quantity,
             };
           });
+          // 生成条码数据
           state.showData.barcodes[`${colorId}`] = {
             barcode: itemBarcodeLevel == 1 ? item.barcode : '',
           };
           state.showData.barcodeId[`${colorId}`] = {
             id: item.id,
           };
+          // 图片策略为sku 生成图片数据
           if (itemImageLevel == 'sku') {
             item.skuimages && item.skuimages.data.forEach((subItem) => {
               state.showData.imageFile[`${colorId}`] = [];
@@ -284,12 +289,15 @@ export default {
               store_quantity: subItem.store_quantity,
             };
           });
+          // 生成库存数据
           state.showData.barcodes[`${colorId}_${sizeId}`] = {
             barcode: itemBarcodeLevel == 1 ? item.barcode : '',
           };
+          // 生成条码数据
           state.showData.barcodeId[`${colorId}_${sizeId}`] = {
             id: item.id,
           };
+          // 图片策略为sku 生成图片数据
           if (itemImageLevel == 'sku') {
             item.skuimages && item.skuimages.data.forEach((subItem) => {
               state.showData.imageFile[`${colorId}`] = [];
@@ -304,6 +312,7 @@ export default {
         });
       }
       itemBarcodeLevel == 0 ? state.showData.barcodes.barcode = value.barcode : '';
+      // 图片策略为item 生成图片数据
       if (itemImageLevel == 'item') {
         state.showData.imageFile = [];
         itemimage.forEach((item) => {
@@ -315,215 +324,13 @@ export default {
           });
         });
       }
-      console.log(state.showData);
+      console.log(state.showData)
       return { ...state };
     },
 
 
-    setServerData(state, { payload: { value, selectColors, selectUnits, selectQuantityStep, warehouses, priceModel, itemBarcodeLevel, itemImageLevel } }) {
-      console.log(value);
-      state.serverData = {};
-      state.serverData.item_ref = value.item_ref;
-      state.serverData.standard_price = value.standard_price;
-      state.serverData.purchase_price = value.purchase_price || 0;
-      state.serverData.prices = [];
-      if (priceModel == '') {
-        state.serverData.prices = Object.values(value.prices_table);
-        state.serverData.prices.push({
-          price: value.standard_price,
-        });
-      } else if (priceModel == 'shop') {
-        state.serverData.prices = Object.values(value.prices_table);
-        state.serverData.prices.push({
-          price: value.standard_price,
-        });
-      } else if (priceModel == 'unit') {
-        Object.values(value.prices_table).forEach((item) => {
-          if (value.unit_select.some(n => n == item.unit_id)) {
-            state.serverData.prices.push(item);
-          }
-        });
-        state.serverData.prices.push({
-          price: value.standard_price,
-        });
-      } else if (priceModel == 'quantityrange') {
-        Object.values(value.prices_table).forEach((item) => {
-          if (selectQuantityStep.some(n => n.id == item.quantityrange_id)) {
-            state.serverData.prices.push(item);
-          }
-        });
-        state.serverData.prices.push({
-          price: value.standard_price,
-        });
-      }
-      state.serverData.units = selectUnits.map((item) => {
-        return {
-          id: item.id,
-          number: item.number,
-        };
-      });
-      state.serverData.name = value.name || '';
-      state.serverData.desc = value.desc || '';
-      state.serverData.itemgroup_ids = [];
-      Object.values(value.goods_group).forEach((item) => {
-        state.serverData.itemgroup_ids = state.serverData.itemgroup_ids.concat(...item);
-      });
-      const picture = {};
-      if (itemImageLevel == 'item') {
-        picture.fileName = [];
-        value.picture.fileList.forEach((item) => {
-          delete item.url;
-          if (item.type) {
-            const fileName = `${(window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime()}.${(item.type).slice(6, (item.type).length)}`;
-            picture.fileName.push(fileName);
-            state.imageFile.push({
-              image_name: fileName,
-              image_file: item,
-            });
-          } else {
-            picture.fileName.push(item.name);
-          }
-        });
-      }
-      state.serverData.skus = [];
-      if (value.color_select.length === 0 && value.size_select.length === 0) {
-        state.serverData.dimension = [];
-        if (state.showData.barcodeId) {
-          state.serverData.skus.push({
-            id: state.showData.barcodeId.id,
-            barcode: itemBarcodeLevel === 1 ? value.barcode.barcode : '',
-            attributes: [],
-            images: [],
-            stocks: [],
-          });
-        } else {
-          state.serverData.skus.push({
-            barcode: itemBarcodeLevel === 1 ? value.barcode.barcode : '',
-            attributes: [],
-            images: [],
-            stocks: [],
-          });
-        }
-        state.serverData.skus.forEach((item) => {
-          warehouses.forEach((subItem) => {
-            item.stocks.push({
-              warehouse_id: value.stock[`${subItem.id}`].warehouse_id,
-              store_quantity: value.stock[`${subItem.id}`].store_quantity || 0,
-            });
-          });
-        });
-      } else if (value.color_select.length !== 0 && value.size_select.length === 0) {
-        state.serverData.dimension = [1];
-        value.color_select.forEach((colorId, index) => {
-          if (state.showData.barcodeId && Object.keys(state.showData.barcodeId).some(n => n == colorId)) {
-            state.serverData.skus.push({
-              id: state.showData.barcodeId[`${colorId}`].id,
-              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}`].barcode : '',
-              attributes: [{
-                attributetype_id: 1,
-                attribute_id: colorId,
-              }],
-              images: [],
-              stocks: [],
-            });
-          } else {
-            state.serverData.skus.push({
-              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}`].barcode : '',
-              attributes: [{
-                attributetype_id: 1,
-                attribute_id: colorId,
-              }],
-              images: [],
-              stocks: [],
-            });
-          }
-          if (itemImageLevel == 'sku') {
-            const currentImageFile = Object.values(value.picture)[index].fileList;
-            currentImageFile.forEach((n) => {
-              delete n.url;
-              if (n.type) {
-                const fileName = `${(window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime()}.${(n.type).slice(6, (n.type).length)}`;
-                state.serverData.skus[index].images.push(fileName);
-                state.imageFile.push({
-                  image_name: fileName,
-                  image_file: n,
-                });
-              } else {
-                state.serverData.skus[index].images.push(n.name);
-              }
-            });
-          }
-        });
-        state.serverData.skus.forEach((item) => {
-          warehouses.forEach((subItem) => {
-            item.stocks.push({
-              warehouse_id: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}`].warehouse_id,
-              store_quantity: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}`].store_quantity || 0,
-            });
-          });
-        });
-      } else if (value.color_select.length !== 0 && value.size_select !== 0) {
-        state.serverData.dimension = [1, 2];
-        value.color_select.forEach((colorId, index) => {
-          value.size_select.forEach((sizeId) => {
-            if (state.showData.barcodeId && Object.keys(state.showData.barcodeId).some(n => n == `${colorId}_${sizeId}`)) {
-              state.serverData.skus.push({
-                id: state.showData.barcodeId[`${colorId}_${sizeId}`].id,
-                barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode : '',
-                attributes: [{
-                  attributetype_id: 1,
-                  attribute_id: colorId,
-                }, {
-                  attributetype_id: 2,
-                  attribute_id: sizeId,
-                }],
-                images: [],
-                stocks: [],
-              });
-            } else {
-              state.serverData.skus.push({
-                barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode : '',
-                attributes: [{
-                  attributetype_id: 1,
-                  attribute_id: colorId,
-                }, {
-                  attributetype_id: 2,
-                  attribute_id: sizeId,
-                }],
-                images: [],
-                stocks: [],
-              });
-            }
-          });
-          if (itemImageLevel == 'sku') {
-            const currentImageFile = Object.values(value.picture)[index].fileList;
-            currentImageFile.forEach((n) => {
-              delete n.url;
-              if (n.type) {
-                fileName = `${(window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime()}.${(n.type).slice(6, (n.type).length)}`;
-                state.serverData.skus[index].images.push(fileName);
-                state.imageFile.push({
-                  image_name: fileName,
-                  image_file: n,
-                });
-              } else {
-                state.serverData.skus[index].images.push(n.name);
-              }
-            });
-          }
-        });
-        state.serverData.skus.forEach((item) => {
-          warehouses.forEach((subItem) => {
-            item.stocks.push({
-              warehouse_id: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}_${item.attributes[1].attribute_id}`].warehouse_id,
-              store_quantity: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}_${item.attributes[1].attribute_id}`].store_quantity || 0,
-            });
-          });
-        });
-      }
-      itemImageLevel === 'item' ? state.serverData.itemimages = picture.fileName : null;
+    setServerData(state, { payload: { value, selectColors, selectUnits, selectQuantityStep, warehouses, priceModel, itemBarcodeLevel, itemImageLevel } }) {      itemImageLevel === 'item' ? state.serverData.itemimages = picture.fileName : null;
       itemBarcodeLevel === 0 ? state.serverData.barcode = value.barcode.barcode : null;
-      console.log(state.serverData);
       return { ...state };
     },
 

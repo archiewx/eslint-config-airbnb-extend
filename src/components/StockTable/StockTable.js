@@ -30,7 +30,7 @@ export default class StockTable extends PureComponent {
   }
 
   render() {
-    const { selectColors, selectSizes, selectWarehouseId, selecStockUnitNum } = this.props;
+    const { selectColors, selectSizes, selectWarehouseId } = this.props;
     const { skuStocks } = this.state;
     const tableWidth = ((1 / (selectSizes.length + 1)) * 100).toFixed(1);
     return (

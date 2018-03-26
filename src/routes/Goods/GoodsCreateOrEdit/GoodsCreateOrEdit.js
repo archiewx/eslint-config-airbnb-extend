@@ -53,18 +53,18 @@ const pictureItemLayout = {
 }))
 export default class GoodsCreateOrEdit extends PureComponent {
   state = {
-    defaultSelectUnits: [],
-    selectUnits: [],
-    selectColors: [],
-    selectSizes: [],
-    selectQuantityStep: [],
+    defaultSelectUnits: [], // 多选框的默认单位
+    selectUnits: [], // 单位
+    selectColors: [], // 颜色
+    selectSizes: [], // 尺码
+    selectQuantityStep: [], 
     priceTableValue: {},
     skuImages: {},
     skuStocks: {},
     skuBarcodes: {},
     selectWarehouseId: '',
     selecStockUnitNum: '',
-    isNeedIcon: false,
+    isNeedIcon: false, // 是否展示icon
   }
 
   componentDidMount() {
@@ -97,10 +97,11 @@ export default class GoodsCreateOrEdit extends PureComponent {
     const { shops } = nextProps.shop;
     const { units } = nextProps.unit;
     const { warehouses } = nextProps.warehouse;
-    const { showData } = nextProps.goodsCreateOrEdit;
-    const priceTableValue = {};
+    const { showData } = nextProps.goodsCreateOrEdit; // showData 判断是否是编辑或新建
+    let priceTableValue = {};
+    // 单位的初始化
     if (showData.selectUnits) {
-      if (!!units.length && this.state.selectUnits.length == 1) {
+      if (!!units.length) {
         this.setState({ selectUnits: [...showData.selectUnits] });
       }
     } else if (!!units.length && !this.state.selectUnits.length) {
@@ -112,96 +113,97 @@ export default class GoodsCreateOrEdit extends PureComponent {
         number: `${defaultUnit.number}`,
         id: defaultUnit.id,
       });
-      defaultSelectUnits.push((defaultUnit.id).toString());
+      defaultSelectUnits.push((defaultUnit.id).toString()); // 多选框的默认单位
       this.setState({ selectUnits, defaultSelectUnits });
     }
+    // 编辑时，颜色的初始化
     if (showData.selectColors && !this.state.selectColors.length) {
       this.setState({ selectColors: [...showData.selectColors] });
     }
+    // 编辑时，尺码的初始化
     if (showData.selectSizes && !this.state.selectSizes.length) {
       this.setState({ selectSizes: [...showData.selectSizes] });
     }
+    // 价格等级&价格组成的初始化
     if (showData.prices) {
-      if (!!priceGrades.length && !!shops.length && (Object.values(this.state.priceTableValue).length == 0 || Object.values(this.state.priceTableValue).length == priceGrades.length || Object.values(this.state.priceTableValue).length == shops.length || Object.values(this.state.priceTableValue).length == (shops.length * priceGrades.length))) {
-        if (!showData.prices.price) {
-          if (usePricelelvel === 'yes') {
-            if (priceModel === '') {
-              priceGrades.forEach((item) => {
-                priceTableValue[`${item.id}`] = {
-                  pricelevel_id: item.id,
-                  price: showData.prices[`${item.id}`].price,
-                };
-              });
-            } else if (priceModel === 'shop') {
-              shops.forEach((item) => {
-                priceGrades.forEach((subItem) => {
-                  priceTableValue[`${item.id}_${subItem.id}`] = {
-                    shop_id: item.id,
-                    pricelevel_id: subItem.id,
-                    price: showData.prices[`${item.id}_${subItem.id}`].price,
-                  };
-                });
-              });
-            } else if (priceModel === 'unit') {
-              showData.selectUnits.forEach((item) => {
-                priceGrades.forEach((subItem) => {
-                  priceTableValue[`${item.id}_${subItem.id}`] = {
-                    unit_id: item.id,
-                    pricelevel_id: subItem.id,
-                    price: showData.prices[`${item.id}_${subItem.id}`].price,
-                  };
-                });
-              });
-            } else if (priceModel === 'quantityrange') {
-              showData.selectQuantityStep.forEach((item) => {
-                priceGrades.forEach((subItem) => {
-                  priceTableValue[`${item.id}_${subItem.id}`] = {
-                    quantityrange_id: item.id,
-                    pricelevel_id: subItem.id,
-                    price: showData.prices[`${item.id}_${subItem.id}`].price,
-                  };
-                });
-              });
-            }
-          } else if (priceModel === '') {
-
+      if (!!priceGrades.length && !!shops.length ) {
+        //判断策略生成数据
+        if (usePricelelvel === 'yes') {
+          if (priceModel === '') {
+            priceGrades.forEach((item) => {
+              priceTableValue[`${item.id}`] = {
+                pricelevel_id: item.id,
+                price: (showData.prices[`${item.id}`] || {}).price || showData.prices.price,
+              };
+            });
           } else if (priceModel === 'shop') {
             shops.forEach((item) => {
-              priceTableValue[`${item.id}`] = {
-                shop_id: item.id,
-                price: showData.prices[`${item.id}`].price,
-              };
+              priceGrades.forEach((subItem) => {
+                priceTableValue[`${item.id}_${subItem.id}`] = {
+                  shop_id: item.id,
+                  pricelevel_id: subItem.id,
+                  price: (showData.prices[`${item.id}_${subItem.id}`] || {}).price || showData.prices.price,
+                };
+              });
             });
           } else if (priceModel === 'unit') {
             showData.selectUnits.forEach((item) => {
-              priceTableValue[`${item.id}`] = {
-                unit_id: item.id,
-                price: showData.prices[`${item.id}`].price,
-              };
+              priceGrades.forEach((subItem) => {
+                priceTableValue[`${item.id}_${subItem.id}`] = {
+                  unit_id: item.id,
+                  pricelevel_id: subItem.id,
+                  price: (showData.prices[`${item.id}_${subItem.id}`] || {}).price || showData.prices.price,
+                };
+              });
             });
           } else if (priceModel === 'quantityrange') {
             showData.selectQuantityStep.forEach((item) => {
-              priceTableValue[`${item.id}`] = {
-                quantityrange_id: item.id,
-                price: showData.selectQuantityStep[`${item.id}`].price,
-              };
+              priceGrades.forEach((subItem) => {
+                priceTableValue[`${item.id}_${subItem.id}`] = {
+                  quantityrange_id: item.id,
+                  pricelevel_id: subItem.id,
+                  price: (showData.prices[`${item.id}_${subItem.id}`] || {}).price || showData.prices.price,
+                };
+              });
             });
           }
-          this.setState({ priceTableValue });
-        } else {
-          this.setState({ priceTableValue: { ...showData.prices } });
+        } else if (priceModel === '') {
+
+        } else if (priceModel === 'shop') {
+          shops.forEach((item) => {
+            priceTableValue[`${item.id}`] = {
+              shop_id: item.id,
+              price: (showData.prices[`${item.id}`] || {}).price || showData.prices.price,
+            };
+          });
+        } else if (priceModel === 'unit') {
+          showData.selectUnits.forEach((item) => {
+            priceTableValue[`${item.id}`] = {
+              unit_id: item.id,
+              price: (showData.prices[`${item.id}`] || {}).price || showData.prices.price,
+            };
+          });
+        } else if (priceModel === 'quantityrange') {
+          showData.selectQuantityStep.forEach((item) => {
+            priceTableValue[`${item.id}`] = {
+              quantityrange_id: item.id,
+              price: (showData.selectQuantityStep[`${item.id}`] || {}).price || showData.prices.price,
+            };
+          });
         }
+        this.setState({ priceTableValue });
       }
     } else if (!!priceGrades.length && !!shops.length && !!units.length && !Object.values(this.state.priceTableValue).length) {
-      if (usePricelelvel === 'yes') {
-        if (priceModel === '') {
+      //使用价格等级
+      if (usePricelelvel === 'yes') { 
+        if (priceModel === '') { // 基本价格组成为空
           priceGrades.forEach((item) => {
             priceTableValue[`${item.id}`] = {
               pricelevel_id: item.id,
               price: null,
             };
           });
-        } else if (priceModel === 'shop') {
+        } else if (priceModel === 'shop') { // 基本价格组成为店铺
           shops.forEach((item) => {
             priceGrades.forEach((subItem) => {
               priceTableValue[`${item.id}_${subItem.id}`] = {
@@ -211,7 +213,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
               };
             });
           });
-        } else if (priceModel === 'unit') {
+        } else if (priceModel === 'unit') { // 基本价格组成为单位
           const selectUnits = [].concat(units.find(n => n.default == 1));
           selectUnits.forEach((item) => {
             priceGrades.forEach((subItem) => {
@@ -222,19 +224,15 @@ export default class GoodsCreateOrEdit extends PureComponent {
               };
             });
           });
-        } else if (priceModel === 'quantityrange') {
-
-        }
-      } else if (priceModel === '') {
-
-      } else if (priceModel === 'shop') {
+        } 
+      }  else if (priceModel === 'shop') { // 关闭价格等级并价格基本组成为店铺
         shops.forEach((item) => {
           priceTableValue[`${item.id}`] = {
             shop_id: item.id,
             price: null,
           };
         });
-      } else if (priceModel === 'unit') {
+      } else if (priceModel === 'unit') { // 关闭价格等级并价格基本组成为单位
         const selectUnits = [].concat(units.find(n => n.default == 1));
         selectUnits.forEach((item) => {
           priceTableValue[`${item.id}`] = {
@@ -242,11 +240,10 @@ export default class GoodsCreateOrEdit extends PureComponent {
             price: null,
           };
         });
-      } else if (priceModel === 'quantityrange') {
-
       }
       this.setState({ priceTableValue });
     }
+    // 库存的初始化
     if (showData.selectColors && showData.selectSizes && showData.stocks) {
       if (!!warehouses.length && (Object.values(this.state.skuStocks).length == 0 || Object.values(this.state.skuStocks).length == warehouses.length || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length) || Object.values(this.state.skuStocks).length == (warehouses.length * this.state.selectColors.length * this.state.selectSizes.length))) {
         const skuStocks = {};
@@ -281,37 +278,16 @@ export default class GoodsCreateOrEdit extends PureComponent {
         this.setState({ skuStocks });
       }
     } else if (!!warehouses.length && !Object.values(this.state.skuStocks).length) {
-      const skuStocks = {};
-      if (this.state.selectColors.length == 0) {
-        warehouses.forEach((item) => {
-          skuStocks[`${item.id}`] = {
-            warehouse_id: item.id,
-            store_quantity: null,
-          };
-        });
-      } else if (this.state.selectSizes.length == 0) {
-        warehouses.forEach((item) => {
-          this.state.selectColors.forEach((colorItem) => {
-            skuStocks[`${item.id}_${colorItem.id}`] = {
-              warehouse_id: item.id,
-              store_quantity: null,
-            };
-          });
-        });
-      } else {
-        warehouses.forEach((item) => {
-          this.state.selectColors.forEach((colorItem) => {
-            this.state.selectSizes.forEach((sizeItem) => {
-              skuStocks[`${item.id}_${colorItem.id}_${sizeItem.id}`] = {
-                warehouse_id: item.id,
-                store_quantity: null,
-              };
-            });
-          });
-        });
-      }
+      let skuStocks = {};
+      warehouses.forEach((item) => {
+        skuStocks[`${item.id}`] = {
+          warehouse_id: item.id,
+          store_quantity: null,
+        };
+      });
       this.setState({ skuStocks });
     }
+    // 条码的初始化
     if (showData.selectColors && showData.selectSizes && showData.barcodes) {
       if (!this.state.selectColors.length && (Object.values(this.state.skuBarcodes).length == 0 || Object.values(this.state.skuBarcodes).length == 1 || Object.values(this.state.skuBarcodes).length == this.state.selectColors.length || Object.values(this.state.skuBarcodes).length == (this.state.selectColors.length * this.state.selectSizes.length))) {
         let skuBarcodes = {};
@@ -338,32 +314,18 @@ export default class GoodsCreateOrEdit extends PureComponent {
       }
     } else if (!Object.values(this.state.skuBarcodes).length) {
       let skuBarcodes = {};
-      if (this.state.selectColors.length == 0 || itemBarcodeLevel == 0) {
-        skuBarcodes = {
-          barcode: '',
-        };
-      } else if (this.state.selectSizes.length == 0) {
-        this.state.selectColors.forEach((item) => {
-          skuBarcodes[`${item.id}`] = {
-            barcode: '',
-          };
-        });
-      } else {
-        selectColors.forEach((item) => {
-          selectSizes.forEach((subItem) => {
-            skuBarcodes[`${item.id}_${subItem.id}`] = {
-              barcode: '',
-            };
-          });
-        });
-      }
+      skuBarcodes = {
+        barcode: '',
+      };
       this.setState({ skuBarcodes });
     }
+    // 库存单位的默认选择
     if (this.state.selecStockUnitNum == '' && !!units.length) {
       this.setState({
         selecStockUnitNum: Number(units.find(n => n.default == '1').number),
       });
     }
+    // 库存的默认选择
     if (this.state.selectWarehouseId == '' && !!warehouses.length) {
       this.setState({
         selectWarehouseId: warehouses[0].id,
@@ -403,16 +365,19 @@ export default class GoodsCreateOrEdit extends PureComponent {
     }
   }
 
+  // 确认
   handleSubmit = (e) => {
     const { validateFields } = this.props.form;
     e.preventDefault();
     validateFields((err, value) => {
       if (!err) {
+        // 把库存转化为单位1的数据
         const skuStocks = this.state.skuStocks;
         for (const key in skuStocks) {
           if (skuStocks[key].store_quantity) { skuStocks[key].store_quantity = Number(skuStocks[key].store_quantity) * Number(this.state.selecStockUnitNum); }
         }
         value.stock = this.state.skuStocks;
+        //转化数据
         this.props.dispatch({ type: 'goodsCreateOrEdit/setServerData',
           payload: {
             value,
@@ -424,31 +389,35 @@ export default class GoodsCreateOrEdit extends PureComponent {
             itemBarcodeLevel: this.props.configSetting.itemBarcodeLevel,
             itemImageLevel: this.props.configSetting.itemImageLevel,
           } });
-        if (this.props.goodsCreateOrEdit.showData.id) {
-          this.props.dispatch({ type: 'goodsCreateOrEdit/editSingleGoods',
-            payload: {
-              serverData: this.props.goodsCreateOrEdit.serverData,
-              id: this.props.goodsCreateOrEdit.showData.id,
-              imageFile: this.props.goodsCreateOrEdit.imageFile,
-            } }).then(() => {
-            this.props.history.goBack();
-          });
-        } else {
-          this.props.dispatch({ type: 'goodsCreateOrEdit/createSingleGoods',
-            payload: {
-              serverData: this.props.goodsCreateOrEdit.serverData,
-              imageFile: this.props.goodsCreateOrEdit.imageFile,
-            } }).then(() => {
-            this.props.dispatch(routerRedux.push('/goods-list'));
-          });
-        }
+        //提交
+        // if (this.props.goodsCreateOrEdit.showData.id) {
+        //   this.props.dispatch({ type: 'goodsCreateOrEdit/editSingleGoods',
+        //     payload: {
+        //       serverData: this.props.goodsCreateOrEdit.serverData,
+        //       id: this.props.goodsCreateOrEdit.showData.id,
+        //       imageFile: this.props.goodsCreateOrEdit.imageFile,
+        //     } }).then(() => {
+        //     this.props.history.goBack();
+        //   });
+        // } else {
+        //   this.props.dispatch({ type: 'goodsCreateOrEdit/createSingleGoods',
+        //     payload: {
+        //       serverData: this.props.goodsCreateOrEdit.serverData,
+        //       imageFile: this.props.goodsCreateOrEdit.imageFile,
+        //     } }).then(() => {
+        //     this.props.dispatch(routerRedux.push('/goods-list'));
+        //   });
+        // }
       }
     });
   }
 
+  // 验证货号是否重复
   handleCheckItemRef = (rule, value, callback) => {
+    // 300ms一次请求，避免每次输入立刻请求的次数过多
     validateDelay.run(() => {
       if (value) {
+        // 编辑时，货号与输入框的货号相同时不展示icon
         if (this.props.goodsCreateOrEdit.showData.item_ref && this.props.goodsCreateOrEdit.showData.item_ref == value) {
           callback();
           this.setState({
@@ -491,22 +460,44 @@ export default class GoodsCreateOrEdit extends PureComponent {
     }
   }
 
+  // 使得价格等级&价格组成的数据与标准价相同
   handleGetStandardPrice = (e) => {
     const { form } = this.props;
     const priceTableValue = form.getFieldValue('prices_table');
-    const oldstandardPrice = form.getFieldValue('standard_price');
+    const oldstandardPrice = form.getFieldValue('standard_price'); //旧的标准价
     setTimeout(() => {
-      const standardPrice = form.getFieldValue('standard_price');
-      for (const key in priceTableValue) {
-        if (this.props.configSetting.priceModel == 'unit') {
-          if (priceTableValue[key].price == oldstandardPrice || priceTableValue[key].price == null) {
-            priceTableValue[key].price = Number(standardPrice) * Number(priceTableValue[key].unit_id);
-          }
-        } else if (priceTableValue[key].price == oldstandardPrice || priceTableValue[key].price == null) {
-          priceTableValue[key].price = standardPrice;
+      const standardPrice = form.getFieldValue('standard_price'); //新的标准价
+      let isAutoInput = true; // 判断价格等级&价格组成是否跟随标准价
+      // 判断标准价的格式
+      if(typeof standardPrice == 'string' && standardPrice.indexOf('.') > -1 && standardPrice.match(/\./g).length == 1) {
+        if( standardPrice[standardPrice.length-1] != '.' && !Number.isInteger(Number(standardPrice[standardPrice.length-1]))) {
+          form.setFieldsValue({standard_price: oldstandardPrice});
+          isAutoInput = false;
         }
+      }else if(typeof standardPrice == 'string' && standardPrice !== '') {
+        form.setFieldsValue({standard_price: oldstandardPrice});
+        isAutoInput = false;
       }
-      form.setFieldsValue({ prices_table: priceTableValue });
+      if(isAutoInput) {
+        for (let key in priceTableValue) {
+          // 基本组成价格为单位时，价格应为 标准价 x 该单位数量
+          if (this.props.configSetting.priceModel == 'unit') {
+            if ( Number(priceTableValue[key].price) == Number(oldstandardPrice)*Number(this.state.selectUnits.find( n => n.id == priceTableValue[key].unit_id).number )  || priceTableValue[key].price == null) {
+              priceTableValue[key].price =( Number(standardPrice) * Number(this.state.selectUnits.find( n => n.id == priceTableValue[key].unit_id).number )).toString();
+            }
+          } else if (priceTableValue[key].price == oldstandardPrice || priceTableValue[key].price == null) {
+            priceTableValue[key].price = standardPrice;
+          }
+        }
+        form.setFieldsValue({ prices_table: priceTableValue });
+      }
+      // 标准价为null或undenfined时，价格等级价格组成为null
+      if(!standardPrice) {
+        for(let key in priceTableValue) {
+          priceTableValue[key].price = null;
+        }
+        form.setFieldsValue({prices_table: priceTableValue})
+      }
     }, 0);
   }
 
@@ -564,6 +555,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
       isOnlySame = false;
     const priceTableValue = form.getFieldValue('prices_table');
     setTimeout(() => {
+      // 基本价格组成为单位时，获得单位数据已生成价格组成&价格等级
       arr.forEach((item) => {
         if (form.getFieldValue('unit_select').some(n => n == item.id)) {
           selectUnits.push({
@@ -574,29 +566,28 @@ export default class GoodsCreateOrEdit extends PureComponent {
         }
       });
       this.setState({ selectUnits });
+       // 基本价格组成为单位时，生成价格等级&价格组成的价格数据
       if (this.props.configSetting.priceModel == 'unit') {
+        // 取出最后一个单位的id
         const current = [].concat(form.getFieldValue('unit_select')[form.getFieldValue('unit_select').length - 1]);
+        // 选中的最后一个单位是不是已经存在在价格数据中
         isOnlySame = Object.values(priceTableValue).some(item => item.unit_id == current[0]);
         if (this.props.configSetting.usePricelelvel === 'yes') {
           if (!isOnlySame) {
-            current.forEach((item) => {
-              this.props.priceGrade.priceGrades.forEach((subItem) => {
-                priceTableValue[`${item}_${subItem.id}`] = {
-                  unit_id: item,
-                  pricelevel_id: subItem.id,
-                  price: Number(form.getFieldValue('standard_price')) * Number(item.number) || null,
-                };
-              });
+            this.props.priceGrade.priceGrades.forEach((subItem) => {
+              priceTableValue[`${current[0]}_${subItem.id}`] = {
+                unit_id: currennt[0],
+                pricelevel_id: subItem.id,
+                price: Number(form.getFieldValue('standard_price')) * Number(arr.find(n => current[0] == n.id).number) || null,
+              };
             });
             form.setFieldsValue({ prices_table: priceTableValue });
           }
         } else if (!isOnlySame) {
-          current.forEach((item) => {
-            priceTableValue[`${item}`] = {
-              unit_id: item,
-              price: Number(form.getFieldValue('standard_price')) * Number(item.number) || null,
-            };
-          });
+          priceTableValue[`${current[0]}`] = {
+            unit_id: current[0],
+            price: Number(form.getFieldValue('standard_price')) * Number(arr.find(n => current[0] == n.id).number) || null,
+          };
           form.setFieldsValue({ prices_table: priceTableValue });
         }
       }
@@ -612,6 +603,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     const skuBarcodes = form.getFieldValue('barcode');
     const skuImages = form.getFieldValue('picture');
     setTimeout(() => {
+      // 获得颜色数据包括名称和id
       arr.forEach((item) => {
         if (form.getFieldValue('color_select').some(n => n == item.id)) {
           selectColors.push({
@@ -621,40 +613,38 @@ export default class GoodsCreateOrEdit extends PureComponent {
         }
       });
       this.setState({ selectColors });
+      //当前选中的颜色
       const current = [].concat(form.getFieldValue('color_select')[form.getFieldValue('color_select').length - 1]);
+      // 当库存key的长度为2，即只有颜色的情况下获取已经在库存中的颜色属性
       for (const key in skuStocks) {
         const changeKey = key.split('_');
         if (changeKey.length == 2) {
           alreadySelect.push(changeKey[1]);
         }
       }
+      // 判断当前选中的颜色是否已经存在库存中
       isOnlySame = alreadySelect.some(n => n == current[0]);
       if (!isOnlySame && current[0]) {
         this.props.warehouse.warehouses.forEach((item) => {
-          current.forEach((colorItem) => {
-            skuStocks[`${item.id}_${colorItem}`] = {
-              warehouse_id: item.id,
-              store_quantity: null,
-            };
-          });
+          skuStocks[`${item.id}_${current[0]}`] = {
+            warehouse_id: item.id,
+            store_quantity: null,
+          };
         });
-        this.setState({ skuStocks });
         form.setFieldsValue({ stock: skuStocks });
       }
+      //尺码同理
       if (this.props.configSetting.itemBarcodeLevel == 1 && !isOnlySame && current[0]) {
-        current.forEach((colorItem) => {
-          skuBarcodes[`${colorItem}`] = {
-            barcode: '',
-          };
-        });
+        skuBarcodes[`${current[0]}`] = {
+          barcode: '',
+        };
         form.setFieldsValue({ barcode: skuBarcodes });
       }
+      //图片同理
       if (!isOnlySame && current[0]) {
-        current.forEach((colorItem) => {
-          skuImages[`${colorItem}`] = {
-            fileList: [],
-          };
-        });
+        skuImages[`${current[0]}`] = {
+          fileList: [],
+        };
         form.setFieldsValue({ picture: skuImages });
       }
     }, 0);
@@ -668,6 +658,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     const skuStocks = form.getFieldValue('stock');
     const skuBarcodes = form.getFieldValue('barcode');
     setTimeout(() => {
+      // 获得尺码数据包括名称和id
       arr.forEach((item) => {
         if (form.getFieldValue('size_select').some(n => n == item.id)) {
           selectSizes.push({
@@ -677,34 +668,35 @@ export default class GoodsCreateOrEdit extends PureComponent {
         }
       });
       this.setState({ selectSizes });
+      //当前选中的尺码
       const current = [].concat(form.getFieldValue('size_select')[form.getFieldValue('size_select').length - 1]);
+      //当库存的key是既有颜色又有尺码的情况下，获取已经在库存中的尺码
       for (const key in skuStocks) {
         const changeKey = key.split('_');
         if (changeKey.length == 3) {
           alreadySelect.push(changeKey[2]);
         }
       }
+      //判断当前尺码是否已经存在库存
       isOnlySame = alreadySelect.some(n => n == current[0]);
+      //不存在
       if (!isOnlySame && current[0]) {
         this.props.warehouse.warehouses.forEach((item) => {
           this.state.selectColors.forEach((colorItem) => {
-            current.forEach((sizeItem) => {
-              skuStocks[`${item.id}_${colorItem.id}_${sizeItem}`] = {
-                warehouse_id: item.id,
-                store_quantity: null,
-              };
-            });
+            skuStocks[`${item.id}_${colorItem.id}_${current[0]}`] = {
+              warehouse_id: item.id,
+              store_quantity: null,
+            };
           });
         });
         form.setFieldsValue({ stock: skuStocks });
       }
+      //不存在且条码策略为以商品级别
       if (this.props.configSetting.itemBarcodeLevel == 1 && !isOnlySame && current[0]) {
         this.state.selectColors.forEach((colorItem) => {
-          current.forEach((sizeItem) => {
-            skuBarcodes[`${colorItem.id}_${sizeItem}`] = {
-              barcode: '',
-            };
-          });
+          skuBarcodes[`${colorItem.id}_${current[0]}`] = {
+            barcode: '',
+          };
         });
         form.setFieldsValue({ barcode: skuBarcodes });
       }
@@ -721,11 +713,14 @@ export default class GoodsCreateOrEdit extends PureComponent {
 
   handleUnitStockSelect = (value) => {
     const { form } = this.props;
+    // 获取单位数量
     const selecStockUnitNum = value.match(/\d+/)[0];
     this.setState({ selecStockUnitNum });
+    // 保证最后的数据为单位1时的数据
     const onlyStcok = JSON.parse(JSON.stringify(this.state.skuStocks));
+    // 显示的库存数据
     const stock = JSON.parse(JSON.stringify(this.state.skuStocks));
-    for (const key in stock) {
+    for (let key in stock) {
       if (stock[key].store_quantity) {
         onlyStcok[key].store_quantity = Number(stock[key].store_quantity) * Number(this.state.selecStockUnitNum) / Number(selecStockUnitNum);
         stock[key].store_quantity = Math.floor(Number(stock[key].store_quantity) * Number(this.state.selecStockUnitNum) / Number(selecStockUnitNum));
@@ -737,6 +732,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     form.setFieldsValue({ stock });
   }
 
+  // 切换仓库
   handleStockTabChange = (key) => {
     this.setState({
       selectWarehouseId: key,
@@ -817,49 +813,20 @@ export default class GoodsCreateOrEdit extends PureComponent {
               </Row>
             </Form>
             <Form>
-              {
-              usePricelelvel === 'yes' ? (
-                <div>
-                  <div style={{ paddingBottom: 10 }}>
-                    <label className={styles.priceGradeLabelTitle}>价格等级 & 价格组成:</label>
-                    {
-                      priceModel === 'quantityrange' ? (
-                        <Dropdown overlay={quantityStepMenu} >
-                          <Button className={styles.quantityStepPostion}>
-                            选择价格阶梯 <Icon type="down" />
-                          </Button>
-                        </Dropdown>
-                      ) : null
-                    }
-                  </div>
-                  <div>
-                    <FormItem>
-                      {getFieldDecorator('prices_table', {
-                        initialValue: priceTableValue,
-                      })(
-                        <PriceTable priceGrades={priceGrades} shops={shops} selectUnits={selectUnits} selectQuantityStep={selectQuantityStep} usePricelelvel={usePricelelvel} priceModel={priceModel} />
-                      )}
-                    </FormItem>
-                  </div>
-                </div>
-              ) : (
-                <div>
+              <div>
+                <div style={{paddingBottom: 10}}>
+                  {usePricelelvel === 'yes' ? <label className={styles.priceGradeLabelTitle}>价格等级 & 价格组成:</label> :  <label className={styles.priceGradeLabelTitle}>价格组成 (零售价):</label>}
                   {
-                    priceModel !== '' ? (
-                      <div style={{ paddingBottom: 10 }}>
-                        <label className={styles.priceGradeLabelTitle}>价格组成 (零售价):</label>
-                        {
-                          priceModel === 'quantityrange' ? (
-                            <Dropdown overlay={quantityStepMenu}>
-                              <Button className={styles.quantityStepPostion}>
-                                选择价格阶梯 <Icon type="down" />
-                              </Button>
-                            </Dropdown>
-                          ) : null
-                        }
-                      </div>
+                    priceModel === 'quantityrange' ? (
+                      <Dropdown overlay={quantityStepMenu} >
+                        <Button className={styles.quantityStepPostion}>
+                          选择价格阶梯 <Icon type="down" />
+                        </Button>
+                      </Dropdown>
                     ) : null
                   }
+                </div>
+                <div>
                   <FormItem>
                     {getFieldDecorator('prices_table', {
                       initialValue: priceTableValue,
@@ -868,8 +835,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                     )}
                   </FormItem>
                 </div>
-              )
-            }
+              </div>
             </Form>
             <Form layout="horizontal" className={styles.leftLabelTitle}>
               <FormItem label="单位" {...formItemLayout}>
@@ -969,7 +935,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                     {getFieldDecorator('stock', {
                       initialValue: skuStocks,
                     })(
-                      <StockTable selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
+                      <StockTable onChange={this.handleGetStocks} selectWarehouseId={selectWarehouseId}  warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
                     )}
                   </FormItem>
                 </Form>
@@ -980,7 +946,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                       {getFieldDecorator('stock', {
                         initialValue: skuStocks,
                       })(
-                        <StockTable onChange={this.handleGetStocks} selectWarehouseId={selectWarehouseId} selecStockUnitNum={selecStockUnitNum} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
+                        <StockTable onChange={this.handleGetStocks} selectWarehouseId={selectWarehouseId} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
                       )}
                     </FormItem>
                   </Form>
