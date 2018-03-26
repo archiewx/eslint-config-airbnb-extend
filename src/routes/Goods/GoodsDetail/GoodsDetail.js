@@ -7,10 +7,9 @@ import pathToRegexp from 'path-to-regexp';
 import { Row, Col, Card, Button, message, Table, Icon, Menu, Dropdown, Popconfirm, Divider, Form, DatePicker } from 'antd';
 import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/antd-pro/DescriptionList';
-import StandardFormRow from '../../../components/antd-pro/StandardFormRow';
-import TagSelect from '../../../components/DuokeTagSelect';
 import LightBoxImage from '../../../components/LightBoxImage/LightBoxImage';
 import PriceTextTable from '../../../components/PriceTextTable/PriceTextTable';
+import FilterDatePick from '../../../components/FilterDatePick';
 import styles from './GoodsDetail.less';
 
 const ButtonGroup = Button.Group;
@@ -147,26 +146,19 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleSaleFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err, value) => {
-        if (!err) {
-          this.props.dispatch({ type: 'goodsDetail/setFilterSaleServerData',
-            payload: {
-              ...value,
-              sale_datePick: value.sale_datePick ? [value.sale_datePick[0].format('YYYY-MM-DD'), value.sale_datePick[1].format('YYYY-MM-DD')] : undefined,
-            } });
-          const filterSale = this.props.goodsDetail.filterSaleServerData;
-          this.setState({ filterSale });
-          this.props.dispatch({ type: 'goodsDetail/getSingleSales',
-            payload: {
-              ...filterSale,
-              ...this.state.sortSale,
-              id: this.props.goodsDetail.currentId.id,
-            } });
-        }
-      });
-    }, 0);
+    this.props.dispatch({ type: 'goodsDetail/setFilterSaleServerData',
+      payload: {
+        ...value,
+        sale_datePick: value.sale_datePick ? [value.sale_datePick[0].format('YYYY-MM-DD'), value.sale_datePick[1].format('YYYY-MM-DD')] : undefined,
+      } });
+    const filterSale = this.props.goodsDetail.filterSaleServerData;
+    this.setState({ filterSale });
+    this.props.dispatch({ type: 'goodsDetail/getSingleSales',
+      payload: {
+        ...filterSale,
+        ...this.state.sortSale,
+        id: this.props.goodsDetail.currentId.id,
+      } });
   }
 
   handlePurchaseSort = (pagination, filters, sorter) => {
@@ -188,26 +180,19 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handlePurchaseFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err, value) => {
-        if (!err) {
-          this.props.dispatch({ type: 'goodsDetail/setFilterPurchaseServerData',
-            payload: {
-              ...value,
-              purchase_datePick: value.purchase_datePick ? [value.purchase_datePick[0].format('YYYY-MM-DD'), value.purchase_datePick[1].format('YYYY-MM-DD')] : undefined,
-            } });
-          const filterPurchase = this.props.goodsDetail.filterPurchaseServerData;
-          this.setState({ filterPurchase });
-          this.props.dispatch({ type: 'goodsDetail/getSinglePurchases',
-            payload: {
-              ...filterPurchase,
-              ...this.state.sortPurchase,
-              id: this.props.goodsDetail.currentId.id,
-            } });
-        }
-      });
-    }, 0);
+    this.props.dispatch({ type: 'goodsDetail/setFilterPurchaseServerData',
+      payload: {
+        ...value,
+        purchase_datePick: value.purchase_datePick ? [value.purchase_datePick[0].format('YYYY-MM-DD'), value.purchase_datePick[1].format('YYYY-MM-DD')] : undefined,
+      } });
+    const filterPurchase = this.props.goodsDetail.filterPurchaseServerData;
+    this.setState({ filterPurchase });
+    this.props.dispatch({ type: 'goodsDetail/getSinglePurchases',
+      payload: {
+        ...filterPurchase,
+        ...this.state.sortPurchase,
+        id: this.props.goodsDetail.currentId.id,
+      } });
   }
 
   handleCustomerSort = (pagination, filters, sorter) => {
@@ -235,27 +220,20 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleCustomerFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err, value) => {
-        if (!err) {
-          this.props.dispatch({ type: 'goodsDetail/setFilterCustomerServerData',
-            payload: {
-              ...value,
-              customer_datePick: value.customer_datePick ? [value.customer_datePick[0].format('YYYY-MM-DD'), value.customer_datePick[1].format('YYYY-MM-DD')] : undefined,
-            } });
-          const filterCustomer = this.props.goodsDetail.filterCustomerServerData;
-          this.setState({ filterCustomer });
-          this.props.dispatch({ type: 'goodsDetail/getSingleCustomers',
-            payload: {
-              ...filterCustomer,
-              ...this.state.sortCustomer,
-              id: this.props.goodsDetail.currentId.id,
-              mode: this.state.selectCustomerMode.mode,
-            } });
-        }
-      });
-    }, 0);
+    this.props.dispatch({ type: 'goodsDetail/setFilterCustomerServerData',
+      payload: {
+        ...value,
+        customer_datePick: value.customer_datePick ? [value.customer_datePick[0].format('YYYY-MM-DD'), value.customer_datePick[1].format('YYYY-MM-DD')] : undefined,
+      } });
+    const filterCustomer = this.props.goodsDetail.filterCustomerServerData;
+    this.setState({ filterCustomer });
+    this.props.dispatch({ type: 'goodsDetail/getSingleCustomers',
+      payload: {
+        ...filterCustomer,
+        ...this.state.sortCustomer,
+        id: this.props.goodsDetail.currentId.id,
+        mode: this.state.selectCustomerMode.mode,
+      } });
   }
 
   handleCustomerModeSelect = ({ item, key, keyPath }) => {
@@ -292,26 +270,19 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleSupplierFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err, value) => {
-        if (!err) {
-          this.props.dispatch({ type: 'goodsDetail/setFilterSupplierServerData',
-            payload: {
-              ...value,
-              supplier_datePick: value.supplier_datePick ? [value.supplier_datePick[0].format('YYYY-MM-DD'), value.supplier_datePick[1].format('YYYY-MM-DD')] : undefined,
-            } });
-          const filterSupplier = this.props.goodsDetail.filterSupplierServerData;
-          this.setState({ filterSupplier });
-          this.props.dispatch({ type: 'goodsDetail/getSingleSuppliers',
-            payload: {
-              ...filterSupplier,
-              ...this.state.sortSupplier,
-              id: this.props.goodsDetail.currentId.id,
-            } });
-        }
-      });
-    }, 0);
+    this.props.dispatch({ type: 'goodsDetail/setFilterSupplierServerData',
+      payload: {
+        ...value,
+        supplier_datePick: value.supplier_datePick ? [value.supplier_datePick[0].format('YYYY-MM-DD'), value.supplier_datePick[1].format('YYYY-MM-DD')] : undefined,
+      } });
+    const filterSupplier = this.props.goodsDetail.filterSupplierServerData;
+    this.setState({ filterSupplier });
+    this.props.dispatch({ type: 'goodsDetail/getSingleSuppliers',
+      payload: {
+        ...filterSupplier,
+        ...this.state.sortSupplier,
+        id: this.props.goodsDetail.currentId.id,
+      } });
   }
 
   handleStockSort = (pagination, filters, sorter) => {
@@ -333,26 +304,19 @@ export default class GoodsDetail extends PureComponent {
   }
 
   handleStockFormSubmit = () => {
-    const { form, dispatch } = this.props;
-    setTimeout(() => {
-      form.validateFields((err, value) => {
-        if (!err) {
-          this.props.dispatch({ type: 'goodsDetail/setFilterStockServerData',
-            payload: {
-              ...value,
-              stock_datePick: value.stock_datePick ? [value.stock_datePick[0].format('YYYY-MM-DD'), value.stock_datePick[1].format('YYYY-MM-DD')] : undefined,
-            } });
-          const filterStock = this.props.goodsDetail.filterStockServerData;
-          this.setState({ filterStock });
-          this.props.dispatch({ type: 'goodsDetail/getSingleStocks',
-            payload: {
-              ...filterStock,
-              ...this.state.sortStock,
-              id: this.props.goodsDetail.currentId.id,
-            } });
-        }
-      });
-    }, 0);
+    this.props.dispatch({ type: 'goodsDetail/setFilterStockServerData',
+      payload: {
+        ...value,
+        stock_datePick: value.stock_datePick ? [value.stock_datePick[0].format('YYYY-MM-DD'), value.stock_datePick[1].format('YYYY-MM-DD')] : undefined,
+      } });
+    const filterStock = this.props.goodsDetail.filterStockServerData;
+    this.setState({ filterStock });
+    this.props.dispatch({ type: 'goodsDetail/getSingleStocks',
+      payload: {
+        ...filterStock,
+        ...this.state.sortStock,
+        id: this.props.goodsDetail.currentId.id,
+      } });
   }
 
   render() {
@@ -379,7 +343,7 @@ export default class GoodsDetail extends PureComponent {
 
     const menu = (
       <Menu style={{ width: 109 }}>
-        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement="bottom" onConfirm={this.handleDeleteSingleGoods.bind(null, currentId)}><span style={{ width: '100%' }}>删除</span></Popconfirm></Menu.Item>
+        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement="bottom" onConfirm={this.handleDeleteSingleGoods.bind(null, currentId)}><span style={{ width: '100%',display:'inline-block' }}>删除</span></Popconfirm></Menu.Item>
       </Menu>
     );
 
@@ -642,34 +606,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'sale' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout="inline">
-              {
-                goodsDetailFilter.map((item, index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`sale_${item.code}`)(
-                          <TagSelect expandable onChange={this.handleSaleFormSubmit}>
-                            {
-                              item.options.map((subItem, subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>;
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  );
-                })
-              }
-              <FormItem label="选择日期" >
-                {getFieldDecorator('sale_datePick', {
-                  initialValue: [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
-                })(
-                  <RangePicker style={{ width: 542 }} onChange={this.handleSaleFormSubmit} />
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handleSaleFormSubmit} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false}>
             <Table columns={saleColumns} dataSource={singleGoodsSales} onChange={this.handleSaleSort} pagination={false} rowKey="id" />
@@ -677,34 +614,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'purchase' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout="inline">
-              {
-                goodsDetailFilter.map((item, index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`purchase_${item.code}`)(
-                          <TagSelect expandable onChange={this.handlePurchaseFormSubmit}>
-                            {
-                              item.options.map((subItem, subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>;
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  );
-                })
-              }
-              <FormItem label="选择日期" >
-                {getFieldDecorator('purchase_datePick', {
-                  initialValue: [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
-                })(
-                  <RangePicker style={{ width: 542 }} onChange={this.handlePurchaseFormSubmit} />
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handlePurchaseFormSubmit} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false}>
             <Table columns={purchaseColumns} dataSource={singleGoodsPurchases} onChange={this.handlePurchaseSort} pagination={false} rowKey="id" />
@@ -712,34 +622,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'customer' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided} >
-            <Form layout="inline">
-              {
-                goodsDetailFilter.map((item, index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`customer_${item.code}`)(
-                          <TagSelect expandable onChange={this.handleCustomerFormSubmit}>
-                            {
-                              item.options.map((subItem, subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>;
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  );
-                })
-              }
-              <FormItem label="选择日期" >
-                {getFieldDecorator('customer_datePick', {
-                  initialValue: [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
-                })(
-                  <RangePicker style={{ width: 542 }} onChange={this.handleCustomerFormSubmit} />
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handleCustomerFormSubmit} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false} title={selectCustomerMode.name} extra={customerExrta}>
             <Table columns={customerColumns} dataSource={singleGoodsCustomers} onChange={this.handleCustomerSort} rowKey="id" pagination={selectCustomerMode.mode == 'customer' ? customerPagination : false} />
@@ -754,34 +637,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'supplier' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout="inline">
-              {
-                goodsDetailFilter.map((item, index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`supplier_${item.code}`)(
-                          <TagSelect expandable onChange={this.handleSupplierFormSubmit}>
-                            {
-                              item.options.map((subItem, subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>;
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  );
-                })
-              }
-              <FormItem label="选择日期" >
-                {getFieldDecorator('supplier_datePick', {
-                  initialValue: [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
-                })(
-                  <RangePicker style={{ width: 542 }} onChange={this.handleSupplierFormSubmit} />
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handleSupplierFormSubmit} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false}>
             <Table columns={supplierColumns} dataSource={singleGoodsSuppliers} onChange={this.handleSupplierSort} pagination={false} rowKey="id" />
@@ -789,34 +645,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'stock' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout="inline">
-              {
-                goodsDetailFilter.map((item, index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`stock_${item.code}`)(
-                          <TagSelect expandable onChange={this.handleStockFormSubmit}>
-                            {
-                              item.options.map((subItem, subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>;
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  );
-                })
-              }
-              <FormItem label="选择日期" >
-                {getFieldDecorator('stock_datePick', {
-                  initialValue: [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
-                })(
-                  <RangePicker style={{ width: 542 }} onChange={this.handleStockFormSubmit} />
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handleStockFormSubmit} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false}>
             <Table columns={stockColumns} dataSource={singleGoodsStocks} onChange={this.handleStockSort} pagination={false} rowKey="id" />
