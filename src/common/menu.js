@@ -124,7 +124,7 @@ const menuData = [{
   }],
 }, {
   name: 'version：0.0.4',
-  icon: 'version_number',
+  icon: 'version_number' ,
 }];
 
 function formatter(data, parentPath = '') {
