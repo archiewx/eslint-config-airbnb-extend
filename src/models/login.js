@@ -37,6 +37,7 @@ export default {
   },
 
   effects: {
+    //获取二维码
     *pollQrcode({ payload }, { call, put, take, select }) {
       while (true) {
         const { isQuerying } = yield select(({ login }) => (login));
@@ -51,6 +52,7 @@ export default {
       }
     },
 
+    //检查返回token
     *checkLogin({ payload }, { call, put, select }) {
       while (true) {
         const { isQuerying, code } = yield select(({ login }) => (login));
@@ -65,12 +67,12 @@ export default {
               isQuerying: true,
               code: '',
             } });
-          // yield put({type:'currentUser/fetchCurrent'})
+          //用户信息获取
           const user = yield call(getSingle);
           sessionStorage.setItem('currentname', user.result.data.name);
           sessionStorage.setItem('currentavatar', `http://duoke3-image.oss-cn-hangzhou.aliyuncs.com/${user.result.data.role.data.avatar}`);
-          // yield call(delay, 1000*1);
           reloadAuthorized();
+          //跳转商品列表
           yield put(routerRedux.push('/goods-list'));
         } else {
           yield call(delay, 1000);
@@ -78,15 +80,11 @@ export default {
       }
     },
 
+    //登出
     *logout({ payload }, { call, put }) {
       yield put(routerRedux.push('/user'));
     },
 
-    *getCurrentUser(_, { call, put }) {
-      const user = yield call(getSingle);
-      sessionStorage.setItem('currentname', user.result.data.name);
-      sessionStorage.setItem('currentavatar', `http://duoke3-image.oss-cn-hangzhou.aliyuncs.com/${user.result.data.role.data.avatar}`);
-    },
   },
 
   reducers: {

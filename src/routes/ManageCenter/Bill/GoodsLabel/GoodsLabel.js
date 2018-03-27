@@ -38,6 +38,8 @@ export default class GoodsLabel extends PureComponent {
     });
     this.props.dispatch({ type: 'label/editItemLableSingle', payload: value }).then(() => {
       this.props.dispatch({ type: 'label/getItemLabel' });
+    }).catch(()=>{
+      message.error('编辑失败')
     });
   }
 

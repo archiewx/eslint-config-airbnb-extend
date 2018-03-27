@@ -59,6 +59,8 @@ export default class DeliverOrder extends PureComponent {
       } else {
         this.props.dispatch({ type: 'logistics/getList' });
       }
+    }).catch(()=>{
+      value.id ? message.error('编辑失败') : message.error('新建失败')
     });
   }
 
@@ -68,6 +70,8 @@ export default class DeliverOrder extends PureComponent {
         id: item.id,
       } }).then(() => {
       this.props.dispatch({ type: 'logistics/getList' });
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -80,6 +84,8 @@ export default class DeliverOrder extends PureComponent {
     item.use == 1 ? current.use = 0 : current.use = 1;
     this.props.dispatch({ type: 'logistics/editSingle', payload: current }).then(() => {
       this.props.dispatch({ type: 'logistics/getList' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 
@@ -106,6 +112,9 @@ export default class DeliverOrder extends PureComponent {
 
   handleSortOk = () => {
     this.props.dispatch({ type: 'logistics/editSort', payload: this.props.logistics.logistics }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

@@ -12,7 +12,9 @@ import './index.less';
 const app = dva({
   // history: browserHistory(),
   onError(e) {
-    message.error(e.message);
+    if(e.type !== 'page') {
+      message.error(e.message);
+    }
   },
 });
 

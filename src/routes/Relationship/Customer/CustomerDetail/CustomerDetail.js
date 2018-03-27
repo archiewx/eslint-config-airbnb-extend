@@ -105,20 +105,24 @@ export default class CustomerDetail extends PureComponent {
     },
   }
 
+  //切换tab
   handleTabChange = (key) => {
     this.setState({ activeTabKey: key });
   }
 
+  //切换欠款tab
   handleBlanceTabChange = (key) => {
     this.setState({ activeBlanceTabKey: key });
   }
 
+  //删除客户
   handleDeleteSingleCustomer = (id) => {
     this.props.dispatch({ type: 'customerDetail/deleteSingle', payload: id }).then(() => {
       this.props.dispatch(routerRedux.push('/relationship/customer-list'));
     });
   }
 
+  //改变客户状态
   handleChangeCustomerStatus = (id, status) => {
     this.props.dispatch({ type: 'customerDetail/changeCustomerStatus',
       payload: {
@@ -127,10 +131,12 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //跳转编辑客户
   handleToCustomerEdit = () => {
     this.props.dispatch(routerRedux.push(`/relationship/customer-edit/${this.props.customerDetail.currentId.id}`));
   }
 
+  //交易历史排序
   handleSaleHistorySort = (pagination, filter, sorter) => {
     const pageSaleHistory = {
       page: pagination.current,
@@ -156,6 +162,7 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //交易历史筛
   handleSaleFilter = (value) => {
     this.props.dispatch({ type: 'customerDetail/setFilterSaleServerData',
       payload: {
@@ -172,6 +179,7 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //商品历史排序
   handleGoodsHistorySort = (pagination, filter, sorter) => {
     const pageGoodsHistory = {
       page: pagination.current,
@@ -197,6 +205,7 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //商品历史筛
   handleGoodsFilter = (value) => {
     this.props.dispatch({ type: 'customerDetail/setFilterGoodsServerData',
       payload: {
@@ -213,6 +222,7 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //收银历史排序
   handlePaymentHistorySort = (pagination, filter, sorter) => {
     const pagePaymentHistory = {
       page: pagination.current,
@@ -238,6 +248,7 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //收银历史筛选你
   handlePaymentFilter = (value) => {
     this.props.dispatch({ type: 'customerDetail/setFilterPurchaseServerData',
       payload: {
@@ -254,6 +265,7 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //欠款，当前余额排序
   handlePaymentsSort = (pagination, filter, sorter) => {
     const pagePayments = {
       page: pagination.current,
@@ -275,6 +287,7 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //欠款，未结算销售单排序
   handleSalesorderSort = (pagination, filter, sorter) => {
     const pageSalesorder = {
       page: pagination.current,
@@ -296,6 +309,7 @@ export default class CustomerDetail extends PureComponent {
       } });
   }
 
+  //欠款，未付款结算单排序
   handleStatementSort = (pagination, filter, sorter) => {
     const pageStatement = {
       page: pagination.current,

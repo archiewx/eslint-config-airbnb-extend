@@ -13,6 +13,8 @@ export default class CustomerManage extends PureComponent {
   handleSwitchShopShareCustomer = () => {
     this.props.dispatch({ type: 'configSetting/switchShopShareCustomer', payload: this.props.configSetting.shopShareCustomer == 1 ? 0 : 1 }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 

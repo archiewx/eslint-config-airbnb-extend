@@ -617,7 +617,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'sale' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick onChange={this.handleSaleFilter} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handleSaleFilter} filterOptions={goodsDetailFilter} tagLabel="sale" dateLabel="sale"/>
           </Card>
           <Card bordered={false}>
             <Table columns={saleColumns} dataSource={singleGoodsSales} onChange={this.handleSaleSort} pagination={false} rowKey="id" />
@@ -625,7 +625,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'purchase' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick onChange={this.handlePurchaseFilter} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handlePurchaseFilter} filterOptions={goodsDetailFilter} tagLabel="purchase" dateLabel="purchase"/>
           </Card>
           <Card bordered={false}>
             <Table columns={purchaseColumns} dataSource={singleGoodsPurchases} onChange={this.handlePurchaseSort} pagination={false} rowKey="id" />
@@ -633,7 +633,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'customer' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided} >
-            <FilterDatePick onChange={this.handleCustomerFilter} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handleCustomerFilter} filterOptions={goodsDetailFilter} tagLabel="customer" dateLabel="customer"/>
           </Card>
           <Card bordered={false} title={selectCustomerMode.name} extra={customerExrta}>
             <Table columns={customerColumns} dataSource={singleGoodsCustomers} onChange={this.handleCustomerSort} rowKey="id" pagination={selectCustomerMode.mode == 'customer' ? customerPagination : false} />
@@ -648,7 +648,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'supplier' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick onChange={this.handleSupplierFilter} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handleSupplierFilter} filterOptions={goodsDetailFilter} tagLabel="supplier" dateLabel="supplier"/>
           </Card>
           <Card bordered={false}>
             <Table columns={supplierColumns} dataSource={singleGoodsSuppliers} onChange={this.handleSupplierSort} pagination={false} rowKey="id" />
@@ -656,7 +656,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'stock' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick onChange={this.handleStockFilter} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handleStockFilter} filterOptions={goodsDetailFilter} tagLabel="stock" dateLabel="stock"/>
           </Card>
           <Card bordered={false}>
             <Table columns={stockColumns} dataSource={singleGoodsStocks} onChange={this.handleStockSort} pagination={false} rowKey="id" />

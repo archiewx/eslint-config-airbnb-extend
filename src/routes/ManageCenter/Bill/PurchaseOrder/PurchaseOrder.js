@@ -43,6 +43,8 @@ export default class PurchaseOrderLabel extends PureComponent {
     });
     this.props.dispatch({ type: 'label/editPurchaseOrderLabel', payload: value }).then(() => {
       this.props.dispatch({ type: 'label/getPurchaseOrderLabel' });
+    }).catch(()=>{
+      message.error('编辑失败')
     });
   }
 

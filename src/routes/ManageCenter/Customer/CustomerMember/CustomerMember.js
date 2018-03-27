@@ -55,6 +55,8 @@ export default class CustomerMember extends PureComponent {
       } else {
         this.props.dispatch({ type: 'customerMember/getList' });
       }
+    }).catch(()=>{
+      value.id?message.error('编辑失败') : message.error('新建失败')
     });
   }
 
@@ -64,6 +66,8 @@ export default class CustomerMember extends PureComponent {
         id: item.id,
       } }).then(() => {
       this.props.dispatch({ type: 'customerMember/getList' });
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -90,6 +94,9 @@ export default class CustomerMember extends PureComponent {
 
   handleSortOk = () => {
     this.props.dispatch({ type: 'customerMember/editSort', payload: this.props.customerMember.customerMembers }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

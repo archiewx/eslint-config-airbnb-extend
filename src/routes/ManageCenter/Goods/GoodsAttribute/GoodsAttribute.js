@@ -26,6 +26,8 @@ export default class GoodsAttribute extends PureComponent {
     }
     this.props.dispatch({ type: 'configSetting/switchItemAttrite', payload: current }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 

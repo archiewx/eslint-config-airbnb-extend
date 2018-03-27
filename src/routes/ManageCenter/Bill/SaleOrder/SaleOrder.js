@@ -89,6 +89,8 @@ export default class SaleOrder extends PureComponent {
       } else {
         this.props.dispatch({ type: 'adjustPrice/getList' });
       }
+    }).catch(()=>{
+      value.id ? message.error('编辑失败') : message.error('新建失败')
     });
   }
 
@@ -98,6 +100,8 @@ export default class SaleOrder extends PureComponent {
         id: item.id,
       } }).then(() => {
       this.props.dispatch({ type: 'adjustPrice/getList' });
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -120,6 +124,8 @@ export default class SaleOrder extends PureComponent {
     });
     this.props.dispatch({ type: 'label/editSaleOrderLabel', payload: value }).then(() => {
       this.props.dispatch({ type: 'label/getSaleOrderLabel' });
+    }).catch(()=>{
+      message.error('编辑失败')
     });
   }
 
@@ -132,6 +138,8 @@ export default class SaleOrder extends PureComponent {
   handleSwitchDefaultDeliverWay = (key) => {
     this.props.dispatch({ type: 'configSetting/switchDefaultDeleiverWay', payload: key }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).then(()=>{
+      message.error('更改失败')
     });
   }
 
@@ -140,17 +148,23 @@ export default class SaleOrder extends PureComponent {
       this.props.dispatch({ type: 'configSetting/switchUsePrice', payload: 'no' }).then(() => {
         this.props.dispatch({ type: 'configSetting/switchHistoryPrice', payload: 'no' }).then(() => {
           this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+        }).catch(()=>{
+          message.error('更改失败')
         });
       });
     } else if (key == 2) {
       this.props.dispatch({ type: 'configSetting/switchUsePrice', payload: 'yes' }).then(() => {
         this.props.dispatch({ type: 'configSetting/switchHistoryPrice', payload: 'no' }).then(() => {
           this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+        }).catch(()=>{
+          message.error('更改失败')
         });
       });
     } else if (key == 3) {
       this.props.dispatch({ type: 'configSetting/switchHistoryPrice', payload: 'yes' }).then(() => {
         this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+      }).catch(()=>{
+        message.error('更改失败')
       });
     }
   }
@@ -178,6 +192,9 @@ export default class SaleOrder extends PureComponent {
 
   handleSortOk = () => {
     this.props.dispatch({ type: 'adjustPrice/editSort', payload: this.props.adjustPrice.adjustPrices }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

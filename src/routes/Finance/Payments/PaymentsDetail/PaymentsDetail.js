@@ -25,7 +25,7 @@ export default class PaymentsDetail extends PureComponent {
     const { singleData } = this.props.paymentsDetail;
 
     const breadcrumbList = [{
-      title: '单据',
+      title: '财务',
     }, {
       title: '流水',
     }, {

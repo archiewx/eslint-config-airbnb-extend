@@ -83,7 +83,7 @@ export default class PurchaseSettleDetail extends PureComponent {
     const { singleData } = this.props.purchaseSettleDetail;
 
     const breadcrumbList = [{
-      title: '单据',
+      title: '财务',
     }, {
       title: '进货结算',
     }, {

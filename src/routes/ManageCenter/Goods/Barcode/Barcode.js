@@ -13,12 +13,16 @@ export default class Barcode extends PureComponent {
   handleSwitchUseBarcode = (useBarcode) => {
     this.props.dispatch({ type: 'configSetting/switchBarcode', payload: useBarcode ? -1 : 0 }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 
   handleSwitchBarcodeLevel = () => {
     this.props.dispatch({ type: 'configSetting/switchBarcode', payload: this.props.configSetting.itemBarcodeLevel == 0 ? 1 : 0 }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 

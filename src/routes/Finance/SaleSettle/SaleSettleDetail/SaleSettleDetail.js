@@ -81,7 +81,7 @@ export default class SaleSettleDetail extends PureComponent {
     const { singleData } = this.props.saleSettleDetail;
 
     const breadcrumbList = [{
-      title: '单据',
+      title: '财务',
     }, {
       title: '销售结算',
     }, {

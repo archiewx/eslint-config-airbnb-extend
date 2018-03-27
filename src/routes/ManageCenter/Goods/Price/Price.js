@@ -67,6 +67,8 @@ export default class Size extends PureComponent {
       } else {
         this.props.dispatch({ type: 'priceGrade/getList' });
       }
+    }).catch(()=>{
+      this.state.priceGradeModalType == 'create' ? message.error('新建失败') : message.error('编辑失败')
     });
   }
 
@@ -76,12 +78,16 @@ export default class Size extends PureComponent {
         id: item.id,
       } }).then(() => {
       this.props.dispatch({ type: 'priceGrade/getList' });
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
   handleSwitchUsePriceLevel = () => {
     this.props.dispatch({ type: 'configSetting/switchUsePrice', payload: this.props.configSetting.usePricelelvel == 'yes' ? 'no' : 'yes' }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 
@@ -108,6 +114,8 @@ export default class Size extends PureComponent {
     }
     this.props.dispatch({ type: 'configSetting/switchPriceModal', payload: current }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 
@@ -135,6 +143,8 @@ export default class Size extends PureComponent {
     });
     this.props.dispatch({ type: 'priceQuantityStep/createSingle', payload: value }).then(() => {
       this.props.dispatch({ type: 'priceQuantityStep/getList' });
+    }).catch(()=>{
+      message.error('新建失败')
     });
   }
 
@@ -144,6 +154,8 @@ export default class Size extends PureComponent {
         id: item.id,
       } }).then(() => {
       this.props.dispatch({ type: 'priceQuantityStep/getList' });
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -174,6 +186,9 @@ export default class Size extends PureComponent {
 
   handleSortOk = () => {
     this.props.dispatch({ type: 'priceGrade/editSort', payload: this.props.priceGrade.priceGrades }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

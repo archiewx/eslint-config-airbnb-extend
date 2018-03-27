@@ -52,6 +52,8 @@ export default class Inventory extends PureComponent {
     });
     this.props.dispatch({ type: 'configSetting/switchInventoryApprover', payload: Object.values(inventoryApprover) }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('编辑失败')
     });
   }
 
@@ -74,6 +76,8 @@ export default class Inventory extends PureComponent {
     }
     this.props.dispatch({ type: 'configSetting/switchInventoryApprover', payload: Object.values(inventoryApprover) }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 

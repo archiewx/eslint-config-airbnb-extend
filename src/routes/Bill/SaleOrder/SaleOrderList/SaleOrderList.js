@@ -204,7 +204,7 @@ export default class SaleOrderList extends PureComponent {
     } else if (payStatus == 1) {
       if (deliveryStatus == 1) {
         popconfirmModal = (
-          <Popconfirm title="确认删除结算单" onConfirm={this.handleDeleteSingle.bind(null, id, -1)} okText="确认">
+          <Popconfirm title="确认删除销售单?" onConfirm={this.handleDeleteSingle.bind(null, id, -1)} okText="确认">
               删除
           </Popconfirm>
         );

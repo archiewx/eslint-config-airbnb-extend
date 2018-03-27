@@ -53,6 +53,8 @@ export default class Payment extends PureComponent {
       } else {
         this.props.dispatch({ type: 'payment/getList' });
       }
+    }).catch(()=>{
+      value.id ? message.error('编辑失败') : message.error('新建失败')
     });
   }
 
@@ -62,6 +64,8 @@ export default class Payment extends PureComponent {
         id: item.id,
       } }).then(() => {
       this.props.dispatch({ type: 'payment/getList' });
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -88,6 +92,9 @@ export default class Payment extends PureComponent {
 
   handleSortOk = () => {
     this.props.dispatch({ type: 'payment/editSort', payload: this.props.payment.payments }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

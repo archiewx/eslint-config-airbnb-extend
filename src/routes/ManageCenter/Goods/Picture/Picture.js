@@ -13,6 +13,8 @@ export default class Picture extends PureComponent {
   handleSwitchImageLevel = () => {
     this.props.dispatch({ type: 'configSetting/switchPicture', payload: this.props.configSetting.itemImageLevel == 'item' ? 'sku' : 'item' }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
+    }).catch(()=>{
+      message.error('更改失败')
     });
   }
 

@@ -75,13 +75,14 @@ export default class Shop extends PureComponent {
     this.setState({
       modalVisibel: false,
     });
-    this.props.dispatch({ type: 'shop/editBind',
-      payload: {
-        itemData,
-        warehouseData,
-      } }).then(() => {
-      this.props.dispatch({ type: 'shop/getList' });
-    });
+    this.props.dispatch({type:'shop/editBind',payload:{
+      itemData,
+      warehouseData,
+    }}).then(()=>{
+      this.props.dispatch({type:'shop/getList'})
+    }).catch(()=>{
+      message.error('编辑失败')
+    })
   }
 
   render() {

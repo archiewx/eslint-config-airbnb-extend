@@ -55,6 +55,8 @@ export default class CustomerGroup extends PureComponent {
       } else {
         this.props.dispatch({ type: 'customerGroup/getList' });
       }
+    }).catch(()=>{
+      this.state.modalType.indexOf('Create') ? message.error('新建失败') : message.error('编辑失败')
     });
   }
 
@@ -68,6 +70,8 @@ export default class CustomerGroup extends PureComponent {
       } else {
         this.props.dispatch({ type: 'customerGroup/getList' });
       }
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -94,6 +98,9 @@ export default class CustomerGroup extends PureComponent {
 
   handleSortOk = () => {
     this.props.dispatch({ type: 'customerGroup/editSort', payload: this.props.customerGroup.customerGroups }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

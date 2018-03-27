@@ -57,6 +57,8 @@ export default class Color extends PureComponent {
       } else {
         this.props.dispatch({ type: 'color/getList' });
       }
+    }).catch(()=>{
+      value.id ? message.error('编辑失败') : message.error('新建失败')
     });
   }
 
@@ -71,6 +73,8 @@ export default class Color extends PureComponent {
       } else {
         this.props.dispatch({ type: 'color/getList' });
       }
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -102,6 +106,9 @@ export default class Color extends PureComponent {
   // 排序完成
   handleSortOk = () => {
     this.props.dispatch({ type: 'color/editSort', payload: this.props.color.colors }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

@@ -58,6 +58,8 @@ export default class GoodsGroup extends PureComponent {
         message.error(result.message);
       }
       this.props.dispatch({ type: 'goodsGroup/getList' });
+    }).catch(()=>{
+      this.state.modalType.indexOf('Create') > -1 ? message.error('创建失败') : message.error('编辑失败')
     });
   }
 
@@ -72,6 +74,8 @@ export default class GoodsGroup extends PureComponent {
       } else {
         this.props.dispatch({ type: 'goodsGroup/getList' });
       }
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -103,6 +107,9 @@ export default class GoodsGroup extends PureComponent {
   // 排序完成
   handleSortOk = () => {
     this.props.dispatch({ type: 'goodsGroup/editSort', payload: this.props.goodsGroup.goodsGroups }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

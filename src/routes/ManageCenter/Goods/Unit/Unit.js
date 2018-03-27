@@ -53,6 +53,8 @@ export default class Unit extends PureComponent {
       } else {
         this.props.dispatch({ type: 'unit/getList' });
       }
+    }).catch(()=>{
+      this.state.modalType === 'create' ? message.error('创建失败') : message.error('编辑失败')
     });
   }
 
@@ -66,6 +68,8 @@ export default class Unit extends PureComponent {
       } else {
         this.props.dispatch({ type: 'unit/getList' });
       }
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -92,6 +96,9 @@ export default class Unit extends PureComponent {
 
   handleSortOk = () => {
     this.props.dispatch({ type: 'unit/editSort', payload: this.props.unit.units }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }

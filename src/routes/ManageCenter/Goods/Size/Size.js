@@ -70,6 +70,8 @@ export default class Size extends PureComponent {
       } else {
         this.props.dispatch({ type: 'size/getSizeLibrary' });
       }
+    }).catch(()=>{
+      this.state.sizeLibraryModalType === 'create' ? message.error('新建失败') : message.error('编辑失败')
     });
   }
 
@@ -84,6 +86,8 @@ export default class Size extends PureComponent {
       } else {
         this.props.dispatch({ type: 'size/getSizeLibrary' });
       }
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -123,6 +127,8 @@ export default class Size extends PureComponent {
       } else {
         this.props.dispatch({ type: 'size/getSizeGroup' });
       }
+    }).catch(()=>{
+      this.state.sizeGroupModalType == 'create' ? message.error('新建失败') : message.error('编辑失败')
     });
   }
 
@@ -133,6 +139,8 @@ export default class Size extends PureComponent {
         id: item.id,
       } }).then(() => {
       this.props.dispatch({ type: 'size/getSizeGroup' });
+    }).catch(()=>{
+      message.error('删除失败')
     });
   }
 
@@ -164,6 +172,9 @@ export default class Size extends PureComponent {
 
   handleSortOk = () => {
     this.props.dispatch({ type: 'size/editSort', payload: this.props.size.sizeLibrarys }).then(() => {
+      this.handleSortCancel();
+    }).catch(()=>{
+      message.error('排序失败')
       this.handleSortCancel();
     });
   }
