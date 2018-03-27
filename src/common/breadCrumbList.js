@@ -1,30 +1,7 @@
-import { getMenuData } from './menu';
 import { getRouterData } from './router';
-
-// function getFlatMenuData(menus) {
-//   let keys = {};
-//   menus.forEach((item) => {
-//     if (item.children) {
-//       keys[item.path] = item.name;
-//       keys = { ...keys,...getFlatMenuData(item.children) };
-//     } else {
-//       keys[item.path] = item.name;
-//     }
-//   });
-//   return keys;
-// }
-
-// const menuData = getFlatMenuData(getMenuData());
 
 const routerData = JSON.parse(JSON.stringify(getRouterData()));
 
-// Object.keys(menuData).forEach((item) => {
-//   if(!Object.keys(routerData).some( n => item == n.replace(/^\//, ''))) {
-//     routerData[`/${item}`] = {
-//       name: menuData[item]
-//     }
-//   }
-// })
 
 function breadCrumbList(pathname) {
   let breadcrumblist = [];

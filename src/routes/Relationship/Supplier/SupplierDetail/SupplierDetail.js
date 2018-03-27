@@ -329,8 +329,8 @@ export default class SupplierDetail extends PureComponent {
   }
 
   render() {
-    const { singleSupplierDetail, singleSupplierFinance, singleSupplierSaleHistory, singleSupplierGoodsHistory, singleSupplierPaymentHistory, saleHistoryFilter, goodsHistoryFilter, paymentHistoryFilter, currentId, singleSupplierPurchaseorders, singleSupplierStatements,singleSupplierPayments } = this.props.supplierDetail;
-    const { activeTabKey, activeDebtTabKey, pageSaleHistory, pageGoodsHistory, pagePaymentHistory, pagePurchaseorder, pageStatement,pagePayments } = this.state;
+    const { singleSupplierDetail, singleSupplierFinance, singleSupplierSaleHistory, singleSupplierGoodsHistory, singleSupplierPaymentHistory, saleHistoryFilter, goodsHistoryFilter, paymentHistoryFilter, currentId, singleSupplierPurchaseorders, singleSupplierStatements, singleSupplierPayments } = this.props.supplierDetail;
+    const { activeTabKey, activeDebtTabKey, pageSaleHistory, pageGoodsHistory, pagePaymentHistory, pagePurchaseorder, pageStatement, pagePayments } = this.state;
     const { getFieldDecorator } = this.props.form;
     const description = (
       <DescriptionList size="small" col="2" className={styles.descriptionPostion}>
@@ -341,7 +341,7 @@ export default class SupplierDetail extends PureComponent {
     const menu = (
       <Menu style={{ width: 109 }}>
         <Menu.Item key="1">
-          <Popconfirm title="确认删除此供应商?" placement="bottom" onConfirm={this.handleDeleteSingleSupplier.bind(null, currentId.id)}><span style={{width: '100%',display:'inline-block'}}>删除</span></Popconfirm>
+          <Popconfirm title="确认删除此供应商?" placement="bottom" onConfirm={this.handleDeleteSingleSupplier.bind(null, currentId.id)}><span style={{ width: '100%', display: 'inline-block' }}>删除</span></Popconfirm>
         </Menu.Item>
       </Menu>
     );

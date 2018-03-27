@@ -10,7 +10,6 @@ import DuokeSwitch from '../../../../components/DuokeSwitch';
   configSetting: state.configSetting,
 }))
 export default class GoodsAttribute extends PureComponent {
-
   // 更改商品属性配置
   handleSwitchItemAttribute = (key) => {
     const current = [...this.props.configSetting.itemAttribute];

@@ -107,7 +107,7 @@ export default class GoodsDetail extends PureComponent {
     this.setState({ activeTabKey: key });
   }
 
-  //改变商品状态
+  // 改变商品状态
   handleSelectGoodStatus = (not_sale, { id }) => {
     this.props.dispatch({ type: 'goodsDetail/changeGoodsStatus',
       payload: {
@@ -116,7 +116,7 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
-  //删除商品
+  // 删除商品
   handleDeleteSingleGoods = (id, { item, key, keyPath }) => {
     this.props.dispatch({ type: 'goodsDetail/deleteSingleGoods', payload: id }).then(() => {
       this.prop.dispatch(routerRedux.push('/goods-list'));
@@ -354,7 +354,7 @@ export default class GoodsDetail extends PureComponent {
 
     const menu = (
       <Menu style={{ width: 109 }}>
-        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement="bottom" onConfirm={this.handleDeleteSingleGoods.bind(null, currentId)}><span style={{ width: '100%',display:'inline-block' }}>删除</span></Popconfirm></Menu.Item>
+        <Menu.Item key="1"><Popconfirm title="确认删除此商品?" placement="bottom" onConfirm={this.handleDeleteSingleGoods.bind(null, currentId)}><span style={{ width: '100%', display: 'inline-block' }}>删除</span></Popconfirm></Menu.Item>
       </Menu>
     );
 

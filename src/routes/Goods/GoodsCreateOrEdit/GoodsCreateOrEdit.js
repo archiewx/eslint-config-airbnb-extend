@@ -57,7 +57,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     selectUnits: [], // 单位
     selectColors: [], // 颜色
     selectSizes: [], // 尺码
-    selectQuantityStep: [], 
+    selectQuantityStep: [],
     priceTableValue: {},
     skuImages: {},
     skuStocks: {},
@@ -98,10 +98,10 @@ export default class GoodsCreateOrEdit extends PureComponent {
     const { units } = nextProps.unit;
     const { warehouses } = nextProps.warehouse;
     const { showData } = nextProps.goodsCreateOrEdit; // showData 判断是否是编辑或新建
-    let priceTableValue = {};
+    const priceTableValue = {};
     // 单位的初始化
     if (showData.selectUnits) {
-      if (!!units.length) {
+      if (units.length) {
         this.setState({ selectUnits: [...showData.selectUnits] });
       }
     } else if (!!units.length && !this.state.selectUnits.length) {
@@ -126,8 +126,8 @@ export default class GoodsCreateOrEdit extends PureComponent {
     }
     // 价格等级&价格组成的初始化
     if (showData.prices) {
-      if (!!priceGrades.length && !!shops.length ) {
-        //判断策略生成数据
+      if (!!priceGrades.length && !!shops.length) {
+        // 判断策略生成数据
         if (usePricelelvel === 'yes') {
           if (priceModel === '') {
             priceGrades.forEach((item) => {
@@ -194,8 +194,8 @@ export default class GoodsCreateOrEdit extends PureComponent {
         this.setState({ priceTableValue });
       }
     } else if (!!priceGrades.length && !!shops.length && !!units.length && !Object.values(this.state.priceTableValue).length) {
-      //使用价格等级
-      if (usePricelelvel === 'yes') { 
+      // 使用价格等级
+      if (usePricelelvel === 'yes') {
         if (priceModel === '') { // 基本价格组成为空
           priceGrades.forEach((item) => {
             priceTableValue[`${item.id}`] = {
@@ -224,8 +224,8 @@ export default class GoodsCreateOrEdit extends PureComponent {
               };
             });
           });
-        } 
-      }  else if (priceModel === 'shop') { // 关闭价格等级并价格基本组成为店铺
+        }
+      } else if (priceModel === 'shop') { // 关闭价格等级并价格基本组成为店铺
         shops.forEach((item) => {
           priceTableValue[`${item.id}`] = {
             shop_id: item.id,
@@ -278,7 +278,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
         this.setState({ skuStocks });
       }
     } else if (!!warehouses.length && !Object.values(this.state.skuStocks).length) {
-      let skuStocks = {};
+      const skuStocks = {};
       warehouses.forEach((item) => {
         skuStocks[`${item.id}`] = {
           warehouse_id: item.id,
@@ -377,7 +377,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
           if (skuStocks[key].store_quantity) { skuStocks[key].store_quantity = Number(skuStocks[key].store_quantity) * Number(this.state.selecStockUnitNum); }
         }
         value.stock = this.state.skuStocks;
-        //转化数据
+        // 转化数据
         this.props.dispatch({ type: 'goodsCreateOrEdit/setServerData',
           payload: {
             value,
@@ -389,7 +389,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
             itemBarcodeLevel: this.props.configSetting.itemBarcodeLevel,
             itemImageLevel: this.props.configSetting.itemImageLevel,
           } });
-        //提交
+        // 提交
         if (this.props.goodsCreateOrEdit.showData.id) {
           this.props.dispatch({ type: 'goodsCreateOrEdit/editSingleGoods',
             payload: {
@@ -464,26 +464,26 @@ export default class GoodsCreateOrEdit extends PureComponent {
   handleGetStandardPrice = (e) => {
     const { form } = this.props;
     const priceTableValue = form.getFieldValue('prices_table');
-    const oldstandardPrice = form.getFieldValue('standard_price'); //旧的标准价
+    const oldstandardPrice = form.getFieldValue('standard_price'); // 旧的标准价
     setTimeout(() => {
-      const standardPrice = form.getFieldValue('standard_price'); //新的标准价
+      const standardPrice = form.getFieldValue('standard_price'); // 新的标准价
       let isAutoInput = true; // 判断价格等级&价格组成是否跟随标准价
       // 判断标准价的格式
-      if(typeof standardPrice == 'string' && standardPrice.indexOf('.') > -1 && standardPrice.match(/\./g).length == 1) {
-        if( standardPrice[standardPrice.length-1] != '.' && !Number.isInteger(Number(standardPrice[standardPrice.length-1]))) {
-          form.setFieldsValue({standard_price: oldstandardPrice});
+      if (typeof standardPrice === 'string' && standardPrice.indexOf('.') > -1 && standardPrice.match(/\./g).length == 1) {
+        if (standardPrice[standardPrice.length - 1] != '.' && !Number.isInteger(Number(standardPrice[standardPrice.length - 1]))) {
+          form.setFieldsValue({ standard_price: oldstandardPrice });
           isAutoInput = false;
         }
-      }else if(typeof standardPrice == 'string' && standardPrice !== '') {
-        form.setFieldsValue({standard_price: oldstandardPrice});
+      } else if (typeof standardPrice === 'string' && standardPrice !== '') {
+        form.setFieldsValue({ standard_price: oldstandardPrice });
         isAutoInput = false;
       }
-      if(isAutoInput) {
-        for (let key in priceTableValue) {
+      if (isAutoInput) {
+        for (const key in priceTableValue) {
           // 基本组成价格为单位时，价格应为 标准价 x 该单位数量
           if (this.props.configSetting.priceModel == 'unit') {
-            if ( Number(priceTableValue[key].price) == Number(oldstandardPrice)*Number(this.state.selectUnits.find( n => n.id == priceTableValue[key].unit_id).number )  || priceTableValue[key].price == null) {
-              priceTableValue[key].price =( Number(standardPrice) * Number(this.state.selectUnits.find( n => n.id == priceTableValue[key].unit_id).number )).toString();
+            if (Number(priceTableValue[key].price) == Number(oldstandardPrice) * Number(this.state.selectUnits.find(n => n.id == priceTableValue[key].unit_id).number) || priceTableValue[key].price == null) {
+              priceTableValue[key].price = (Number(standardPrice) * Number(this.state.selectUnits.find(n => n.id == priceTableValue[key].unit_id).number)).toString();
             }
           } else if (priceTableValue[key].price == oldstandardPrice || priceTableValue[key].price == null) {
             priceTableValue[key].price = standardPrice;
@@ -492,11 +492,11 @@ export default class GoodsCreateOrEdit extends PureComponent {
         form.setFieldsValue({ prices_table: priceTableValue });
       }
       // 标准价为null或undenfined时，价格等级价格组成为null
-      if(!standardPrice) {
-        for(let key in priceTableValue) {
+      if (!standardPrice) {
+        for (const key in priceTableValue) {
           priceTableValue[key].price = null;
         }
-        form.setFieldsValue({prices_table: priceTableValue})
+        form.setFieldsValue({ prices_table: priceTableValue });
       }
     }, 0);
   }
@@ -566,7 +566,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
         }
       });
       this.setState({ selectUnits });
-       // 基本价格组成为单位时，生成价格等级&价格组成的价格数据
+      // 基本价格组成为单位时，生成价格等级&价格组成的价格数据
       if (this.props.configSetting.priceModel == 'unit') {
         // 取出最后一个单位的id
         const current = [].concat(form.getFieldValue('unit_select')[form.getFieldValue('unit_select').length - 1]);
@@ -613,7 +613,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
         }
       });
       this.setState({ selectColors });
-      //当前选中的颜色
+      // 当前选中的颜色
       const current = [].concat(form.getFieldValue('color_select')[form.getFieldValue('color_select').length - 1]);
       // 当库存key的长度为2，即只有颜色的情况下获取已经在库存中的颜色属性
       for (const key in skuStocks) {
@@ -633,14 +633,14 @@ export default class GoodsCreateOrEdit extends PureComponent {
         });
         form.setFieldsValue({ stock: skuStocks });
       }
-      //尺码同理
+      // 尺码同理
       if (this.props.configSetting.itemBarcodeLevel == 1 && !isOnlySame && current[0]) {
         skuBarcodes[`${current[0]}`] = {
           barcode: '',
         };
         form.setFieldsValue({ barcode: skuBarcodes });
       }
-      //图片同理
+      // 图片同理
       if (!isOnlySame && current[0]) {
         skuImages[`${current[0]}`] = {
           fileList: [],
@@ -668,18 +668,18 @@ export default class GoodsCreateOrEdit extends PureComponent {
         }
       });
       this.setState({ selectSizes });
-      //当前选中的尺码
+      // 当前选中的尺码
       const current = [].concat(form.getFieldValue('size_select')[form.getFieldValue('size_select').length - 1]);
-      //当库存的key是既有颜色又有尺码的情况下，获取已经在库存中的尺码
+      // 当库存的key是既有颜色又有尺码的情况下，获取已经在库存中的尺码
       for (const key in skuStocks) {
         const changeKey = key.split('_');
         if (changeKey.length == 3) {
           alreadySelect.push(changeKey[2]);
         }
       }
-      //判断当前尺码是否已经存在库存
+      // 判断当前尺码是否已经存在库存
       isOnlySame = alreadySelect.some(n => n == current[0]);
-      //不存在
+      // 不存在
       if (!isOnlySame && current[0]) {
         this.props.warehouse.warehouses.forEach((item) => {
           this.state.selectColors.forEach((colorItem) => {
@@ -691,7 +691,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
         });
         form.setFieldsValue({ stock: skuStocks });
       }
-      //不存在且条码策略为以商品级别
+      // 不存在且条码策略为以商品级别
       if (this.props.configSetting.itemBarcodeLevel == 1 && !isOnlySame && current[0]) {
         this.state.selectColors.forEach((colorItem) => {
           skuBarcodes[`${colorItem.id}_${current[0]}`] = {
@@ -720,7 +720,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
     const onlyStcok = JSON.parse(JSON.stringify(this.state.skuStocks));
     // 显示的库存数据
     const stock = JSON.parse(JSON.stringify(this.state.skuStocks));
-    for (let key in stock) {
+    for (const key in stock) {
       if (stock[key].store_quantity) {
         onlyStcok[key].store_quantity = Number(stock[key].store_quantity) * Number(this.state.selecStockUnitNum) / Number(selecStockUnitNum);
         stock[key].store_quantity = Math.floor(Number(stock[key].store_quantity) * Number(this.state.selecStockUnitNum) / Number(selecStockUnitNum));
@@ -814,8 +814,8 @@ export default class GoodsCreateOrEdit extends PureComponent {
             </Form>
             <Form>
               <div>
-                <div style={{paddingBottom: 10}}>
-                  {usePricelelvel === 'yes' ? <label className={styles.priceGradeLabelTitle}>价格等级 & 价格组成:</label> :  <label className={styles.priceGradeLabelTitle}>价格组成 (零售价):</label>}
+                <div style={{ paddingBottom: 10 }}>
+                  {usePricelelvel === 'yes' ? <label className={styles.priceGradeLabelTitle}>价格等级 & 价格组成:</label> : <label className={styles.priceGradeLabelTitle}>价格组成 (零售价):</label>}
                   {
                     priceModel === 'quantityrange' ? (
                       <Dropdown overlay={quantityStepMenu} >
@@ -935,7 +935,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                     {getFieldDecorator('stock', {
                       initialValue: skuStocks,
                     })(
-                      <StockTable onChange={this.handleGetStocks} selectWarehouseId={selectWarehouseId}  warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
+                      <StockTable onChange={this.handleGetStocks} selectWarehouseId={selectWarehouseId} warehouses={warehouses} selectColors={selectColors} selectSizes={selectSizes} />
                     )}
                   </FormItem>
                 </Form>

@@ -62,7 +62,7 @@ export default {
         },
         id: payload.id,
       };
-      const [data1, data2, data3, data4, data5, data6, data7,data8] = yield all([
+      const [data1, data2, data3, data4, data5, data6, data7, data8] = yield all([
         call(supplierService.getSingle, payload),
         call(supplierService.getSupplierSaleHistory, condition),
         call(supplierService.getSupplierGoodsHistory, conditionWTwo),
@@ -70,7 +70,7 @@ export default {
         call(supplierService.getPurchaseorderNeedPay, conditionWThree),
         call(supplierService.getStatementsNeedPay, conditionWThree),
         call(supplierService.getSupplierFinance, payload),
-        call(supplierService.getSupplierPayments,conditionWThree)
+        call(supplierService.getSupplierPayments, conditionWThree),
       ]);
 
       yield put({ type: 'setShowData', payload: data1.result.data });
