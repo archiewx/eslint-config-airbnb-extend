@@ -2,18 +2,21 @@
 
 src目录 
 
-## assets 资源
+## assets 
+资源
 
 - log
 
-## common 共用文件
+## common 
+共用文件
 
 - menu: 菜单
 - router: 路由
 - breadCrumbList: 管理中心的面包屑
 - index: 接口baseApi,图片baseApi，token
 
-## components 组件
+## components 
+组件
 
 - antd-pro: ant-design-pro组件
 - BarCodeTable: 商品新建/编辑条码组件
@@ -27,17 +30,23 @@ src目录
 - SelectMultiple: 商品新建/编辑商品分组组件
 - StockTabel: 商品新建/编辑库存组件
 
-## e2e 集成测试用例
+## e2e 
+集成测试用例
 
-## layouts 通用布局
+## layouts 
+通用布局
 
 - BasicLayout: 基础布局 | 登录之后的布局
 - UserLayout: 登录布局
 
-## models dva model
+## models 
+dva model
 
-## routes 业务页面入口
+## routes 
+业务页面入口
 
-## services 后台接口服务
+## services 
+后台接口服务
 
-## utils 工具库
+## utils 
+工具库
