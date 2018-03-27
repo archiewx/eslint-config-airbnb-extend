@@ -1,8 +1,8 @@
-English | [简体中文](./README.zh-CN.md)
-
 # Duoke_Pc_Web
 
-- [链接][./Duoke_Pc_Web.md]
+- [链接](./Duoke_Pc_Web.md)
+
+English | [简体中文](./README.zh-CN.md)
 
 # Ant Design Pro
 
