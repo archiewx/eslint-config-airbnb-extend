@@ -6,7 +6,6 @@ import currency from 'currency.js';
 import { Row, Col, Card, Button, Icon, Menu, Dropdown, Popconfirm, Divider, Radio, Table, Form, DatePicker } from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import FilterDatePick from '../../../../components/FilterDatePick';
-import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
 import LightBoxImage from '../../../../components/LightBoxImage/LightBoxImage';
 import TagSelect from '../../../../components/DuokeTagSelect';
@@ -390,7 +389,7 @@ export default class CustomerDetail extends PureComponent {
       title: '操作',
       dataIndex: 'operation',
       width: '10%',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) => <Link to={`/bill/sale-detail/${record.id}`}>查看</Link>
     }];
 
     const goodsColumns = [{
@@ -449,7 +448,7 @@ export default class CustomerDetail extends PureComponent {
       title: '操作',
       dataIndex: 'operation',
       width: '10%',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) => (<Link to={`/finance/payments-detail/${record.id}`}>查看</Link>),
     }];
 
     const salesorderColumns = [{
@@ -480,7 +479,7 @@ export default class CustomerDetail extends PureComponent {
       title: '操作',
       width: '10%',
       dataIndex: 'operation',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) =>  <Link to={`/bill/sale-detail/${record.id}`}>查看</Link>
     }];
 
     const statementColumns = [{
@@ -511,7 +510,7 @@ export default class CustomerDetail extends PureComponent {
       title: '操作',
       width: '10%',
       dataIndex: 'operation',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) => ( <Link to={`/finance/sale-settle-detail/${record.id}`}>查看</Link>),
     }];
 
     const purchasesColumns = [{

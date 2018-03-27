@@ -102,13 +102,12 @@ export default class GoodsDetail extends PureComponent {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-  }
-
+  // 切换tabe
   handleTabChange = (key) => {
     this.setState({ activeTabKey: key });
   }
 
+  //改变商品状态
   handleSelectGoodStatus = (not_sale, { id }) => {
     this.props.dispatch({ type: 'goodsDetail/changeGoodsStatus',
       payload: {
@@ -117,6 +116,7 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
+  //删除商品
   handleDeleteSingleGoods = (id, { item, key, keyPath }) => {
     this.props.dispatch({ type: 'goodsDetail/deleteSingleGoods', payload: id }).then(() => {
       this.prop.dispatch(routerRedux.push('/goods-list'));
@@ -127,6 +127,7 @@ export default class GoodsDetail extends PureComponent {
     this.props.dispatch(routerRedux.push(`/goods-edit/${id}`));
   }
 
+  // 排序
   handleSaleSort = (pagination, filters, sorter) => {
     const sortSale = {
       sorts: {},
@@ -145,7 +146,8 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
-  handleSaleFormSubmit = () => {
+  // 筛选
+  handleSaleFilter = () => {
     this.props.dispatch({ type: 'goodsDetail/setFilterSaleServerData',
       payload: {
         ...value,
@@ -161,6 +163,7 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
+  // 排序
   handlePurchaseSort = (pagination, filters, sorter) => {
     const sortPurchase = {
       sorts: {},
@@ -179,7 +182,8 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
-  handlePurchaseFormSubmit = () => {
+  // 筛选
+  handlePurchaseFilter = () => {
     this.props.dispatch({ type: 'goodsDetail/setFilterPurchaseServerData',
       payload: {
         ...value,
@@ -195,6 +199,7 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
+  // 排序
   handleCustomerSort = (pagination, filters, sorter) => {
     const pageCustomer = {
       page: pagination.current,
@@ -219,7 +224,8 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
-  handleCustomerFormSubmit = () => {
+  // 筛选
+  handleCustomerFilter = () => {
     this.props.dispatch({ type: 'goodsDetail/setFilterCustomerServerData',
       payload: {
         ...value,
@@ -236,6 +242,7 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
+  // 客户模式
   handleCustomerModeSelect = ({ item, key, keyPath }) => {
     const selectCustomerMode = {
       name: item.props.children,
@@ -251,6 +258,7 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
+  // 排序
   handleSupplierSort = (pagination, filters, sorter) => {
     const sortSupplier = {
       sorts: {},
@@ -269,7 +277,8 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
-  handleSupplierFormSubmit = () => {
+  // 筛选
+  handleSupplierFilter = () => {
     this.props.dispatch({ type: 'goodsDetail/setFilterSupplierServerData',
       payload: {
         ...value,
@@ -285,6 +294,7 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
+  // 排序
   handleStockSort = (pagination, filters, sorter) => {
     const sortStock = {
       sorts: {},
@@ -303,7 +313,8 @@ export default class GoodsDetail extends PureComponent {
       } });
   }
 
-  handleStockFormSubmit = () => {
+  // 筛选
+  handleStockFilter = () => {
     this.props.dispatch({ type: 'goodsDetail/setFilterStockServerData',
       payload: {
         ...value,
@@ -606,7 +617,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'sale' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick onChange={this.handleSaleFormSubmit} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handleSaleFilter} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false}>
             <Table columns={saleColumns} dataSource={singleGoodsSales} onChange={this.handleSaleSort} pagination={false} rowKey="id" />
@@ -614,7 +625,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'purchase' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick onChange={this.handlePurchaseFormSubmit} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handlePurchaseFilter} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false}>
             <Table columns={purchaseColumns} dataSource={singleGoodsPurchases} onChange={this.handlePurchaseSort} pagination={false} rowKey="id" />
@@ -622,7 +633,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'customer' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided} >
-            <FilterDatePick onChange={this.handleCustomerFormSubmit} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handleCustomerFilter} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false} title={selectCustomerMode.name} extra={customerExrta}>
             <Table columns={customerColumns} dataSource={singleGoodsCustomers} onChange={this.handleCustomerSort} rowKey="id" pagination={selectCustomerMode.mode == 'customer' ? customerPagination : false} />
@@ -637,7 +648,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'supplier' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick onChange={this.handleSupplierFormSubmit} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handleSupplierFilter} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false}>
             <Table columns={supplierColumns} dataSource={singleGoodsSuppliers} onChange={this.handleSupplierSort} pagination={false} rowKey="id" />
@@ -645,7 +656,7 @@ export default class GoodsDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'stock' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick onChange={this.handleStockFormSubmit} filterOptions={goodsDetailFilter} />
+            <FilterDatePick onChange={this.handleStockFilter} filterOptions={goodsDetailFilter} />
           </Card>
           <Card bordered={false}>
             <Table columns={stockColumns} dataSource={singleGoodsStocks} onChange={this.handleStockSort} pagination={false} rowKey="id" />

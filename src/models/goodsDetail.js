@@ -131,18 +131,17 @@ export default {
     },
 
     setsingleGoodsDetail(state, { payload: { value, itemimage, usePricelelvel, priceModel, itemImageLevel } }) {
-      console.log(value);
       state.singleGoodsDetail = {};
-      state.singleGoodsDetail.item_ref = value.item_ref;
-      state.singleGoodsDetail.not_sale = value.not_sale;
-      state.singleGoodsDetail.purchase_price = value.purchase_price;
-      state.singleGoodsDetail.standard_price = value.standard_price;
-      state.singleGoodsDetail.name = value.name || '无';
-      state.singleGoodsDetail.desc = value.desc || '无';
+      state.singleGoodsDetail.item_ref = value.item_ref; // 货号
+      state.singleGoodsDetail.not_sale = value.not_sale; // 在售出售
+      state.singleGoodsDetail.purchase_price = value.purchase_price; // 进货价
+      state.singleGoodsDetail.standard_price = value.standard_price; // 标准价
+      state.singleGoodsDetail.name = value.name || '无'; // 名称
+      state.singleGoodsDetail.desc = value.desc || '无'; // 备注
 
       const priceMatrix = [...value.itemprices.data];
-      state.singleGoodsDetail.prices = {};
-      let flag = false;
+      state.singleGoodsDetail.prices = {}; // 价格等级价格组成
+      let flag = false; // 判断数据是否与策略相符合
       if (priceMatrix.length) {
         if (usePricelelvel == 'yes') {
           if (priceModel == '') {
@@ -282,10 +281,10 @@ export default {
           });
         }
       }
-      state.singleGoodsDetail.units = value.units.data.map(item => (`${item.name} x ( ${item.number} )`)).join('、');
-      let colors = [],
-        sizes = [];
-      state.singleGoodsDetail.images = [];
+      state.singleGoodsDetail.units = value.units.data.map(item => (`${item.name} x ( ${item.number} )`)).join('、'); // 单位
+      let colors = [], // 颜色
+        sizes = []; // 尺码
+      state.singleGoodsDetail.images = []; // 图片
       value.skus.data.forEach((item) => {
         item.skuattributes.data.forEach((subItem) => {
           if (subItem.skuattributetype_id === '1') {
@@ -305,6 +304,7 @@ export default {
             }
           }
         });
+        // 图片策略为sku
         if (itemImageLevel == 'sku') {
           item.skuimages && item.skuimages.data.forEach((subItem) => {
             state.singleGoodsDetail.images.push({
@@ -315,6 +315,7 @@ export default {
           });
         }
       });
+      // 图片策略为item
       if (itemImageLevel == 'item') {
         state.singleGoodsDetail.images = itemimage.map((item, index) => {
           return {
@@ -327,7 +328,6 @@ export default {
       state.singleGoodsDetail.colors = colors.map(item => item.name).join('、');
       state.singleGoodsDetail.sizes = sizes.map(item => item.name).join('、');
       state.singleGoodsDetail.goodsGroup = value.itemgroups.data.map(item => item.name).join('、');
-      console.log(state.singleGoodsDetail);
       return { ...state };
     },
 
@@ -476,6 +476,7 @@ export default {
     },
 
     setShowCustomerList(state, { payload }) {
+      // 客户列表数据包括散客
       const current = [];
       current.push(payload.guest);
       state.singleGoodsCustomers = [].concat(current, payload.list);
@@ -488,6 +489,7 @@ export default {
       if (payload.length === 0) {
         state.singleGoodsSales = payload;
       } else {
+        // 销售列表的sku有3个形式，1: 无颜色无尺码 2: 有颜色无尺码 3:有颜色有尺码
         payload.forEach((item, index) => {
           if (item.skuattributes.length == 0) {
             state.singleGoodsSales.push({
@@ -538,6 +540,7 @@ export default {
             }
           }
         });
+        // 有颜色有尺码
         if (Object.values(expandedRowRender).length != 0) {
           state.singleGoodsSales.forEach((item) => {
             item.children = expandedRowRender[item.id];

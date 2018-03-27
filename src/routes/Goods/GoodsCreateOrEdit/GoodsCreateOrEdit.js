@@ -390,24 +390,24 @@ export default class GoodsCreateOrEdit extends PureComponent {
             itemImageLevel: this.props.configSetting.itemImageLevel,
           } });
         //提交
-        // if (this.props.goodsCreateOrEdit.showData.id) {
-        //   this.props.dispatch({ type: 'goodsCreateOrEdit/editSingleGoods',
-        //     payload: {
-        //       serverData: this.props.goodsCreateOrEdit.serverData,
-        //       id: this.props.goodsCreateOrEdit.showData.id,
-        //       imageFile: this.props.goodsCreateOrEdit.imageFile,
-        //     } }).then(() => {
-        //     this.props.history.goBack();
-        //   });
-        // } else {
-        //   this.props.dispatch({ type: 'goodsCreateOrEdit/createSingleGoods',
-        //     payload: {
-        //       serverData: this.props.goodsCreateOrEdit.serverData,
-        //       imageFile: this.props.goodsCreateOrEdit.imageFile,
-        //     } }).then(() => {
-        //     this.props.dispatch(routerRedux.push('/goods-list'));
-        //   });
-        // }
+        if (this.props.goodsCreateOrEdit.showData.id) {
+          this.props.dispatch({ type: 'goodsCreateOrEdit/editSingleGoods',
+            payload: {
+              serverData: this.props.goodsCreateOrEdit.serverData,
+              id: this.props.goodsCreateOrEdit.showData.id,
+              imageFile: this.props.goodsCreateOrEdit.imageFile,
+            } }).then(() => {
+            this.props.history.goBack();
+          });
+        } else {
+          this.props.dispatch({ type: 'goodsCreateOrEdit/createSingleGoods',
+            payload: {
+              serverData: this.props.goodsCreateOrEdit.serverData,
+              imageFile: this.props.goodsCreateOrEdit.imageFile,
+            } }).then(() => {
+            this.props.dispatch(routerRedux.push('/goods-list'));
+          });
+        }
       }
     });
   }
