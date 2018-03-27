@@ -14,6 +14,7 @@ export default {
     singleSupplierPaymentHistory: [],
     singleSupplierPurchaseorders: [],
     singleSupplierStatements: [],
+    singleSupplierPayments: [],
     saleHistoryFilter: [],
     goodsHistoryFilter: [],
     paymentHistoryFilter: [],
@@ -61,7 +62,7 @@ export default {
         },
         id: payload.id,
       };
-      const [data1, data2, data3, data4, data5, data6, data7] = yield all([
+      const [data1, data2, data3, data4, data5, data6, data7, data8] = yield all([
         call(supplierService.getSingle, payload),
         call(supplierService.getSupplierSaleHistory, condition),
         call(supplierService.getSupplierGoodsHistory, conditionWTwo),
@@ -69,6 +70,7 @@ export default {
         call(supplierService.getPurchaseorderNeedPay, conditionWThree),
         call(supplierService.getStatementsNeedPay, conditionWThree),
         call(supplierService.getSupplierFinance, payload),
+        call(supplierService.getSupplierPayments, conditionWThree),
       ]);
 
       yield put({ type: 'setShowData', payload: data1.result.data });
@@ -84,6 +86,7 @@ export default {
           singleSupplierStatements: data6.result.data,
           currentId: payload,
           singleSupplierFinance: data7.result.data,
+          singleSupplierPayments: data8.result.data,
         } });
     },
 
@@ -129,6 +132,14 @@ export default {
       yield put({ type: 'setState',
         payload: {
           singleSupplierStatements: data.result.data,
+        } });
+    },
+
+    *getPayments({ payload }, { call, put }) {
+      const data = yield call(supplierService.getCustomerPayments, payload);
+      yield put({ type: 'setState',
+        payload: {
+          singleSupplierPayments: data.result.data,
         } });
     },
 

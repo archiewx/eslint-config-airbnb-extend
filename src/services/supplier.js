@@ -55,6 +55,16 @@ export async function getSupplierFinance(params) {
   });
 }
 
+export async function getSupplierPayments(params) {
+  const current = { ...params };
+  delete current.id;
+  return request(`${apiBase}/api/suppliers/${params.id}/balance/record`, {
+    method: 'POST',
+    headers: { Authorization: token() },
+    body: current,
+  });
+}
+
 export async function getPurchaseorderNeedPay(params) {
   const condition = {
     sorts: params.sorts,

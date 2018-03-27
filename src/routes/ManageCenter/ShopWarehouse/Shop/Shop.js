@@ -39,7 +39,7 @@ export default class Shop extends PureComponent {
   handleModalOk = (value) => {
     /*
       组装数据
-      仓库 [{id}] 
+      仓库 [{id}]
       商品分组 [{id}]
     */
     let warehouseData,

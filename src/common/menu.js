@@ -123,7 +123,7 @@ const menuData = [{
     }],
   }],
 }, {
-  name: 'version：0.0.4',
+  name: 'version：0.0.5',
   icon: 'version_number',
 },
 // {

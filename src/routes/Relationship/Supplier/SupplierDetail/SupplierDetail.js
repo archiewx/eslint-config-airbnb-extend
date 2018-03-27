@@ -5,10 +5,9 @@ import moment from 'moment';
 import currency from 'currency.js';
 import { Row, Col, Card, Button, Icon, Menu, Dropdown, Popconfirm, Divider, Radio, Table, Form, DatePicker } from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
-import StandardFormRow from '../../../../components/antd-pro/StandardFormRow';
+import FilterDatePick from '../../../../components/FilterDatePick';
 import DescriptionList from '../../../../components/antd-pro/DescriptionList';
 import LightBoxImage from '../../../../components/LightBoxImage/LightBoxImage';
-import TagSelect from '../../../../components/DuokeTagSelect';
 import styles from './SupplierDetail.less';
 
 const NCNF = value => currency(value, { symbol: '', precision: 2 });
@@ -44,23 +43,7 @@ const tabListNoTitle = [{
   key: 'settle',
   tab: '未付款结算单',
 }];
-const salePagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
-};
-const goodsPagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
-};
-const paymentPagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
-};
-const purchaseorderPagination = {
-  showQuickJumper: true,
-  showSizeChanger: true,
-};
-const settlesorderPagination = {
+const pagination = {
   showQuickJumper: true,
   showSizeChanger: true,
 };
@@ -119,6 +102,10 @@ export default class SupplierDetail extends PureComponent {
       per_page: 10,
     },
     pageStatement: {
+      page: 1,
+      per_page: 10,
+    },
+    pagePayments: {
       page: 1,
       per_page: 10,
     },
@@ -320,9 +307,30 @@ export default class SupplierDetail extends PureComponent {
       } });
   }
 
+  handlePaymentsSort = (pagination, filter, sorter) => {
+    const pagePayments = {
+      page: pagination.current,
+      per_page: pagination.pageSize,
+    };
+    this.setState({ pagePayments });
+    let sorts = {};
+    if (sorter.field) {
+      sorts[sorter.field] = sorter.order.slice(0, sorter.order.length - 3);
+    } else {
+      sorts = {
+        created_at: 'desc',
+      };
+    }
+    this.props.dispatch({ type: 'supplierDetail/getPayments',
+      payload: {
+        sorts,
+        id: this.props.supplierDetail.currentId.id,
+      } });
+  }
+
   render() {
-    const { singleSupplierDetail, singleSupplierFinance, singleSupplierSaleHistory, singleSupplierGoodsHistory, singleSupplierPaymentHistory, saleHistoryFilter, goodsHistoryFilter, paymentHistoryFilter, currentId, singleSupplierPurchaseorders, singleSupplierStatements } = this.props.supplierDetail;
-    const { activeTabKey, activeDebtTabKey, pageSaleHistory, pageGoodsHistory, pagePaymentHistory, pagePurchaseorder, pageStatement } = this.state;
+    const { singleSupplierDetail, singleSupplierFinance, singleSupplierSaleHistory, singleSupplierGoodsHistory, singleSupplierPaymentHistory, saleHistoryFilter, goodsHistoryFilter, paymentHistoryFilter, currentId, singleSupplierPurchaseorders, singleSupplierStatements, singleSupplierPayments } = this.props.supplierDetail;
+    const { activeTabKey, activeDebtTabKey, pageSaleHistory, pageGoodsHistory, pagePaymentHistory, pagePurchaseorder, pageStatement, pagePayments } = this.state;
     const { getFieldDecorator } = this.props.form;
     const description = (
       <DescriptionList size="small" col="2" className={styles.descriptionPostion}>
@@ -333,7 +341,7 @@ export default class SupplierDetail extends PureComponent {
     const menu = (
       <Menu style={{ width: 109 }}>
         <Menu.Item key="1">
-          <Popconfirm title="确认删除此供应商?" placement="bottom" onConfirm={this.handleDeleteSingleSupplier.bind(null, currentId.id)}><span style={{width: '100%',display:'inline-block'}}>删除</span></Popconfirm>
+          <Popconfirm title="确认删除此供应商?" placement="bottom" onConfirm={this.handleDeleteSingleSupplier.bind(null, currentId.id)}><span style={{ width: '100%', display: 'inline-block' }}>删除</span></Popconfirm>
         </Menu.Item>
       </Menu>
     );
@@ -392,7 +400,7 @@ export default class SupplierDetail extends PureComponent {
       title: '操作',
       dataIndex: 'operation',
       width: '10%',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) => (<Link to={`/bill/purchase-detail/${record.id}`}>查看</Link>),
     }];
 
     const goodsColumns = [{
@@ -453,7 +461,7 @@ export default class SupplierDetail extends PureComponent {
       title: '操作',
       width: '10',
       dataIndex: 'operation',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) => (<Link to={`/finance/payments-detail/${record.id}`}>查看</Link>),
     }];
 
     const purchaseorderColumns = [{
@@ -484,7 +492,7 @@ export default class SupplierDetail extends PureComponent {
       title: '操作',
       width: '10%',
       dataIndex: 'operation',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) => (<Link to={`/bill/purchase-detail/${record.id}`}>查看</Link>),
     }];
 
     const statementColumns = [{
@@ -509,6 +517,36 @@ export default class SupplierDetail extends PureComponent {
     }, {
       title: '创建时间',
       width: '25%',
+      dataIndex: 'created_at',
+      sorter: true,
+    }, {
+      title: '操作',
+      width: '10%',
+      dataIndex: 'operation',
+      render: (text, record) => (<Link to={`/finance/purchase-settle-detail/${record.id}`}>查看</Link>),
+    }];
+
+
+    const purchasesColumns = [{
+      title: '流水号',
+      dataIndex: 'number',
+      width: '20%',
+      render: (text, record) => (`#${record.number}`),
+    }, {
+      title: '支付方式',
+      dataIndex: 'paymentWay',
+      sorter: true,
+      render: (text, record) => record.paymentmethod.data.name,
+    }, {
+      title: '金额',
+      dataIndex: 'value',
+      width: '20%',
+      className: styles.numberRightMove,
+      sorter: true,
+      render: (text, record) => NCNF(record.value).format(true),
+    }, {
+      title: '创建时间',
+      width: '30%',
       dataIndex: 'created_at',
       sorter: true,
     }, {
@@ -597,16 +635,19 @@ export default class SupplierDetail extends PureComponent {
           </Card>
           <Card bordered={false} tabList={tabListNoTitle} onTabChange={this.handleDebtTabChange}>
             <div style={{ display: activeDebtTabKey == 'balance' ? 'block' : 'none' }}>
-              {'emmmm………'}
+              <Table columns={purchasesColumns} dataSource={singleSupplierPayments} onChange={this.handlePaymentsSort} pagination={pagination} rowKey="id" />
+              <div style={{ marginTop: -43, width: 300 }}>
+                <span>{`共 ${singleSupplierPayments.length || ''} 条流水 第 ${pagePayments.page} / ${Math.ceil(Number(singleSupplierPayments.length) / Number(pagePayments.per_page))} 页`}</span>
+              </div>
             </div>
             <div style={{ display: activeDebtTabKey == 'purchase' ? 'block' : 'none' }}>
-              <Table columns={purchaseorderColumns} dataSource={singleSupplierPurchaseorders} onChange={this.handlePurchaseorderSort} pagination={purchaseorderPagination} rowKey="id" />
+              <Table columns={purchaseorderColumns} dataSource={singleSupplierPurchaseorders} onChange={this.handlePurchaseorderSort} pagination={pagination} rowKey="id" />
               <div style={{ marginTop: -43, width: 300 }}>
                 <span>{`共 ${singleSupplierPurchaseorders.length || ''} 条进货单 第 ${pagePurchaseorder.page} / ${Math.ceil(Number(singleSupplierPurchaseorders.length) / Number(pagePurchaseorder.per_page))} 页`}</span>
               </div>
             </div>
             <div style={{ display: activeDebtTabKey == 'settle' ? 'block' : 'none' }}>
-              <Table columns={statementColumns} dataSource={singleSupplierStatements} onChange={this.handleStatementSort} pagination={settlesorderPagination} rowKey="id" />
+              <Table columns={statementColumns} dataSource={singleSupplierStatements} onChange={this.handleStatementSort} pagination={pagination} rowKey="id" />
               <div style={{ marginTop: -43, width: 300 }}>
                 <span>{`共 ${singleSupplierStatements.length || ''} 条结算单 第 ${pageStatement.page} / ${Math.ceil(Number(singleSupplierStatements.length) / Number(pageStatement.per_page))} 页`}</span>
               </div>
@@ -615,37 +656,10 @@ export default class SupplierDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'sale' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout="inline">
-              {
-                saleHistoryFilter.map((item, index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`sale_${item.code}`)(
-                          <TagSelect expandable onChange={this.handleSaleFormSubmit}>
-                            {
-                              item.options.map((subItem, subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>;
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  );
-                })
-              }
-              <FormItem label="选择日期" >
-                {getFieldDecorator('sale_datePick', {
-                  initialValue: [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
-                })(
-                  <RangePicker style={{ width: 542 }} onChange={this.handleSaleFormSubmit} />
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handleSaleFormSubmit} filterOptions={saleHistoryFilter} tagLabel="sale" dateLabel="sale" />
           </Card>
           <Card bordered={false}>
-            <Table columns={saleColumns} dataSource={singleSupplierSaleHistory} onChange={this.handleSaleHistorySort} pagination={salePagination} rowKey="id" />
+            <Table columns={saleColumns} dataSource={singleSupplierSaleHistory} onChange={this.handleSaleHistorySort} pagination={pagination} rowKey="id" />
             <div style={{ marginTop: -43, width: 300 }}>
               <span>{`共 ${singleSupplierSaleHistory.length || ''} 条进货单 第 ${pageSaleHistory.page} / ${Math.ceil(Number(singleSupplierSaleHistory.length) / Number(pageSaleHistory.per_page))} 页`}</span>
             </div>
@@ -653,37 +667,10 @@ export default class SupplierDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'goods' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout="inline">
-              {
-                goodsHistoryFilter.map((item, index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem>
-                        {getFieldDecorator(`goods_${item.code}`)(
-                          <TagSelect expandable onChange={this.handleGoodsFormSubmit}>
-                            {
-                              item.options.map((subItem, subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>;
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  );
-                })
-              }
-              <FormItem label="选择日期" >
-                {getFieldDecorator('goods_datePick', {
-                  initialValue: [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
-                })(
-                  <RangePicker style={{ width: 542 }} onChange={this.handleGoodsFormSubmit} />
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handleGoodsFormSubmit} filterOptions={goodsHistoryFilter} tagLabel="goods" dateLabel="goods" />
           </Card>
           <Card bordered={false}>
-            <Table columns={goodsColumns} dataSource={singleSupplierGoodsHistory} onChange={this.handleGoodsHistorySort} pagination={goodsPagination} rowKey="id" />
+            <Table columns={goodsColumns} dataSource={singleSupplierGoodsHistory} onChange={this.handleGoodsHistorySort} pagination={pagination} rowKey="id" />
             <div style={{ marginTop: -43, width: 300 }}>
               <span>{`共 ${singleSupplierGoodsHistory.length || ''} 件商品 第 ${pageGoodsHistory.page} / ${Math.ceil(Number(singleSupplierGoodsHistory.length) / Number(pageGoodsHistory.per_page))} 页`}</span>
             </div>
@@ -691,37 +678,10 @@ export default class SupplierDetail extends PureComponent {
         </div>
         <div style={{ display: activeTabKey == 'payment' ? 'block' : 'none' }}>
           <Card bordered={false} className={styles.bottomCardDivided}>
-            <Form layout="inline">
-              {
-                paymentHistoryFilter.map((item, index) => {
-                  return item.options.length == 0 ? null : (
-                    <StandardFormRow key={`${index}`} title={`${item.name}`} block>
-                      <FormItem expandable >
-                        {getFieldDecorator(`payment_${item.code}`)(
-                          <TagSelect onChange={this.handlePaymentFormSubmit}>
-                            {
-                              item.options.map((subItem, subIndex) => {
-                                return <TagSelect.Option key={`${subIndex}`} value={`${subItem.value}`}>{subItem.name}</TagSelect.Option>;
-                              })
-                            }
-                          </TagSelect>
-                        )}
-                      </FormItem>
-                    </StandardFormRow>
-                  );
-                })
-              }
-              <FormItem label="选择日期" >
-                {getFieldDecorator('payment_datePick', {
-                  initialValue: [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
-                })(
-                  <RangePicker style={{ width: 542 }} onChange={this.handlePaymentFormSubmit} />
-                )}
-              </FormItem>
-            </Form>
+            <FilterDatePick onChange={this.handlePaymentFormSubmit} filterOptions={paymentHistoryFilter} tagLabel="payment" dateLabel="payment" />
           </Card>
           <Card bordered={false}>
-            <Table columns={paymentColumns} dataSource={singleSupplierPaymentHistory} onChange={this.handlePaymentHistorySort} pagination={paymentPagination} rowKey="id" />
+            <Table columns={paymentColumns} dataSource={singleSupplierPaymentHistory} onChange={this.handlePaymentHistorySort} pagination={pagination} rowKey="id" />
             <div style={{ marginTop: -43, width: 300 }}>
               <span>{`共 ${singleSupplierPaymentHistory.length || ''} 条流水 第 ${pagePaymentHistory.page} / ${Math.ceil(Number(singleSupplierPaymentHistory.length) / Number(pagePaymentHistory.per_page))} 页`}</span>
             </div>

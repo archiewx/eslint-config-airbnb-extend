@@ -5,21 +5,21 @@ import DuokeIcon from '../../components/DuokeIcon';
 
 export default class Test extends PureComponent {
   state = {
-    q: null
+    q: null,
   }
 
   handleChange = (value) => {
     this.setState({
-      q: value
-    })
+      q: value,
+    });
   }
 
   handleFormat = (value) => {
-    return (value.toString()).replace(/[^\d+(\.\d{2})?$]/,'');
+    return (value.toString()).replace(/[^\d+(\.\d{2})?$]/, '');
   }
 
   handleParser = (value) => {
-    return value
+    return value;
   }
 
   render() {

@@ -20,7 +20,7 @@ const tabList = [{
 }))
 export default class Size extends PureComponent {
   state = {
-    activeTabKey: 'sizeLibrary', 
+    activeTabKey: 'sizeLibrary',
     sizeLibraryModalVisibel: false,
     sizeLibraryModalType: '',
     sizeLibraryModalFormValue: {},
@@ -64,13 +64,13 @@ export default class Size extends PureComponent {
     this.setState({
       sizeLibraryModalVisibel: false,
     });
-    this.props.dispatch({type: `size/${this.state.sizeLibraryModalType === 'create' ? 'createSizeLibrarySingle' : 'editSizeLibrarySingle'}` ,payload: value}).then( result => {
+    this.props.dispatch({ type: `size/${this.state.sizeLibraryModalType === 'create' ? 'createSizeLibrarySingle' : 'editSizeLibrarySingle'}`, payload: value }).then((result) => {
       if (result.code != 0) {
         message.error(`${result.message}`);
       } else {
         this.props.dispatch({ type: 'size/getSizeLibrary' });
       }
-    })
+    });
   }
 
   // 尺码库删除
@@ -254,7 +254,7 @@ export default class Size extends PureComponent {
     return (
       <PageHeaderLayout breadcrumbList={breadCrumbList(this.props.history.location.pathname)} tabList={tabList} activeTabKey={activeTabKey} onTabChange={this.handleTabChange}>
         <div style={{ display: activeTabKey == 'sizeLibrary' ? 'block' : 'none' }}>
-          <Card bordered={false} title="尺码库列表" extra={sizeLibraryAction}  >
+          <Card bordered={false} title="尺码库列表" extra={sizeLibraryAction} >
             <Table dataSource={sizeLibrarys} columns={sizeLibraryColumns} rowKey="id" pagination={false} />
           </Card>
         </div>

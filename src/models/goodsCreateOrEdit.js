@@ -65,14 +65,14 @@ export default {
     },
 
     setShowData(state, { payload: { value, itemimage, usePricelelvel, priceModel, itemBarcodeLevel, itemImageLevel } }) {
-      state.showData.id = value.id; //商品id
-      state.showData.item_ref = value.item_ref; //货号
-      state.showData.standard_price = (value.standard_price).toString(); //标准价
-      state.showData.purchase_price = (value.purchase_price).toString(); //进货价就
+      state.showData.id = value.id; // 商品id
+      state.showData.item_ref = value.item_ref; // 货号
+      state.showData.standard_price = (value.standard_price).toString(); // 标准价
+      state.showData.purchase_price = (value.purchase_price).toString(); // 进货价就
       let priceMatrix = [...value.itemprices.data];
       priceMatrix = priceMatrix.splice(0, priceMatrix.length - 1);
       state.showData.prices = {}; // 价格组成&价格等级
-      let flag = false; //判断当前的价格组成的策略与数据相符合
+      let flag = false; // 判断当前的价格组成的策略与数据相符合
       if (priceMatrix.length) {
         if (usePricelelvel == 'yes') {
           if (priceModel == '') {
@@ -182,10 +182,10 @@ export default {
       state.showData.units = value.units.data.map((item) => {
         return (item.id).toString();
       });
-      state.showData.name = value.name; //名称
-      state.showData.desc = value.desc; //备注
-      state.showData.goodsGroup = {}; //商品分组
-      let alreadyExitItemGroups = [];
+      state.showData.name = value.name; // 名称
+      state.showData.desc = value.desc; // 备注
+      state.showData.goodsGroup = {}; // 商品分组
+      const alreadyExitItemGroups = [];
       value.itemgroups.data.forEach((item) => {
         if (alreadyExitItemGroups.some(n => n == item.parent_id)) {
           state.showData.goodsGroup[`${item.parent_id}`].push(item.id);
@@ -220,10 +220,10 @@ export default {
           }
         });
       });
-      state.showData.imageFile = {}; //图片
-      state.showData.stocks = {}; //库存
-      state.showData.barcodes = {}; //条码
-      state.showData.barcodeId = {}; //skuId
+      state.showData.imageFile = {}; // 图片
+      state.showData.stocks = {}; // 库存
+      state.showData.barcodes = {}; // 条码
+      state.showData.barcodeId = {}; // skuId
       state.showData.imageFile = {};
       if (state.showData.colors.length == 0) {
         value.skus.data.forEach((item) => {
@@ -324,12 +324,13 @@ export default {
           });
         });
       }
-      console.log(state.showData)
+      console.log(state.showData);
       return { ...state };
     },
 
 
-    setServerData(state, { payload: { value, selectColors, selectUnits, selectQuantityStep, warehouses, priceModel, itemBarcodeLevel, itemImageLevel } }) {      itemImageLevel === 'item' ? state.serverData.itemimages = picture.fileName : null;
+    setServerData(state, { payload: { value, selectColors, selectUnits, selectQuantityStep, warehouses, priceModel, itemBarcodeLevel, itemImageLevel } }) {
+      itemImageLevel === 'item' ? state.serverData.itemimages = picture.fileName : null;
       itemBarcodeLevel === 0 ? state.serverData.barcode = value.barcode.barcode : null;
       return { ...state };
     },

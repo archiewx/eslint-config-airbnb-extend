@@ -15,6 +15,7 @@ export default class LoginPage extends Component {
   }
 
   componentWillReceiveProps({ login }) {
+    // 生成二维码
     QRCode.toDataURL(login.qrcode || '', { errorCorrectionLevel: 'H', color: { light: '#F0F2F5' }, width: 220 }).then((url) => {
       if (url && !login.isQuerying) {
         const img = document.getElementById('login_qrcode');

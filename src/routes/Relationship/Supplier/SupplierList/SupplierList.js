@@ -207,9 +207,9 @@ export default class SupplierList extends PureComponent {
       render: (text, record) => NCNF(record.trade_amount).format(true),
     }, {
       title: '他欠我金额',
-      dataIndex: 'balance',
+      dataIndex: 'debt',
       className: styles.numberRightMove,
-      render: (text, record) => NCNF(record.balance).format(true),
+      render: (text, record) => NCNF(record.debt).format(true),
     }, {
       title: '操作',
       dataIndex: 'operation',
