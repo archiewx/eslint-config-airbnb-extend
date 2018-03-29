@@ -8,7 +8,7 @@ import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import FilterDatePick from '../../../../components/FilterDatePick';
 import styles from './SaleOrderList.less';
 
-const NCNF = value => currency(value, { symbol: '', precision: 2 });
+const NCNF = value => currency(value, { symbol: '', precision: 2 }) ;
 const NCNI = value => currency(value, { symbol: '', precision: 0 });
 const Option = Select.Option;
 let confirmModal;
