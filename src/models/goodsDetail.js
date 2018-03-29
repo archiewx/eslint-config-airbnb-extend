@@ -120,7 +120,7 @@ export default {
 
     *getSingleStocks({ payload }, { call, put }) {
       const data = yield call(goodsService.getSingleStocks, payload);
-      yield put({ type: 'setShowStockList', payload: data.result.data.list });
+      yield put({type: 'setShowStockList', payload: data.result.data.list});
     },
   },
 
