@@ -5,9 +5,7 @@ import pathToRegexp from 'path-to-regexp';
 import { Row, Col, Card, Button, Input, Table, Icon, Select, Menu, Dropdown, Popconfirm, Divider, Form, InputNumber, Spin, Radio } from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import FooterToolbar from '../../../../components/antd-pro/FooterToolbar';
-import TagSelect from '../../../../components/antd-pro/TagSelect';
 import SelectInput from '../../../../components/SelectInput/SelectInput';
-import SelectMultiple from '../../../../components/SelectMultiple/SelectMultiple';
 import CustomerPictureModal from '../../../../components/RelationPictureModal/RelationPictureModal';
 import CustomerModal from './CustomerModal';
 import styles from './CustomerCreateOrEdit.less';
@@ -55,6 +53,9 @@ export default class CustomerCreateOrEdit extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
+    if(!this.props.form.getFieldValue('addresses')) {
+      this.props.form.getFieldDecorator('addresses',{initialValue: []})
+    }
     if (!this.state.addresses.length && nextProps.customerCreateOrEdit.showData.addresses) {
       this.setState({
         addresses: JSON.parse(JSON.stringify(nextProps.customerCreateOrEdit.showData.addresses)) || [],
@@ -87,6 +88,12 @@ export default class CustomerCreateOrEdit extends PureComponent {
   handleModalOk = (value) => {
     const addresses = this.state.addresses;
     if (addresses.some(item => item.uid == value.uid)) {
+      const detail = JSON.parse(localStorage.getItem('country')).map( n => {
+        if(n.value == value.location[0]) {
+          return `${n.label}${n.children.find( m => m.value == value.location[1]).label}`
+        }
+      }).filter( _ => _)[0]
+      value.detailCity = detail
       addresses[addresses.findIndex(item => item.uid == value.uid)] = value;
       this.setState({
         addresses: [...addresses],
@@ -94,6 +101,12 @@ export default class CustomerCreateOrEdit extends PureComponent {
       });
     } else {
       const uid = ++this.state.uid;
+      const detail = JSON.parse(localStorage.getItem('country')).map( n => {
+        if(n.value == value.location[0]) {
+          return `${n.label}${n.children.find( m => m.value == value.location[1]).label}`
+        }
+      }).filter( _ => _)[0]
+      value.detailCity = detail
       addresses.push(value);
       this.setState({
         addresses: [...addresses],
@@ -101,7 +114,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
         uid,
       });
     }
-    this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
+    this.props.form.setFieldsValue({'addresses': addresses });
   }
 
   handleRadioSelect = (uid, e) => {
@@ -113,7 +126,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
     this.setState({
       addresses: [...addresses],
     });
-    this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
+    this.props.form.setFieldsValue({'addresses': addresses });
   }
 
   handleDeleteAddress = (item) => {
@@ -126,13 +139,13 @@ export default class CustomerCreateOrEdit extends PureComponent {
       addresses[0].default = 1;
     }
     this.setState({ addresses: [...addresses] });
-    this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
+    this.props.form.setFieldsValue({'addresses': addresses });
   }
 
   handleSubmit = (e) => {
     const { validateFields, setFieldsValue, getFieldDecorator, getFieldsValue } = this.props.form;
     e.preventDefault();
-    if (!getFieldsValue().addresses) getFieldDecorator('addresses', { initialValue: this.state.addresses });
+    if (!getFieldsValue().addresses) setFieldsValue({'addresses':  this.state.addresses} );
     validateFields((err, value) => {
       if (!err) {
         this.props.dispatch({ type: 'customerCreateOrEdit/setServerData', payload: value });
@@ -272,7 +285,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
                             {
                               item.children && item.children.map((subItem) => {
                                 return (
-                                  <Option key={subItem.id}>{subItem.name}</Option>
+                                  <Option key={subItem.uid}>{subItem.name}</Option>
                                 );
                               })
                             }
@@ -329,7 +342,7 @@ export default class CustomerCreateOrEdit extends PureComponent {
                       <label className={styles.labelTitle}>手机号：</label><span>{item.phone}</span>
                     </Col>
                     <Col span={13}>
-                      <label className={styles.labelTitle}>收货地址：</label><span>{item.address}</span>
+                      <label className={styles.labelTitle}>收货地址：</label><span>{item.detailCity}{item.address}</span>
                     </Col>
                   </Row>
                   <div style={{ marginTop: 24 }}>

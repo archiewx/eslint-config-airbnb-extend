@@ -147,7 +147,7 @@ export default class GoodsDetail extends PureComponent {
   }
 
   // 筛选
-  handleSaleFilter = () => {
+  handleSaleFilter = (value) => {
     this.props.dispatch({ type: 'goodsDetail/setFilterSaleServerData',
       payload: {
         ...value,
@@ -183,7 +183,7 @@ export default class GoodsDetail extends PureComponent {
   }
 
   // 筛选
-  handlePurchaseFilter = () => {
+  handlePurchaseFilter = (value) => {
     this.props.dispatch({ type: 'goodsDetail/setFilterPurchaseServerData',
       payload: {
         ...value,
@@ -225,7 +225,7 @@ export default class GoodsDetail extends PureComponent {
   }
 
   // 筛选
-  handleCustomerFilter = () => {
+  handleCustomerFilter = (value) => {
     this.props.dispatch({ type: 'goodsDetail/setFilterCustomerServerData',
       payload: {
         ...value,
@@ -278,7 +278,7 @@ export default class GoodsDetail extends PureComponent {
   }
 
   // 筛选
-  handleSupplierFilter = () => {
+  handleSupplierFilter = (value) => {
     this.props.dispatch({ type: 'goodsDetail/setFilterSupplierServerData',
       payload: {
         ...value,
@@ -314,7 +314,7 @@ export default class GoodsDetail extends PureComponent {
   }
 
   // 筛选
-  handleStockFilter = () => {
+  handleStockFilter = (value) => {
     this.props.dispatch({ type: 'goodsDetail/setFilterStockServerData',
       payload: {
         ...value,

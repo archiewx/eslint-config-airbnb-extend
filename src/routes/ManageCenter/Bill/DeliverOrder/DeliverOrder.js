@@ -81,6 +81,8 @@ export default class DeliverOrder extends PureComponent {
       name: item.name,
       use: '',
     };
+    // current.use = item.use == 1 ? 0 : 1;
+    // current.use = Number(!(item.use == 1))
     item.use == 1 ? current.use = 0 : current.use = 1;
     this.props.dispatch({ type: 'logistics/editSingle', payload: current }).then(() => {
       this.props.dispatch({ type: 'logistics/getList' });

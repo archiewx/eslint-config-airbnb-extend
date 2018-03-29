@@ -24,7 +24,6 @@ export default class Inventory extends PureComponent {
   }
 
   componentDidMount() {
-    // this.props.dispatch({type:'color/getList'})
   }
 
   handleModalOpen = (item) => {

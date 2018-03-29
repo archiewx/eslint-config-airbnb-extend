@@ -66,6 +66,7 @@ export default {
           location: [item.province_id, item.city_id],
           default: item.default,
           address: item.address,
+          detailCity: `${item.province_name || ''}${item.city_name || ''}`
         };
       });
       state.showData.imageFile = [];
@@ -81,7 +82,6 @@ export default {
     },
 
     setServerData(state, { payload }) {
-      console.log(payload);
       state.serverData.name = payload.name;
       state.serverData.phone = payload.phone;
       state.serverData.wechat = payload.wechat;
@@ -90,7 +90,7 @@ export default {
       state.serverData.customergroups = [];
       for (const key in payload) {
         if (key.indexOf('customerGroup_') > -1 && payload[key]) {
-          state.serverData.customergroups.push(payload[key]);
+          state.serverData.customergroups.push(Number(payload[key]));
         }
       }
       state.serverData.addresses = (payload.addresses || []).map((item) => {
@@ -128,7 +128,6 @@ export default {
           state.serverData.attachments.push(item.name);
         }
       });
-      console.log(state.serverData);
       return { ...state };
     },
   },

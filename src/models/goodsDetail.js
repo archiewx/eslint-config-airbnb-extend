@@ -131,6 +131,7 @@ export default {
     },
 
     setsingleGoodsDetail(state, { payload: { value, itemimage, usePricelelvel, priceModel, itemImageLevel } }) {
+      console.log(value)
       state.singleGoodsDetail = {};
       state.singleGoodsDetail.item_ref = value.item_ref; // 货号
       state.singleGoodsDetail.not_sale = value.not_sale; // 在售出售
@@ -606,7 +607,6 @@ export default {
           }
         });
         if (Object.values(expandedRowRender).length != 0) {
-          console.log(expandedRowRender);
           state.singleGoodsPurchases.forEach((item) => {
             item.children = expandedRowRender[item.id];
             item.purchase_quantity = expandedRowRender[item.id].reduce((sum, item) => (sum, Number(item.purchase_quantity)), 0);
@@ -642,7 +642,7 @@ export default {
             });
           } else if (item.skuattributes.length == 2) {
             if (state.singleGoodsStocks.some(n => n.id == item.skuattributes[0].id)) {
-              expandedRowRender[`${item.id}`].push({
+              expandedRowRender[`${item.skuattributes[0].id}`].push({
                 id: `${item.skuattributes[1].id}_${index}`,
                 name: item.skuattributes[1].name,
                 sales_quantity: item.sales_quantity,

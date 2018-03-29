@@ -70,6 +70,12 @@ export default class SupplierCreateOrEdit extends PureComponent {
   handleModalOk = (value) => {
     const addresses = this.state.addresses;
     if (addresses.some(item => item.uid == value.uid)) {
+      const detail = JSON.parse(localStorage.getItem('country')).map( n => {
+        if(n.value == value.location[0]) {
+          return `${n.label}${n.children.find( m => m.value == value.location[1]).label}`
+        }
+      }).filter( _ => _)[0]
+      value.detailCity = detail
       addresses[addresses.findIndex(item => item.uid == value.uid)] = value;
       this.setState({
         addresses: [...addresses],
@@ -77,6 +83,12 @@ export default class SupplierCreateOrEdit extends PureComponent {
       });
     } else {
       const uid = ++this.state.uid;
+      const detail = JSON.parse(localStorage.getItem('country')).map( n => {
+        if(n.value == value.location[0]) {
+          return `${n.label}${n.children.find( m => m.value == value.location[1]).label}`
+        }
+      }).filter( _ => _)[0]
+      value.detailCity = detail
       addresses.push(value);
       this.setState({
         addresses: [...addresses],
@@ -255,7 +267,7 @@ export default class SupplierCreateOrEdit extends PureComponent {
                         <label className={styles.labelTitle}>手机号：</label><span>{item.phone}</span>
                       </Col>
                       <Col span={13}>
-                        <label className={styles.labelTitle}>收货地址：</label><span>{item.address}</span>
+                        <label className={styles.labelTitle}>收货地址：</label><span>{item.detailCity}{item.address}</span>
                       </Col>
                     </Row>
                     <div style={{ marginTop: 24 }}>

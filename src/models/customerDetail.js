@@ -162,9 +162,9 @@ export default {
     },
 
     setShowData(state, { payload }) {
-      state.singleCustomerDetail.name = payload.name;
-      state.singleCustomerDetail.phone = payload.phone;
-      state.singleCustomerDetail.vip = payload.vip && payload.vip.data.name;
+      state.singleCustomerDetail.name = payload.name; //名称
+      state.singleCustomerDetail.phone = payload.phone || '无'; //电话
+      state.singleCustomerDetail.vip = payload.vip && payload.vip.data.name || '无'; 
       state.singleCustomerDetail.debt = payload.debt;
       state.singleCustomerDetail.total_points = payload.total_points;
       state.singleCustomerDetail.basicDetail = [];
@@ -184,7 +184,7 @@ export default {
 
       payload.customergroups.data.forEach((item) => {
         state.singleCustomerDetail.basicDetail.push({
-          parentName: item.parent.data[0].name,
+          parentName: (item.parent.data[0] || {}).name || '',
           name: item.name,
         });
       });

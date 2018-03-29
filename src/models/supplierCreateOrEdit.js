@@ -67,6 +67,7 @@ export default {
           location: [item.province_id, item.city_id],
           default: item.default,
           address: item.address,
+          detailCity: `${item.province_name || ''}${item.city_name || ''}`
         };
       });
       state.showData.imageFile = [];

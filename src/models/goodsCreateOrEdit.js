@@ -324,12 +324,210 @@ export default {
           });
         });
       }
-      console.log(state.showData);
       return { ...state };
     },
 
 
     setServerData(state, { payload: { value, selectColors, selectUnits, selectQuantityStep, warehouses, priceModel, itemBarcodeLevel, itemImageLevel } }) {
+      state.serverData = {};
+      state.serverData.item_ref = value.item_ref;
+      state.serverData.standard_price = value.standard_price;
+      state.serverData.purchase_price = value.purchase_price || 0;
+      state.serverData.prices = [];
+      if (priceModel == '') {
+        state.serverData.prices = Object.values(value.prices_table);
+        state.serverData.prices.push({
+          price: value.standard_price,
+        });
+      } else if (priceModel == 'shop') {
+        state.serverData.prices = Object.values(value.prices_table);
+        state.serverData.prices.push({
+          price: value.standard_price,
+        });
+      } else if (priceModel == 'unit') {
+        Object.values(value.prices_table).forEach((item) => {
+          if (value.unit_select.some(n => n == item.unit_id)) {
+            state.serverData.prices.push(item);
+          }
+        });
+        state.serverData.prices.push({
+          price: value.standard_price,
+        });
+      } else if (priceModel == 'quantityrange') {
+        Object.values(value.prices_table).forEach((item) => {
+          if (selectQuantityStep.some(n => n.id == item.quantityrange_id)) {
+            state.serverData.prices.push(item);
+          }
+        });
+        state.serverData.prices.push({
+          price: value.standard_price,
+        });
+      }
+      state.serverData.units = selectUnits.map((item) => {
+        return {
+          id: item.id,
+          number: item.number,
+        };
+      });
+      state.serverData.name = value.name || '';
+      state.serverData.desc = value.desc || '';
+      state.serverData.itemgroup_ids = [];
+      Object.values(value.goods_group).forEach((item) => {
+        state.serverData.itemgroup_ids = state.serverData.itemgroup_ids.concat(...item);
+      });
+      const picture = {};
+      if (itemImageLevel == 'item') {
+        picture.fileName = [];
+        value.picture.fileList.forEach((item) => {
+          delete item.url;
+          if (item.type) {
+            const fileName = `${(window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime()}.${(item.type).slice(6, (item.type).length)}`;
+            picture.fileName.push(fileName);
+            state.imageFile.push({
+              image_name: fileName,
+              image_file: item,
+            });
+          } else {
+            picture.fileName.push(item.name);
+          }
+        });
+      }
+      state.serverData.skus = [];
+      if (value.color_select.length === 0 && value.size_select.length === 0) {
+        state.serverData.dimension = [];
+        if (state.showData.barcodeId) {
+          state.serverData.skus.push({
+            id: state.showData.barcodeId.id,
+            barcode: itemBarcodeLevel === 1 ? value.barcode.barcode : '',
+            attributes: [],
+            images: [],
+            stocks: [],
+          });
+        } else {
+          state.serverData.skus.push({
+            barcode: itemBarcodeLevel === 1 ? value.barcode.barcode : '',
+            attributes: [],
+            images: [],
+            stocks: [],
+          });
+        }
+        state.serverData.skus.forEach((item) => {
+          warehouses.forEach((subItem) => {
+            item.stocks.push({
+              warehouse_id: value.stock[`${subItem.id}`].warehouse_id,
+              store_quantity: value.stock[`${subItem.id}`].store_quantity || 0,
+            });
+          });
+        });
+      } else if (value.color_select.length !== 0 && value.size_select.length === 0) {
+        state.serverData.dimension = [1];
+        value.color_select.forEach((colorId, index) => {
+          if (state.showData.barcodeId && Object.keys(state.showData.barcodeId).some(n => n == colorId)) {
+            state.serverData.skus.push({
+              id: state.showData.barcodeId[`${colorId}`].id,
+              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}`].barcode : '',
+              attributes: [{
+                attributetype_id: 1,
+                attribute_id: colorId,
+              }],
+              images: [],
+              stocks: [],
+            });
+          } else {
+            state.serverData.skus.push({
+              barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}`].barcode : '',
+              attributes: [{
+                attributetype_id: 1,
+                attribute_id: colorId,
+              }],
+              images: [],
+              stocks: [],
+            });
+          }
+          if (itemImageLevel == 'sku') {
+            const currentImageFile = Object.values(value.picture)[index].fileList;
+            currentImageFile.forEach((n) => {
+              delete n.url;
+              if (n.type) {
+                const fileName = `${(window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime()}.${(n.type).slice(6, (n.type).length)}`;
+                state.serverData.skus[index].images.push(fileName);
+                state.imageFile.push({
+                  image_name: fileName,
+                  image_file: n,
+                });
+              } else {
+                state.serverData.skus[index].images.push(n.name);
+              }
+            });
+          }
+        });
+        state.serverData.skus.forEach((item) => {
+          warehouses.forEach((subItem) => {
+            item.stocks.push({
+              warehouse_id: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}`].warehouse_id,
+              store_quantity: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}`].store_quantity || 0,
+            });
+          });
+        });
+      } else if (value.color_select.length !== 0 && value.size_select !== 0) {
+        state.serverData.dimension = [1, 2];
+        value.color_select.forEach((colorId, index) => {
+          value.size_select.forEach((sizeId) => {
+            if (state.showData.barcodeId && Object.keys(state.showData.barcodeId).some(n => n == `${colorId}_${sizeId}`)) {
+              state.serverData.skus.push({
+                id: state.showData.barcodeId[`${colorId}_${sizeId}`].id,
+                barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode : '',
+                attributes: [{
+                  attributetype_id: 1,
+                  attribute_id: colorId,
+                }, {
+                  attributetype_id: 2,
+                  attribute_id: sizeId,
+                }],
+                images: [],
+                stocks: [],
+              });
+            } else {
+              state.serverData.skus.push({
+                barcode: itemBarcodeLevel === 1 ? value.barcode[`${colorId}_${sizeId}`].barcode : '',
+                attributes: [{
+                  attributetype_id: 1,
+                  attribute_id: colorId,
+                }, {
+                  attributetype_id: 2,
+                  attribute_id: sizeId,
+                }],
+                images: [],
+                stocks: [],
+              });
+            }
+          });
+          if (itemImageLevel == 'sku') {
+            const currentImageFile = Object.values(value.picture)[index].fileList;
+            currentImageFile.forEach((n) => {
+              delete n.url;
+              if (n.type) {
+                fileName = `${(window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime()}.${(n.type).slice(6, (n.type).length)}`;
+                state.serverData.skus[index].images.push(fileName);
+                state.imageFile.push({
+                  image_name: fileName,
+                  image_file: n,
+                });
+              } else {
+                state.serverData.skus[index].images.push(n.name);
+              }
+            });
+          }
+        });
+        state.serverData.skus.forEach((item) => {
+          warehouses.forEach((subItem) => {
+            item.stocks.push({
+              warehouse_id: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}_${item.attributes[1].attribute_id}`].warehouse_id,
+              store_quantity: value.stock[`${subItem.id}_${item.attributes[0].attribute_id}_${item.attributes[1].attribute_id}`].store_quantity || 0,
+            });
+          });
+        });
+      }
       itemImageLevel === 'item' ? state.serverData.itemimages = picture.fileName : null;
       itemBarcodeLevel === 0 ? state.serverData.barcode = value.barcode.barcode : null;
       return { ...state };
