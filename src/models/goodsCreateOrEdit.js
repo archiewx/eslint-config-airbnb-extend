@@ -224,7 +224,6 @@ export default {
       state.showData.stocks = {}; // 库存
       state.showData.barcodes = {}; // 条码
       state.showData.barcodeId = {}; // skuId
-      state.showData.imageFile = {};
       if (state.showData.colors.length == 0) {
         value.skus.data.forEach((item) => {
           item.skustocks.data.forEach((subItem) => {
@@ -262,14 +261,17 @@ export default {
           };
           // 图片策略为sku 生成图片数据
           if (itemImageLevel == 'sku') {
+            if(state.showData.imageFile[`${colorId}`] && state.showData.imageFile[`${colorId}`].length > 0) {}
+            else state.showData.imageFile[`${colorId}`] = [];
             item.skuimages && item.skuimages.data.forEach((subItem) => {
-              state.showData.imageFile[`${colorId}`] = [];
-              state.showData.imageFile[`${colorId}`].push({
-                uid: Number(`-${window.crypto.getRandomValues(new Uint32Array(1))[0].toString()}`),
-                url: subItem.url,
-                name: subItem.name,
-                status: 'done',
-              });
+              if(!state.showData.imageFile[`${colorId}`].some( _ => _.name == subItem.name)) {
+                state.showData.imageFile[`${colorId}`].push({
+                  uid: Number(`-${window.crypto.getRandomValues(new Uint32Array(1))[0].toString()}`),
+                  url: subItem.url,
+                  name: subItem.name,
+                  status: 'done',
+                });
+              }
             });
           }
         });
@@ -299,14 +301,17 @@ export default {
           };
           // 图片策略为sku 生成图片数据
           if (itemImageLevel == 'sku') {
+            if(state.showData.imageFile[`${colorId}`] && state.showData.imageFile[`${colorId}`].length > 0) {}
+            else state.showData.imageFile[`${colorId}`] = [];
             item.skuimages && item.skuimages.data.forEach((subItem) => {
-              state.showData.imageFile[`${colorId}`] = [];
-              state.showData.imageFile[`${colorId}`].push({
-                uid: Number(`-${window.crypto.getRandomValues(new Uint32Array(1))[0].toString()}`),
-                url: subItem.url,
-                name: subItem.name,
-                status: 'done',
-              });
+              if(!state.showData.imageFile[`${colorId}`].some( _ => _.name == subItem.name)) {
+                state.showData.imageFile[`${colorId}`].push({
+                  uid: Number(`-${window.crypto.getRandomValues(new Uint32Array(1))[0].toString()}`),
+                  url: subItem.url,
+                  name: subItem.name,
+                  status: 'done',
+                });
+              }
             });
           }
         });
@@ -472,7 +477,7 @@ export default {
       } else if (value.color_select.length !== 0 && value.size_select !== 0) {
         state.serverData.dimension = [1, 2];
         value.color_select.forEach((colorId, index) => {
-          value.size_select.forEach((sizeId) => {
+          value.size_select.forEach((sizeId,subIndex) => {
             if (state.showData.barcodeId && Object.keys(state.showData.barcodeId).some(n => n == `${colorId}_${sizeId}`)) {
               state.serverData.skus.push({
                 id: state.showData.barcodeId[`${colorId}_${sizeId}`].id,
@@ -501,23 +506,23 @@ export default {
                 stocks: [],
               });
             }
+            if (itemImageLevel == 'sku') {
+              const currentImageFile = Object.values(value.picture)[index].fileList;
+              currentImageFile.forEach((n) => {
+                delete n.url;
+                if (n.type) {
+                  const fileName = `${(window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime()}.${(n.type).slice(6, (n.type).length)}`;
+                  state.serverData.skus[`${index * 3 + subIndex }`].images.push(fileName);
+                  state.imageFile.push({
+                    image_name: fileName,
+                    image_file: n,
+                  });
+                } else {
+                  state.serverData.skus[`${index * 3 + subIndex }`].images.push(n.name);
+                }
+              });
+            }
           });
-          if (itemImageLevel == 'sku') {
-            const currentImageFile = Object.values(value.picture)[index].fileList;
-            currentImageFile.forEach((n) => {
-              delete n.url;
-              if (n.type) {
-                fileName = `${(window.crypto.getRandomValues(new Uint32Array(1))[0]).toString() + (new Date()).getTime()}.${(n.type).slice(6, (n.type).length)}`;
-                state.serverData.skus[index].images.push(fileName);
-                state.imageFile.push({
-                  image_name: fileName,
-                  image_file: n,
-                });
-              } else {
-                state.serverData.skus[index].images.push(n.name);
-              }
-            });
-          }
         });
         state.serverData.skus.forEach((item) => {
           warehouses.forEach((subItem) => {

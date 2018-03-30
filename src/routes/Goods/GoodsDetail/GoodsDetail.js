@@ -467,7 +467,7 @@ export default class GoodsDetail extends PureComponent {
       sorter: true,
       width: '20%',
       className: styles.numberRightMove,
-      render: (text, record) => NCNI(record.stock_quantity).format(true),
+      render: (text, record) => NCNF(record.stock_quantity).format(true),
     }];
 
     const purchaseColumns = [{
@@ -494,7 +494,7 @@ export default class GoodsDetail extends PureComponent {
       sorter: true,
       width: '30%',
       className: styles.numberRightMove,
-      render: (text, record) => NCNI(record.stock_quantity).format(true),
+      render: (text, record) => NCNF(record.stock_quantity).format(true),
     }];
 
     const stockColumns = [{
@@ -521,7 +521,7 @@ export default class GoodsDetail extends PureComponent {
       width: '30%',
       sorter: true,
       className: styles.numberRightMove,
-      render: (text, record) => NCNI(record.stock_quantity).format(true),
+      render: (text, record) => NCNF(record.stock_quantity).format(true),
     }];
 
     const customerColumns = [{
