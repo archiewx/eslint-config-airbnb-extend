@@ -65,7 +65,7 @@ export default class SkusPurchaseDetail extends PureComponent {
     }, {
       title: '操作',
       dataIndex: 'operation',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) => (<Link to={`/bill/sale-detail/${record.id}`}>查看</Link>),
     }];
 
     return (

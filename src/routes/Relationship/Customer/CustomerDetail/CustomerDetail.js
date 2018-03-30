@@ -553,7 +553,7 @@ export default class CustomerDetail extends PureComponent {
       title: '操作',
       width: '10%',
       dataIndex: 'operation',
-      render: (text, record) => (<a>查看</a>),
+      render: (text, record) => (<Link to={`/finance/payments-detail/${record.id}`}>查看</Link>),
     }];
 
     const Info = ({ title, value, bordered }) => (

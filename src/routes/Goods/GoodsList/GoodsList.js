@@ -205,8 +205,8 @@ export default class GoodsList extends PureComponent {
         id: item.id,
         not_sale: item.not_sale == '1' ? 0 : 1,
       } }).then(() => {
-        this.handleGetSaleList(this.filterSale, this.pagesSale, this.state.sortSale);
-        this.handleGetPurchaseList(this.filterPurchase, this.pagesPurchase, this.state.sortPurchase);
+        this.handleGetSaleList(this.state.filterSale, this.state.pagesSale, this.state.sortSale);
+        this.handleGetPurchaseList(this.state.filterPurchase, this.state.pagesPurchase, this.state.sortPurchase);
     });
   }
 
@@ -216,8 +216,8 @@ export default class GoodsList extends PureComponent {
       payload: {
         id: item.id,
       } }).then(() => {
-        this.handleGetSaleList(this.filterSale, this.pagesSale, this.state.sortSale);
-        this.handleGetPurchaseList(this.filterPurchase, this.pagesPurchase, this.state.sortPurchase);
+        this.handleGetSaleList(this.state.filterSale, this.state.pagesSale, this.state.sortSale);
+        this.handleGetPurchaseList(this.state.filterPurchase, this.state.pagesPurchase, this.state.sortPurchase);
     });
   }
 
@@ -243,14 +243,12 @@ export default class GoodsList extends PureComponent {
 
   // 筛选
   handleSaleFilter = (value) => {
-    console.log(value)
     this.props.dispatch({ type: 'goodsList/setFilterSaleServerData',
       payload: {
         ...value,
         sale_datePick: value.sale_datePick ? [value.sale_datePick[0].format('YYYY-MM-DD'), value.sale_datePick[1].format('YYYY-MM-DD')] : undefined,
       } });
     const filterSale = { ...this.props.goodsList.filterSaleServerData };
-    console.log(filterSale)
     const pagesSale = { ...this.state.pagesSale, page: 1 };
     this.setState({ filterSale, pagesSale });
     this.handleGetSaleList(filterSale, pagesSale, this.state.sortSale);
@@ -369,7 +367,7 @@ export default class GoodsList extends PureComponent {
       dataIndex: 'stock_quantity',
       width: '15%',
       className: styles.numberRightMove,
-      render: (text, record) => NCNI(record.stock_quantity).format(true),
+      render: (text, record) => NCNF(record.stock_quantity).format(true),
     }, {
       title: '状态',
       dataIndex: 'not_sale',
@@ -425,7 +423,7 @@ export default class GoodsList extends PureComponent {
       width: '15%',
       dataIndex: 'stock_quantity',
       className: styles.numberRightMove,
-      render: (text, record) => NCNI(record.stock_quantity).format(true),
+      render: (text, record) => NCNF(record.stock_quantity).format(true),
     }, {
       title: '状态',
       dataIndex: 'not_sale',

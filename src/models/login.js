@@ -2,6 +2,7 @@ import * as loginService from '../services/login';
 import { reloadAuthorized } from '../utils/Authorized';
 import * as configSettingService from '../services/configSetting';
 import { getSingle } from '../services/user';
+import * as countryService from '../services/country';
 import { routerRedux } from 'dva/router';
 import { message } from 'antd';
 
@@ -71,6 +72,26 @@ export default {
           const user = yield call(getSingle);
           sessionStorage.setItem('currentname', user.result.data.name);
           sessionStorage.setItem('currentavatar', `http://duoke3-image.oss-cn-hangzhou.aliyuncs.com/${user.result.data.role.data.avatar}`);
+          //地址
+          if(!localStorage.getItem('country')) {
+            const country = yield call(countryService.getList);
+            const localCountry = country.result.data[0].provinces.data.map((item) => {
+              let current = {};
+              current = {
+                value: `${item.id}`,
+                label: item.name,
+                children: [],
+              };
+              item.cities.data.forEach((subItem) => {
+                current.children.push({
+                  value: `${subItem.id}`,
+                  label: subItem.name,
+                });
+              });
+              return current;
+            });
+            localStorage.setItem('country',JSON.stringify(localCountry))
+          }
           reloadAuthorized();
           //跳转商品列表
           yield put(routerRedux.push('/goods-list'));

@@ -50,6 +50,7 @@ export default class LightBoxImage extends PureComponent {
   render() {
     const { imageSource, style } = this.props;
     const { previewVisible, previewImage } = this.state;
+    console.log(imageSource)
 
     return (
       <div className={styles.picture} style={style}>
