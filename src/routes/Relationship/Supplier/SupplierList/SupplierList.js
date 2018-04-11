@@ -57,12 +57,12 @@ const sortOptions = [{
 }, {
   name: '他欠我金额降序',
   sorts: {
-    balance: 'desc',
+    debt: 'desc',
   },
 }, {
   name: '他欠我金额升序',
   sorts: {
-    balance: 'asc',
+    debt: 'asc',
   },
 }];
 const breadcrumbList = [{

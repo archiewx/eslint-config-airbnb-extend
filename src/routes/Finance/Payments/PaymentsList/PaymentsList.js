@@ -143,12 +143,14 @@ export default class PaymentsList extends PureComponent {
 
   // 筛选
   handleFilter = (value) => {
-    this.props.dispatch({ type: 'paymentsList/setFilterpaymentsListServerData',
+    // this.props.dispatch({ type: 'paymentsList/setFilterpaymentsListServerData',
+    this.props.dispatch({ type: 'paymentsList/setFilterPaymentsServerData',
       payload: {
         ...value,
         datePick: value.datePick ? [value.datePick[0].format('YYYY-MM-DD'), value.datePick[1].format('YYYY-MM-DD')] : undefined,
-      } });
-    const filter = this.props.paymentsList.fifterpaymentsListServerData;
+      }
+    });
+    const filter = this.props.paymentsList.fifterPaymentsServerData;
     const pages = { ...this.state.pages, page: 1 };
     this.setState({ filter, pages });
     this.handleGetList(filter, pages, this.state.sorts);

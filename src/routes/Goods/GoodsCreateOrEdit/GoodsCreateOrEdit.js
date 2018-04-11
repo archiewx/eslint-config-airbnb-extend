@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import { Row, Col, Card, Button, Form, Input, InputNumber, Select, Menu, Dropdown, Icon, Popconfirm, Spin } from 'antd';
+import { Row, Col, Card, Button, Form, Input, InputNumber, Select, Menu, Dropdown, Icon, Popconfirm, Spin, message } from 'antd';
 import { routerRedux } from 'dva/router';
 import pathToRegexp from 'path-to-regexp';
 import classNames from 'classnames/bind';
@@ -440,6 +440,8 @@ export default class GoodsCreateOrEdit extends PureComponent {
             } else {
               callback();
             }
+          }).catch(() => {
+            message.error('查询货号错误');
           });
         }
       } else {
@@ -739,10 +741,19 @@ export default class GoodsCreateOrEdit extends PureComponent {
     });
   }
 
+  checkAttributeItem(field) {
+    const { itemAttribute } = this.props.configSetting;
+    const flag = itemAttribute.findIndex(cv => cv === field) !== -1;
+    if (flag) {
+      return { display: 'block' };
+    }
+    return { display: 'none' };
+  }
+
   render() {
     const { getFieldDecorator, getFieldValue, setFieldsValue } = this.props.form;
     const { goodsGroup: { goodsGroups }, color: { colors }, size: { sizeLibrarys }, unit: { units }, priceGrade: { priceGrades }, priceQuantityStep: { priceQuantitySteps }, shop: { shops }, warehouse: { warehouses } } = this.props;
-    const { usePricelelvel, priceModel, itemBarcodeLevel, itemImageLevel } = this.props.configSetting;
+    const { usePricelelvel, priceModel, itemBarcodeLevel, itemImageLevel, itemAttribute } = this.props.configSetting;
     const { showData } = this.props.goodsCreateOrEdit;
     const { isNeedIcon, defaultSelectUnits, selectUnits, selectColors, selectSizes, selectQuantityStep, priceTableValue, skuStocks, skuBarcodes, selectWarehouseId, selecStockUnitNum, skuImages } = this.state;
 
@@ -801,7 +812,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                     )}
                   </FormItem>
                 </Col>
-                <Col span={8}>
+                <Col span={8} style={this.checkAttributeItem('purchase_price')}>
                   <FormItem label="进货价">
                     {getFieldDecorator('purchase_price', {
                       initialValue: showData.purchase_price || null,
@@ -838,7 +849,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
               </div>
             </Form>
             <Form layout="horizontal" className={styles.leftLabelTitle}>
-              <FormItem label="单位" {...formItemLayout}>
+              <FormItem label="单位" {...formItemLayout} style={this.checkAttributeItem('unit')}>
                 {getFieldDecorator('unit_select', {
                   initialValue: showData.units || defaultSelectUnits,
                 })(
@@ -853,7 +864,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                   </Select>
                 )}
               </FormItem>
-              <FormItem label="颜色" {...formItemLayout}>
+              <FormItem label="颜色" {...formItemLayout} style={this.checkAttributeItem('skuattributetype_1')}>
                 {getFieldDecorator('color_select', {
                   initialValue: showData.colors || [],
                 })(
@@ -868,7 +879,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
                   </Select>
                 )}
               </FormItem>
-              <FormItem label="尺码" {...formItemLayout}>
+              <FormItem label="尺码" {...formItemLayout} style={this.checkAttributeItem('skuattributetype_2')}>
                 {getFieldDecorator('size_select', {
                   initialValue: showData.sizes || [],
                 })(
@@ -888,7 +899,7 @@ export default class GoodsCreateOrEdit extends PureComponent {
           <Card title="描述" bordered={false} className={styles.bottomCardDivided}>
             <Form layout="vertical">
               <Row gutter={64}>
-                <Col span={8}>
+                <Col span={8} style={this.checkAttributeItem('name')}>
                   <FormItem label="名称">
                     {getFieldDecorator('name', {
                       initialValue: showData.name || '',

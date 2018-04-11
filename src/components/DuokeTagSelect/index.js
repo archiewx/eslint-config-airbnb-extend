@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { Tag, Icon } from 'antd';
 
 import styles from './index.less';
+import FilterDatePick from '../FilterDatePick';
 
 const { CheckableTag } = Tag;
 
@@ -48,11 +49,15 @@ class TagSelect extends Component {
   }
 
   handleTagChange = (value, checked) => {
-    const { onChange } = this.props;
+    const { onChange, multi } = this.props;
     const { checkedTags } = this.state;
 
     const index = checkedTags.indexOf(value);
+    // 选中且选中数组里面不存在该数据
     if (checked && index === -1) {
+      if (checkedTags.length && !multi) {
+        checkedTags.pop();
+      }
       checkedTags.push(value);
     } else if (!checked && index > -1) {
       checkedTags.splice(index, 1);
@@ -113,5 +118,8 @@ class TagSelect extends Component {
 }
 
 TagSelect.Option = TagSelectOption;
+TagSelect.defaultProps = {
+  multi: true,
+};
 
 export default TagSelect;

@@ -181,7 +181,7 @@ export default {
           url: item,
         };
       });
-      
+
       state.singleSupplierDetail.freeze = payload.freeze;
       state.singleSupplierDetail.addresses = payload.addresses.data;
       return { ...state };
@@ -194,10 +194,9 @@ export default {
         if (key.indexOf('sale_') == 0) {
           if (payload[key]) {
             const name = key.slice(5, key.length);
-            if (name == 'datePick') {
+            if (name === 'datePick') {
               current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
+              [current.sday, current.eday] = payload[key];
             } else {
               current[`${name}_in`] = payload[key];
             }
@@ -209,8 +208,7 @@ export default {
           delete current[key];
         }
       }
-      state.filterSaleServerData = current;
-      return { ...state };
+      return { ...state, filterSaleServerData: current };
     },
 
     setFilterGoodsServerData(state, { payload }) {

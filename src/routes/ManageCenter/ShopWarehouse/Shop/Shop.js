@@ -97,7 +97,7 @@ export default class Shop extends PureComponent {
           shops.map((n) => {
             return (
               <Card key={n.id} title={n.name} bordered={false} style={{ marginBottom: 24 }} extra={<Button type="primary" onClick={this.handleModalOpen.bind(null, n)}>编辑</Button>}>
-                <div style={{ marginBottom: 30 }}><label className={styles.labelTitle}>关联的仓库:</label><span>{`${n.warehouses.data[0].name}`}</span></div>
+                <div style={{ marginBottom: 30 }}><label className={styles.labelTitle}>关联的仓库:</label><span>{`${n.warehouses.data.length && n.warehouses.data[0].name}`}</span></div>
                 <div>
                   <div className={styles.relationGoodsGroup}>关联的商品分组</div>
                   <div>

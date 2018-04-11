@@ -17,7 +17,7 @@ const { RangePicker } = DatePicker;
 const breadcrumbList = [{
   title: '财务',
 }, {
-  title: '销售结算',
+  title: '进货结算',
 }];
 const sortOptions = [{
   name: '创建时间降序',
@@ -193,7 +193,7 @@ export default class PurchaseSettleList extends PureComponent {
       <div>
         <Link to={`/finance/purchase-settle-detail/${item.id}`}>查看</Link>
         <Divider type="vertical" />
-        <Dropdown overlay={
+        <Dropdown disabled={item.pay_status === '2'} overlay={
           <Menu>
             <Menu.Item key="1">{this.handleDeletePopConfirm(item.pay_status, item.id)}</Menu.Item>
           </Menu>
@@ -208,13 +208,13 @@ export default class PurchaseSettleList extends PureComponent {
   // 删除pop
   handleDeletePopConfirm = (payStatus, id) => {
     let popconfirmModal;
-    if (payStatus == 1) {
+    if (payStatus === '1') {
       popconfirmModal = (
         <Popconfirm title={<div><span>确认删除此进货结算单?</span></div>} okText="确认" onConfirm={this.handleDeleteSingle.bind(null, id, -1)}>
           删除
         </Popconfirm>
       );
-    } else if (payStatus == 3) {
+    } else if (payStatus === '3') {
       popconfirmModal = (
         <Popconfirm title={<div><span>确认删除此进货结算单?</span><div style={{ color: 'red' }}>关联的流水也将一同删除</div></div>} okText="继续" onConfirm={this.handleAgianPopConfirm.bind(null, id)}>
           删除

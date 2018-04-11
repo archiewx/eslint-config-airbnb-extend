@@ -43,8 +43,7 @@ export default {
         if (payload[key]) {
           if (key == 'datePick') {
             current.date_type = 'custom';
-            current.sday = payload[key][0];
-            current.eday = payload[key][1];
+            [current.sday, current.eday] = payload[key];
           } else {
             current[`${key}_in`] = payload[key];
           }
@@ -55,8 +54,7 @@ export default {
           delete current[key];
         }
       }
-      state.fifterPaymentsServerData = current;
-      return { ...state };
+      return { ...state, fifterPaymentsServerData: current };
     },
 
   },

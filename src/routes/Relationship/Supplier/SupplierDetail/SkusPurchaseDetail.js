@@ -39,7 +39,9 @@ export default class SkusPurchaseDetail extends PureComponent {
     }, {
       title: this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/') + 1),
     }, {
-      title: 'SKU购买详情',
+      title: '商品供应详情',
+    }, {
+      title: 'SKU供应详情',
     }];
 
     const columns = [{
@@ -47,13 +49,13 @@ export default class SkusPurchaseDetail extends PureComponent {
       dataIndex: 'number',
       render: (text, record) => `#${record.number}`,
     }, {
-      title: '购买量',
+      title: '供应量',
       dataIndex: 'sku_quantity',
       className: styles.numberRightMove,
       sorter: true,
       render: (text, record) => NCNI(record.sku_quantity).format(true),
     }, {
-      title: '购买额',
+      title: '供应额',
       dataIndex: 'sku_value',
       className: styles.numberRightMove,
       sorter: true,

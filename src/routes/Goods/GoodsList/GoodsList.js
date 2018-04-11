@@ -370,6 +370,7 @@ export default class GoodsList extends PureComponent {
       render: (text, record) => NCNF(record.stock_quantity).format(true),
     }, {
       title: '状态',
+      width: 100,
       dataIndex: 'not_sale',
       render: (text, record) => (
         record.not_sale == 0 ? (

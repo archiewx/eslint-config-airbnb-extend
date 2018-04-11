@@ -240,8 +240,14 @@ export default class PurchaseOrderList extends PureComponent {
   }
 
   render() {
-    const { purchaseOrderList: { purchaseOrderList, purchaseOrderPagination }, layoutFilter: { purchaseOrderFilter } } = this.props;
+    const { purchaseOrderList: { purchaseOrderList, purchaseOrderPagination }, layoutFilter } = this.props;
+    let { purchaseOrderFilter } = layoutFilter;
     const { sorts, pages, filter, sortOrder, sortValue } = this.state;
+
+    purchaseOrderFilter = purchaseOrderFilter.map(cv => ({
+      ...cv,
+      multi: cv.code !== 'settle_way' && cv.code !== 'pay_status' && cv.code !== 'delivery_status',
+    }));
 
     const tableSortExtra = (
       <Select style={{ width: 200 }} value={sortValue} onChange={this.handleSelectSort} optionLabelProp="value">
