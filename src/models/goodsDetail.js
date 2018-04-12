@@ -152,7 +152,7 @@ export default {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-                flag = true;
+                flag = false;
               } else {
                 flag = true;
               }
@@ -164,7 +164,7 @@ export default {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-                flag = true;
+                flag = false;
               } else {
                 flag = true;
               }
@@ -176,7 +176,7 @@ export default {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-                flag = true;
+                flag = false;
               } else {
                 flag = true;
               }
@@ -188,7 +188,7 @@ export default {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-                flag = true;
+                flag = false;
               } else {
                 flag = true;
               }
@@ -236,9 +236,9 @@ export default {
         flag = true;
       }
       if (flag) {
-        state.singleGoodsDetail.hidePriceTable = false;
-      } else {
         state.singleGoodsDetail.hidePriceTable = true;
+      } else {
+        state.singleGoodsDetail.hidePriceTable = false;
         state.singleGoodsDetail.priceGrades = [];
         state.singleGoodsDetail.selectShops = [];
         state.singleGoodsDetail.selectUnits = [];

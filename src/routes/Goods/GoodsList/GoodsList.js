@@ -308,8 +308,13 @@ export default class GoodsList extends PureComponent {
   render() {
     const { activeTabKey, sortSale, sortPurchase, pagesSale, pagesPurchase, filterSale, filterPurchase } = this.state;
     const { goodsListSales, goodsListPurchases, goodsSalePagination, goodsPurchasePagination } = this.props.goodsList;
-    const { goodsSaleFilter, goodsPurchaseFilter } = this.props.layoutFilter;
+    const { goodsPurchaseFilter } = this.props.layoutFilter;
+    let { goodsSaleFilter } = this.props.layoutFilter;
 
+    goodsSaleFilter = goodsSaleFilter.map(cv => ({
+      ...cv,
+      multi: cv.code !== 'not_sale',
+    }));
 
     const extra = (
       <Button type="primary" onClick={this.handleToGoodsCreate}>新建商品</Button>
@@ -339,7 +344,7 @@ export default class GoodsList extends PureComponent {
       title: '',
       dataIndex: 'image',
       width: 60,
-      render: (text, record) => (record.itemimage_names.length == 0 ? null : <img src={`${imageApiBase}/${record.itemimage_names[0]}`} style={{ width: 42, height: 42 }} alt="未显示" />),
+      render: (text, record) => (!record.itemimage_names.length ? null : <img src={record.itemimage_names[0]} style={{ width: 42, height: 42 }} alt="未显示" />),
     }, {
       title: '货号',
       dataIndex: 'item_ref',
@@ -396,7 +401,7 @@ export default class GoodsList extends PureComponent {
       title: '',
       dataIndex: 'image',
       width: 60,
-      render: (text, record) => (record.itemimage_names.length == 0 ? null : <img src={`${imageApiBase}/${record.itemimage_names[0]}`} style={{ width: 42, height: 42 }} alt="未显示" />),
+      render: (text, record) => (!record.itemimage_names.length ? null : <img src={record.itemimage_names[0]} style={{ width: 42, height: 42 }} alt="未显示" />),
     }, {
       title: '货号',
       dataIndex: 'item_ref',
@@ -427,6 +432,7 @@ export default class GoodsList extends PureComponent {
       render: (text, record) => NCNF(record.stock_quantity).format(true),
     }, {
       title: '状态',
+      width: 100,
       dataIndex: 'not_sale',
       render: (text, record) => (
         record.not_sale == 0 ? (
