@@ -323,11 +323,11 @@ export default class SaleOrder extends PureComponent {
           </Card>
           <Divider style={{ margin: 0, width: 0 }} />
           <Card bordered={false}>
-            <DuokeSwitch title="稍后拼包" onClick={this.handleDeliverConfirm.bind(null, 3)} checked={defaultDeliveryWay == 3} disname="icon" />
+            <DuokeSwitch title="稍后拼包" onClick={this.handleDeliverConfirm.bind(null, 4)} checked={defaultDeliveryWay == 4} disname="icon" />
           </Card>
           <Divider style={{ margin: 0, width: 0 }} />
           <Card bordered={false}>
-            <DuokeSwitch title="物流运输" onClick={this.handleDeliverConfirm.bind(null, 4)} checked={defaultDeliveryWay == 4} disname="icon" />
+            <DuokeSwitch title="物流运输" onClick={this.handleDeliverConfirm.bind(null, 3)} checked={defaultDeliveryWay == 3} disname="icon" />
           </Card>
         </div>
         <div style={{ display: activeTabKey == 'default_price' ? 'block' : 'none' }}>
