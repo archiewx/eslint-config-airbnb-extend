@@ -256,8 +256,14 @@ export default class SaleOrderList extends PureComponent {
   }
 
   render() {
-    const { saleOrderList: { saleOrderList, saleOrderPagination }, layoutFilter: { saleOrderFilter } } = this.props;
+    const { saleOrderList: { saleOrderList, saleOrderPagination }, layoutFilter } = this.props;
+    let { saleOrderFilter } = layoutFilter;
     const { sorts, pages, filter, sortOrder, sortValue } = this.state;
+
+    saleOrderFilter = saleOrderFilter.map(cv => ({
+      ...cv,
+      multi: cv.code !== 'settle_way' && cv.code !== 'pay_status', // 支付状态、支付类型单选
+    }));
 
     const tableSortExtra = (
       <Select style={{ width: 200 }} value={sortValue} onChange={this.handleSelectSort} optionLabelProp="value">

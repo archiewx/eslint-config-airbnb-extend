@@ -76,8 +76,11 @@ export default class Size extends PureComponent {
     this.props.dispatch({ type: 'priceGrade/deleteSingle',
       payload: {
         id: item.id,
-      } }).then(() => {
-      this.props.dispatch({ type: 'priceGrade/getList' });
+      } }).then((res) => {
+        if(res.code !== 0) {
+          message.error(res.message);
+        }
+        this.props.dispatch({ type: 'priceGrade/getList' });
     }).catch(()=>{
       message.error('删除失败')
     });
@@ -152,8 +155,11 @@ export default class Size extends PureComponent {
     this.props.dispatch({ type: 'priceQuantityStep/deleteSingle',
       payload: {
         id: item.id,
-      } }).then(() => {
-      this.props.dispatch({ type: 'priceQuantityStep/getList' });
+      } }).then((res) => {
+        if(res.code !== 0) {
+          message.error(res.message);
+        }
+        this.props.dispatch({ type: 'priceQuantityStep/getList' });
     }).catch(()=>{
       message.error('删除失败')
     });

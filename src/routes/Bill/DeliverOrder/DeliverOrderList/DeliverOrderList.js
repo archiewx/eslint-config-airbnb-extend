@@ -186,8 +186,14 @@ export default class DeliverOrderList extends PureComponent {
   }
 
   render() {
-    const { deliverOrderList: { deliverOrderList, deliverOrderPagination }, layoutFilter: { deliverOrderFilter } } = this.props;
+    const { deliverOrderList: { deliverOrderList, deliverOrderPagination }, layoutFilter } = this.props;
+    let { deliverOrderFilter } = layoutFilter;
     const { sorts, pages, filter, sortOrder, sortValue } = this.state;
+
+    deliverOrderFilter = deliverOrderFilter.map(cv => ({
+      ...cv,
+      multi: cv.code !== 'delivery_status' && cv.code !== 'receive_status',
+    }));
 
     const tableSortExtra = (
       <Select style={{ width: 200 }} value={sortValue} onChange={this.handleSelectSort} optionLabelProp="value">

@@ -152,7 +152,7 @@ export default {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-                flag = true;
+                flag = false;
               } else {
                 flag = true;
               }
@@ -164,7 +164,7 @@ export default {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-                flag = true;
+                flag = false;
               } else {
                 flag = true;
               }
@@ -176,7 +176,7 @@ export default {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-                flag = true;
+                flag = false;
               } else {
                 flag = true;
               }
@@ -188,62 +188,64 @@ export default {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-                flag = true;
+                flag = false;
               } else {
                 flag = true;
               }
             });
           }
-        } else if (priceModel == 'shop') {
-          priceMatrix.forEach((item) => {
-            if (item.pricelevel_id == null && item.shop_id && item.unit_id == null && item.quantityrange_id == null) {
-              state.singleGoodsDetail.prices[`${item.shop_id}`] = {
-                price: item.price,
-              };
-            } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-              flag = true;
-            } else {
-              flag = true;
-            }
-          });
-        } else if (priceModel == 'unit') {
-          priceMatrix.forEach((item) => {
-            if (item.pricelevel_id == null && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
-              state.singleGoodsDetail.prices[`${item.unit_id}`] = {
-                price: item.price,
-              };
-            } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-              flag = true;
-            } else {
-              flag = true;
-            }
-          });
-        } else if (priceModel == 'quantityrange') {
-          priceMatrix.forEach((item) => {
-            if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id) {
-              state.singleGoodsDetail.prices[`${item.quantityrange_id}`] = {
-                price: item.price,
-              };
-            } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-              flag = true;
-            } else {
-              flag = true;
-            }
-          });
         }
+        // else if (priceModel == 'shop') {
+        //   priceMatrix.forEach((item) => {
+        //     if (item.pricelevel_id == null && item.shop_id && item.unit_id == null && item.quantityrange_id == null) {
+        //       state.singleGoodsDetail.prices[`${item.shop_id}`] = {
+        //         price: item.price,
+        //       };
+        //     } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+        //       flag = true;
+        //     } else {
+        //       flag = true;
+        //     }
+        //   });
+        // } else if (priceModel == 'unit') {
+        //   priceMatrix.forEach((item) => {
+        //     if (item.pricelevel_id == null && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
+        //       state.singleGoodsDetail.prices[`${item.unit_id}`] = {
+        //         price: item.price,
+        //       };
+        //     } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+        //       flag = true;
+        //     } else {
+        //       flag = true;
+        //     }
+        //   });
+        // } else if (priceModel == 'quantityrange') {
+        //   priceMatrix.forEach((item) => {
+        //     if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id) {
+        //       state.singleGoodsDetail.prices[`${item.quantityrange_id}`] = {
+        //         price: item.price,
+        //       };
+        //     } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+        //       flag = true;
+        //     } else {
+        //       flag = true;
+        //     }
+        //   });
+        // }
       } else {
         flag = true;
       }
       if (flag) {
-        state.singleGoodsDetail.hidePriceTable = false;
-      } else {
         state.singleGoodsDetail.hidePriceTable = true;
+      } else {
+        state.singleGoodsDetail.hidePriceTable = false;
         state.singleGoodsDetail.priceGrades = [];
         state.singleGoodsDetail.selectShops = [];
         state.singleGoodsDetail.selectUnits = [];
         state.singleGoodsDetail.selectQuantityStep = [];
         value.itemprices.data.forEach((item) => {
-          if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {} else if (!state.singleGoodsDetail.priceGrades.some(n => n.id == item.pricelevel.data.id)) {
+          if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
+          else if (!state.singleGoodsDetail.priceGrades.some(n => n.id == item.pricelevel.data.id)) {
             state.singleGoodsDetail.priceGrades.push({
               id: item.pricelevel.data.id,
               name: item.pricelevel.data.name,

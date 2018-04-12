@@ -592,8 +592,8 @@ export default class GoodsDetail extends PureComponent {
         <div style={{ display: activeTabKey == 'message' ? 'block' : 'none' }}>
           <Card bordered={false}>
             {
-              singleGoodsDetail.hidePriceTable && singleGoodsDetail.hidePriceTable ? (
-                <DescriptionList title={usePricelelvel == 'yes' ? '价格等级&价格组成' : '价格组成（零售价)'} size="large" style={{ paddingBottom: 32 }}>
+              !singleGoodsDetail.hidePriceTable ? (
+                <DescriptionList title={usePricelelvel === 'yes' ? '价格等级&价格组成' : '价格组成（零售价)'} size="large" style={{ paddingBottom: 32 }}>
                   <PriceTextTable tableValue={singleGoodsDetail.prices} usePricelelvel={usePricelelvel} priceModel={priceModel} priceGrades={singleGoodsDetail.priceGrades} shops={singleGoodsDetail.selectShops} units={singleGoodsDetail.selectUnits} quantityranges={singleGoodsDetail.selectQuantityStep} />
                 </DescriptionList>
               ) : null

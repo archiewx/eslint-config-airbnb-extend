@@ -31,6 +31,7 @@ export default class GoodsPurchaseDetail extends PureComponent {
 
   render() {
     const { goodsPurchaseList, customerId } = this.props.supplierGoodsPurchaseDetail;
+    let parent = null
 
     const breadcrumbList = [{
       title: '关系',
@@ -39,38 +40,46 @@ export default class GoodsPurchaseDetail extends PureComponent {
     }, {
       title: this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/') + 1),
     }, {
-      title: '商品购买详情',
+      title: '商品供应详情',
     }];
 
     const columns = [{
       title: '名称',
       dataIndex: 'name',
     }, {
-      title: '购买量',
+      title: '供应量',
       dataIndex: 'total_quantity ',
       className: styles.numberRightMove,
       sorter: true,
       render: (text, record) => NCNI(record.total_quantity).format(true),
     }, {
-      title: '购买额',
+      title: '供应额',
       dataIndex: 'total_fee',
       className: styles.numberRightMove,
       sorter: true,
       render: (text, record) => NCNF(record.total_fee).format(true),
     }, {
-      title: '最后购买时间',
+      title: '最后供应时间',
       dataIndex: 'last_purchase_time',
       sorter: true,
     }, {
       title: '操作',
       dataIndex: 'operation',
-      render: (text, record) => (
-        record.name ? (
-          record.children ? (
-            ((record.id).toString()).indexOf('_') > -1 ? <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}/${this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/') + 1)}`}>查看</Link> : null
-          ) : <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}/${this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/') + 1)}`}>查看</Link>
-        ) : null
-      ),
+      render: (text, record) => {
+        // return (
+        //   record.name ? (
+        //     record.children ? (
+        //       ((record.id).toString()).indexOf('_') > -1 ? <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}/${this.props.match.params.name}`}>查看</Link> : null
+        //     ) : <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}/${this.props.match.params.name}`}>查看</Link>
+        //   ) : null
+        // );
+        if (record.children) {
+          parent = record;
+        } else {
+          return (<Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${parent.skuId}/${this.props.match.params.name}`}>查看</Link>);
+        }
+        return null;
+      },
     }];
 
     return (

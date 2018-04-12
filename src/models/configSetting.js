@@ -63,9 +63,9 @@ export default {
       yield call(configSettingService.switchShopShareCustomer, payload);
     },
 
-    *switchShopShareCustomer({ payload }, { call, put }) {
-      yield call(configSettingService.switchShopShareCustomer, payload);
-    },
+    // *switchShopShareCustomer({ payload }, { call, put }) {
+    //   yield call(configSettingService.switchShopShareCustomer, payload);
+    // },
 
     *switchItemAttrite({ payload }, { call, put }) {
       yield call(configSettingService.switchItemAttrite, payload);

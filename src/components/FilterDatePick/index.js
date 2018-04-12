@@ -33,7 +33,7 @@ export default class FilterDatePick extends PureComponent {
                 <StandardFormRow key={`${i}`} title={`${n.name}`} block>
                   <FormItem>
                     {getFieldDecorator(`${tagLabel}${tagLabel ? '_' : ''}${n.code}`)(
-                      <TagSelect expandable onChange={this.handleChange}>
+                      <TagSelect expandable onChange={this.handleChange} multi={n.multi}>
                         {
                           n.options.map((m, j) => {
                             return <TagSelect.Option key={`${j}`} value={`${m.value}`}>{m.name}</TagSelect.Option>;

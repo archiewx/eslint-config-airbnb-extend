@@ -214,8 +214,14 @@ export default class InventoryOrderList extends PureComponent {
   }
 
   render() {
-    const { inventoryOrderList: { inventoryOrderList, inventoryOrderPagination }, layoutFilter: { inventoryOrderFilter } } = this.props;
+    const { inventoryOrderList: { inventoryOrderList, inventoryOrderPagination }, layoutFilter } = this.props;
+    let { inventoryOrderFilter } = layoutFilter;
     const { sorts, pages, filter, sortOrder, sortValue } = this.state;
+
+    inventoryOrderFilter = inventoryOrderFilter.map(cv => ({
+      ...cv,
+      multi: cv.code !== 'status', // 支付状态单选
+    }));
 
     const tableSortExtra = (
       <Select style={{ width: 200 }} value={sortValue} onChange={this.handleSelectSort} optionLabelProp="value">
@@ -235,7 +241,7 @@ export default class InventoryOrderList extends PureComponent {
     }, {
       title: '盘亏数量',
       dataIndex: 'losses_quantity',
-      width: '10%',
+      width: '14%',
       className: styles.numberRightMove,
       sorter: true,
       sortOrder: sortOrder.losses_quantity || false,
@@ -260,6 +266,7 @@ export default class InventoryOrderList extends PureComponent {
       title: '盘盈价值',
       dataIndex: 'profit_amount',
       className: styles.numberRightMove,
+      width: '14%',
       sorter: true,
       sortOrder: sortOrder.profit_amount || false,
       render: (text, record) => NCNF(record.profit_amount).format(true),
@@ -268,7 +275,6 @@ export default class InventoryOrderList extends PureComponent {
       dataIndex: 'created_at',
       sorter: true,
       sortOrder: sortOrder.created_at || false,
-      width: '20%',
     }, {
       title: '操作',
       dataIndex: 'operation',

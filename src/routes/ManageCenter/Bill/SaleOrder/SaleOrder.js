@@ -66,14 +66,17 @@ export default class SaleOrder extends PureComponent {
   }
 
   handleModaAdjustPricelOk = (value) => {
+    // 折扣
     if (value.adjustPrice == '1') {
       value.value = 0;
       value.percent = 1;
       value.percent_method = 1;
+    // 百分比
     } else if (value.adjustPrice == '2') {
       value.value = 0;
       value.percent = 1;
       value.percent_method = 0;
+    // 减价
     } else if (value.adjustPrice == '3') {
       value.value = 1;
       value.percent = 0;
@@ -98,7 +101,10 @@ export default class SaleOrder extends PureComponent {
     this.props.dispatch({ type: 'adjustPrice/deleteSingle',
       payload: {
         id: item.id,
-      } }).then(() => {
+      } }).then((res) => {
+        if(res.code !== 0) {
+          message.error(res.message);
+        }
       this.props.dispatch({ type: 'adjustPrice/getList' });
     }).catch(()=>{
       message.error('删除失败')
@@ -138,7 +144,7 @@ export default class SaleOrder extends PureComponent {
   handleSwitchDefaultDeliverWay = (key) => {
     this.props.dispatch({ type: 'configSetting/switchDefaultDeleiverWay', payload: key }).then(() => {
       this.props.dispatch({ type: 'configSetting/getConfigSetting' });
-    }).then(()=>{
+    }).catch(()=>{
       message.error('更改失败')
     });
   }
@@ -317,11 +323,11 @@ export default class SaleOrder extends PureComponent {
           </Card>
           <Divider style={{ margin: 0, width: 0 }} />
           <Card bordered={false}>
-            <DuokeSwitch title="稍后拼包" onClick={this.handleDeliverConfirm.bind(null, 3)} checked={defaultDeliveryWay == 3} disname="icon" />
+            <DuokeSwitch title="稍后拼包" onClick={this.handleDeliverConfirm.bind(null, 4)} checked={defaultDeliveryWay == 4} disname="icon" />
           </Card>
           <Divider style={{ margin: 0, width: 0 }} />
           <Card bordered={false}>
-            <DuokeSwitch title="物流运输" onClick={this.handleDeliverConfirm.bind(null, 4)} checked={defaultDeliveryWay == 4} disname="icon" />
+            <DuokeSwitch title="物流运输" onClick={this.handleDeliverConfirm.bind(null, 3)} checked={defaultDeliveryWay == 3} disname="icon" />
           </Card>
         </div>
         <div style={{ display: activeTabKey == 'default_price' ? 'block' : 'none' }}>

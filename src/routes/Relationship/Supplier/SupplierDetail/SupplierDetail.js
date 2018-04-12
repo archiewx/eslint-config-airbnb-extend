@@ -157,19 +157,19 @@ export default class SupplierDetail extends PureComponent {
       } });
   }
 
-  handleSaleFormSubmit = () => {
+  handleSaleFormSubmit = (value) => {
     const { form, dispatch } = this.props;
     setTimeout(() => {
-      form.validateFields((err, value) => {
+      form.validateFields((err) => {
         if (!err) {
-          this.props.dispatch({ type: 'supplierDetail/setFilterSaleServerData',
+          dispatch({ type: 'supplierDetail/setFilterSaleServerData',
             payload: {
               ...value,
               sale_datePick: value.sale_datePick ? [value.sale_datePick[0].format('YYYY-MM-DD'), value.sale_datePick[1].format('YYYY-MM-DD')] : undefined,
             } });
           const filterSaleHistory = this.props.supplierDetail.filterSaleServerData;
           this.setState({ filterSaleHistory });
-          this.props.dispatch({ type: 'supplierDetail/getSaleHistory',
+          dispatch({ type: 'supplierDetail/getSaleHistory',
             payload: {
               ...filterSaleHistory,
               ...this.state.sortSaleHistory,
@@ -329,9 +329,16 @@ export default class SupplierDetail extends PureComponent {
   }
 
   render() {
-    const { singleSupplierDetail, singleSupplierFinance, singleSupplierSaleHistory, singleSupplierGoodsHistory, singleSupplierPaymentHistory, saleHistoryFilter, goodsHistoryFilter, paymentHistoryFilter, currentId, singleSupplierPurchaseorders, singleSupplierStatements, singleSupplierPayments } = this.props.supplierDetail;
+    const { singleSupplierDetail, singleSupplierFinance, singleSupplierSaleHistory, singleSupplierGoodsHistory, singleSupplierPaymentHistory, goodsHistoryFilter, paymentHistoryFilter, currentId, singleSupplierPurchaseorders, singleSupplierStatements, singleSupplierPayments } = this.props.supplierDetail;
+    let { saleHistoryFilter } = this.props.supplierDetail;
     const { activeTabKey, activeDebtTabKey, pageSaleHistory, pageGoodsHistory, pagePaymentHistory, pagePurchaseorder, pageStatement, pagePayments } = this.state;
     const { getFieldDecorator } = this.props.form;
+
+    saleHistoryFilter = saleHistoryFilter.map(cv => ({
+      ...cv,
+      multi: cv.code !== 'pay_status' && cv.code !== 'settle_way',
+    }));
+
     const description = (
       <DescriptionList size="small" col="2" className={styles.descriptionPostion}>
         <Description term="手机号">{`${singleSupplierDetail.phone || ''}`}</Description>

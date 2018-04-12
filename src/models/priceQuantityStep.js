@@ -25,7 +25,8 @@ export default {
     },
 
     *deleteSingle({ payload }, { call, put }) {
-      yield call(priceQuantityStepService.deleteSingle, payload);
+      const data = yield call(priceQuantityStepService.deleteSingle, payload);
+      return data;
     },
   },
 

@@ -566,7 +566,7 @@ export default class CustomerDetail extends PureComponent {
 
     return (
       <PageHeaderLayout
-        title={`姓名：${singleCustomerDetail.name || ''}`}
+        title={<div><span>姓名：{singleCustomerDetail.name || ''}</span><span style={{ fontSize: 14, marginLeft: 30, color: '#666' }}>{singleCustomerDetail.freeze === '1' && '已冻结'}</span></div>}
         logo={<img alt="" src="https://gw.alipayobjects.com/zos/rmsportal/nxkuOJlFJuAUhzlMTCEe.png" />}
         breadcrumbList={breadcrumbList}
         content={description}
