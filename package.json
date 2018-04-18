@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-airbnb-base-extend",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "base on airbnb config",
   "main": "index.js",
   "scripts": {
