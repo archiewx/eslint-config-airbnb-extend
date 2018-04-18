@@ -1,10 +1,10 @@
 {
-  "name": "eslint-config-gm",
-  "version": "1.0.1",
-  "description": "gunma eslint config",
+  "name": "eslint-config-airbnb-extend",
+  "version": "0.0.1",
+  "description": "base on airbnb config",
   "main": "index.js",
   "scripts": {
-    "test": "npm link && echo '在项目中使用npm link @gm/eslint-config-gm测试'",
+    "test": "npm link && echo '在项目中使用npm link eslint-config-airbnb-extend测试'",
     "publish:patch": "npm version patch && npm publish",
     "publish:minor": "npm version minor && npm publish",
     "publish:major": "npm version major && npm publish"
@@ -16,7 +16,7 @@
   "peerDepentdencies": {
     "eslint": ">= 3"
   },
-  "repository": "https://github.com/GunMaDev/eslint-config-gm.git",
+  "repository": "https://github.com/zsirfs/eslint-config-airbnb-extend.git",
   "author": "",
   "license": "MIT"
 }
