@@ -1,0 +1,15 @@
+language: node_js
+node_js: stable
+
+before_install:
+
+install:
+
+script:
+
+branches:
+
+before_deploy:
+
+deploy:
+
