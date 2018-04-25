@@ -1,13 +1,13 @@
 # Duoke_Pc_Web
 
-src目录 
+src目录
 
-## assets 
+## assets
 资源
 
 - log
 
-## common 
+## common
 共用文件
 
 - menu: 菜单
@@ -15,7 +15,7 @@ src目录
 - breadCrumbList: 管理中心的面包屑
 - index: 接口baseApi,图片baseApi，token
 
-## components 
+## components
 组件
 
 - antd-pro: ant-design-pro组件
@@ -30,23 +30,31 @@ src目录
 - SelectMultiple: 商品新建/编辑商品分组组件
 - StockTabel: 商品新建/编辑库存组件
 
-## e2e 
+## e2e
 集成测试用例
 
-## layouts 
+## layouts
 通用布局
 
 - BasicLayout: 基础布局 | 登录之后的布局
 - UserLayout: 登录布局
 
-## models 
+## models
 dva model
 
-## routes 
+## routes
 业务页面入口
 
-## services 
+## services
 后台接口服务
 
-## utils 
+## utils
 工具库
+
+## 针对修改bug建议
+
+1. 测试bug应该多测试几次，第一次出错不能说明什么，应该要多次重试，如果多次出现问题才能算bug。出现一次不能说明问题。
+2. 关于web端的问题，应该打开浏览器或者抓包查看数据问题，测试不应该只测试界面问题的
+3. 对于错误应该进行反馈建议，在bug 说明中修复建议复制下来
+4. 测试设备如果移动端应该使用多机型，电脑使用多个浏览器，但就使用safari来说，不是所有人都是safari。
+

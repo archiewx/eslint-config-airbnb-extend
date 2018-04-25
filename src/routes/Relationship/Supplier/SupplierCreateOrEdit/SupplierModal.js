@@ -18,22 +18,26 @@ const specialFormItemLayout = {
 export default class SupplierModal extends PureComponent {
   handleModalClose = () => {
     this.props.form.resetFields();
-  }
+  };
 
   handleConfirm = () => {
     const { validateFields, getFieldsValue } = this.props.form;
     const { onOk, uid, country, addresses, formValue, type } = this.props;
     validateFields((err, value) => {
       if (!err) {
-        onOk && onOk({
-          ...value,
-          ...{ create: { uid }, edit: { uid: formValue.uid } }[type],
-          ...{ create: { default: addresses.length == 0 ? 1 : 0 }, edit: { default: formValue.default } }[type],
-          ...{ edit: { sid: formValue.sid } }[type],
-        });
+        onOk &&
+          onOk({
+            ...value,
+            ...{ create: { uid }, edit: { uid: formValue.uid } }[type],
+            ...{
+              create: { default: addresses.length == 0 ? 1 : 0 },
+              edit: { default: formValue.default },
+            }[type],
+            ...{ edit: { sid: formValue.sid } }[type],
+          });
       }
     });
-  }
+  };
 
   render() {
     const { visible, type, formValue, onOk, onCancel, country } = this.props;
@@ -44,37 +48,34 @@ export default class SupplierModal extends PureComponent {
         visible={visible}
         onOk={this.handleConfirm}
         onCancel={onCancel}
-        afterClose={this.handleModalClose}
-      >
+        afterClose={this.handleModalClose}>
         <Form layout="horizontal">
           <FormItem label="收货人" {...formItemLayout}>
             {getFieldDecorator('name', {
               initialValue: formValue.name,
               rules: [{ required: true, message: '收货人不能为空' }],
-            })(
-              <Input placeholder="请输入" />
-            )}
+            })(<Input placeholder="请输入" />)}
           </FormItem>
           <FormItem label="手机号" {...formItemLayout}>
             {getFieldDecorator('phone', {
               initialValue: formValue.phone,
-            })(
-              <Input placeholder="请输入" />
-            )}
+              rules: [
+                {
+                  message: '请输入正确的手机格式',
+                  pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|18[0-9]|14[57]|17[678])[0-9]{8}$/,
+                },
+              ],
+            })(<Input placeholder="请输入" />)}
           </FormItem>
           <FormItem label="所在地区" {...formItemLayout}>
             {getFieldDecorator('location', {
               initialValue: formValue.location,
-            })(
-              <Cascader options={country} placeholder="请选择" />
-            )}
+            })(<Cascader options={country} placeholder="请选择" />)}
           </FormItem>
           <FormItem label="收货地址" {...specialFormItemLayout}>
             {getFieldDecorator('address', {
               initialValue: formValue.address,
-            })(
-              <TextArea placeholder="请输入" rows={4} />
-            )}
+            })(<TextArea placeholder="请输入" rows={4} />)}
           </FormItem>
         </Form>
       </Modal>

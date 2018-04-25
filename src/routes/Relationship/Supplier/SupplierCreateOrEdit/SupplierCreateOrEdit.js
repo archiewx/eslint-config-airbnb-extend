@@ -1,7 +1,24 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
 import { routerRedux, Link } from 'dva/router';
-import { Row, Col, Card, Button, Input, Table, Icon, Select, Menu, Dropdown, Popconfirm, Divider, Form, InputNumber, Spin, Radio } from 'antd';
+import {
+  Row,
+  Col,
+  Card,
+  Button,
+  Input,
+  Table,
+  Icon,
+  Select,
+  Menu,
+  Dropdown,
+  Popconfirm,
+  Divider,
+  Form,
+  InputNumber,
+  Spin,
+  Radio,
+} from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import FooterToolbar from '../../../../components/antd-pro/FooterToolbar';
 import TagSelect from '../../../../components/antd-pro/TagSelect';
@@ -14,13 +31,16 @@ import styles from './SupplierCreateOrEdit.less';
 const ButtonGroup = Button.Group;
 const Option = Select.Option;
 const FormItem = Form.Item;
-const breadcrumbList = [{
-  title: '关系',
-}, {
-  title: '供应商',
-}];
+const breadcrumbList = [
+  {
+    title: '关系',
+  },
+  {
+    title: '供应商',
+  },
+];
 @Form.create()
-@connect(state => ({
+@connect((state) => ({
   supplierCreateOrEdit: state.supplierCreateOrEdit,
   country: state.country,
 }))
@@ -31,16 +51,15 @@ export default class SupplierCreateOrEdit extends PureComponent {
     formValue: {},
     addresses: [],
     uid: 1,
-  }
+  };
 
-  componentDidMount() {
-
-  }
+  componentDidMount() {}
 
   componentWillReceiveProps(nextProps) {
     if (!this.state.addresses.length && nextProps.supplierCreateOrEdit.showData.addresses) {
       this.setState({
-        addresses: JSON.parse(JSON.stringify(nextProps.supplierCreateOrEdit.showData.addresses)) || [],
+        addresses:
+          JSON.parse(JSON.stringify(nextProps.supplierCreateOrEdit.showData.addresses)) || [],
       });
     }
   }
@@ -51,13 +70,13 @@ export default class SupplierCreateOrEdit extends PureComponent {
       modalType: 'create',
       formValue: {},
     });
-  }
+  };
 
   handleModalCancel = () => {
     this.setState({
       modalVisibel: false,
     });
-  }
+  };
 
   handleModalEdit = (item) => {
     this.setState({
@@ -65,30 +84,34 @@ export default class SupplierCreateOrEdit extends PureComponent {
       modalType: 'edit',
       formValue: item,
     });
-  }
+  };
 
   handleModalOk = (value) => {
     const addresses = this.state.addresses;
-    if (addresses.some(item => item.uid == value.uid)) {
-      const detail = JSON.parse(localStorage.getItem('country')).map( n => {
-        if(n.value == value.location[0]) {
-          return `${n.label}${n.children.find( m => m.value == value.location[1]).label}`
-        }
-      }).filter( _ => _)[0]
-      value.detailCity = detail
-      addresses[addresses.findIndex(item => item.uid == value.uid)] = value;
+    if (addresses.some((item) => item.uid == value.uid)) {
+      const detail = JSON.parse(localStorage.getItem('country'))
+        .map((n) => {
+          if (n.value == value.location[0]) {
+            return `${n.label}${n.children.find((m) => m.value == value.location[1]).label}`;
+          }
+        })
+        .filter((_) => _)[0];
+      value.detailCity = detail;
+      addresses[addresses.findIndex((item) => item.uid == value.uid)] = value;
       this.setState({
         addresses: [...addresses],
         modalVisibel: false,
       });
     } else {
       const uid = ++this.state.uid;
-      const detail = JSON.parse(localStorage.getItem('country')).map( n => {
-        if(n.value == value.location[0]) {
-          return `${n.label}${n.children.find( m => m.value == value.location[1]).label}`
-        }
-      }).filter( _ => _)[0]
-      value.detailCity = detail
+      const detail = JSON.parse(localStorage.getItem('country'))
+        .map((n) => {
+          if (n.value == value.location[0]) {
+            return `${n.label}${n.children.find((m) => m.value == value.location[1]).label}`;
+          }
+        })
+        .filter((_) => _)[0];
+      value.detailCity = detail;
       addresses.push(value);
       this.setState({
         addresses: [...addresses],
@@ -97,66 +120,75 @@ export default class SupplierCreateOrEdit extends PureComponent {
       });
     }
     this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
-  }
+  };
 
   handleRadioSelect = (uid, e) => {
     const addresses = this.state.addresses;
     addresses.forEach((item) => {
       item.default = 0;
     });
-    addresses[addresses.findIndex(item => item.uid == uid)].default = 1;
+    addresses[addresses.findIndex((item) => item.uid == uid)].default = 1;
     this.setState({
       addresses: [...addresses],
     });
     this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
-  }
+  };
 
   handleDeleteAddress = (item) => {
     const addresses = this.state.addresses;
-    if (addresses.find(n => n.uid == item.uid).default == 1) {
+    if (addresses.find((n) => n.uid == item.uid).default == 1) {
       addresses[0].default = 1;
     }
-    addresses.splice(addresses.findIndex(n => n.uid == item.uid), 1);
+    addresses.splice(addresses.findIndex((n) => n.uid == item.uid), 1);
     if (addresses.length == 1) {
       addresses[0].default = 1;
     }
     this.setState({ addresses: [...addresses] });
     this.props.form.getFieldDecorator('addresses', { initialValue: addresses });
-  }
+  };
 
   handleSubmit = (e) => {
     const { validateFields, getFieldDecorator, getFieldsValue } = this.props.form;
     e.preventDefault();
-    if (!getFieldsValue().addresses) getFieldDecorator('addresses', { initialValue: this.state.addresses });
+    if (!getFieldsValue().addresses)
+      getFieldDecorator('addresses', { initialValue: this.state.addresses });
     validateFields((err, value) => {
       if (!err) {
         if (this.props.supplierCreateOrEdit.showData.id) {
           this.props.dispatch({ type: 'supplierCreateOrEdit/setServerData', payload: value });
-          this.props.dispatch({ type: 'supplierCreateOrEdit/editSingle',
-            payload: {
-              serverData: this.props.supplierCreateOrEdit.serverData,
-              imageFile: this.props.supplierCreateOrEdit.imageFile,
-              id: this.props.supplierCreateOrEdit.showData.id,
-            } }).then(() => {
-            this.props.dispatch(routerRedux.push('/relationship/supplier-list'));
-          });
+          this.props
+            .dispatch({
+              type: 'supplierCreateOrEdit/editSingle',
+              payload: {
+                serverData: this.props.supplierCreateOrEdit.serverData,
+                imageFile: this.props.supplierCreateOrEdit.imageFile,
+                id: this.props.supplierCreateOrEdit.showData.id,
+              },
+            })
+            .then(() => {
+              this.props.dispatch(routerRedux.push('/relationship/supplier-list'));
+            });
         } else {
           this.props.dispatch({ type: 'supplierCreateOrEdit/setServerData', payload: value });
-          this.props.dispatch({ type: 'supplierCreateOrEdit/createSingle',
-            payload: {
-              serverData: this.props.supplierCreateOrEdit.serverData,
-              imageFile: this.props.supplierCreateOrEdit.imageFile,
-            } }).then(() => {
-            this.props.dispatch(routerRedux.push('/relationship/supplier-list'));
-          });
+          this.props
+            .dispatch({
+              type: 'supplierCreateOrEdit/createSingle',
+              payload: {
+                serverData: this.props.supplierCreateOrEdit.serverData,
+                imageFile: this.props.supplierCreateOrEdit.imageFile,
+              },
+            })
+            .then(() => {
+              this.props.dispatch(routerRedux.push('/relationship/supplier-list'));
+            });
         }
       }
     });
-  }
+  };
 
   handleSupplierCancel = () => {
     this.props.dispatch(routerRedux.push('/relationship/supplier-list'));
-  }
+  };
 
   render() {
     const { modalVisibel, formValue, addresses, modalType, uid } = this.state;
@@ -173,8 +205,7 @@ export default class SupplierCreateOrEdit extends PureComponent {
     return (
       <PageHeaderLayout
         title={showData.id ? '编辑供应商' : '新建供应商'}
-        breadcrumbList={breadcrumbList}
-      >
+        breadcrumbList={breadcrumbList}>
         <Spin size="large" spinning={false}>
           <Card bordered={false} title="基本资料" className={styles.bottomCardDivided}>
             <Form layout="vertical">
@@ -184,27 +215,27 @@ export default class SupplierCreateOrEdit extends PureComponent {
                     {getFieldDecorator('name', {
                       initialValue: showData.name || '',
                       rules: [{ required: true, message: '名称不能为空' }],
-                    })(
-                      <Input placeholder="请输入" />
-                    )}
+                    })(<Input placeholder="请输入" />)}
                   </FormItem>
                 </Col>
                 <Col span={8}>
                   <FormItem label="手机号">
                     {getFieldDecorator('phone', {
                       initialValue: showData.phone || '',
-                    })(
-                      <Input placeholder="请输入" />
-                    )}
+                      rules: [
+                        {
+                          message: '请输入正确的手机号码',
+                          pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|18[0-9]|14[57]|17[678])[0-9]{8}$/,
+                        },
+                      ],
+                    })(<Input placeholder="请输入" />)}
                   </FormItem>
                 </Col>
                 <Col span={8}>
                   <FormItem label="微信号">
                     {getFieldDecorator('wechat', {
                       initialValue: showData.wechat || '',
-                    })(
-                      <Input placeholder="请输入" />
-                    )}
+                    })(<Input placeholder="请输入" />)}
                   </FormItem>
                 </Col>
               </Row>
@@ -224,9 +255,7 @@ export default class SupplierCreateOrEdit extends PureComponent {
                   <FormItem label="备注">
                     {getFieldDecorator('remark1', {
                       initialValue: showData.remark1,
-                    })(
-                      <Input placeholder="请输入" />
-                    )}
+                    })(<Input placeholder="请输入" />)}
                   </FormItem>
                 </Col>
               </Row>
@@ -236,10 +265,11 @@ export default class SupplierCreateOrEdit extends PureComponent {
             <Form layout="horizontal">
               <FormItem>
                 {getFieldDecorator('filelist', {
-                  initialValue: (showData.imageFile && showData.imageFile.length == 0 ? null : showData.imageFile),
-                })(
-                  <SupplierPictureModal />
-                )}
+                  initialValue:
+                    showData.imageFile && showData.imageFile.length == 0
+                      ? null
+                      : showData.imageFile,
+                })(<SupplierPictureModal />)}
               </FormItem>
             </Form>
           </Card>
@@ -248,30 +278,39 @@ export default class SupplierCreateOrEdit extends PureComponent {
               style={{ width: '100%' }}
               type="dashed"
               icon="plus"
-              onClick={this.handleModalCreate}
-            >
-            新增地址
+              onClick={this.handleModalCreate}>
+              新增地址
             </Button>
           </Card>
           <Card bordered={false}>
-            {
-              !!addresses.length && addresses.map((item, index) => {
+            {!!addresses.length &&
+              addresses.map((item, index) => {
                 return (
                   <div key={item.uid}>
-                    { index > 0 ? <Divider style={{ marginBottom: 32 }} /> : null}
+                    {index > 0 ? <Divider style={{ marginBottom: 32 }} /> : null}
                     <Row>
                       <Col span={5}>
-                        <label className={styles.labelTitle}>收货人：</label><span>{item.name}</span>
+                        <label className={styles.labelTitle}>收货人：</label>
+                        <span>{item.name}</span>
                       </Col>
                       <Col span={6}>
-                        <label className={styles.labelTitle}>手机号：</label><span>{item.phone}</span>
+                        <label className={styles.labelTitle}>手机号：</label>
+                        <span>{item.phone}</span>
                       </Col>
                       <Col span={13}>
-                        <label className={styles.labelTitle}>收货地址：</label><span>{item.detailCity}{item.address}</span>
+                        <label className={styles.labelTitle}>收货地址：</label>
+                        <span>
+                          {item.detailCity}
+                          {item.address}
+                        </span>
                       </Col>
                     </Row>
                     <div style={{ marginTop: 24 }}>
-                      <Radio checked={item.default == 1} onChange={this.handleRadioSelect.bind(null, item.uid)}>默认地址</Radio>
+                      <Radio
+                        checked={item.default == 1}
+                        onChange={this.handleRadioSelect.bind(null, item.uid)}>
+                        默认地址
+                      </Radio>
                       <ButtonGroup style={{ float: 'right', marginTop: -11 }}>
                         <Button onClick={this.handleModalEdit.bind(null, item)}>编辑</Button>
                         <Button onClick={this.handleDeleteAddress.bind(null, item)}>删除</Button>
@@ -279,13 +318,26 @@ export default class SupplierCreateOrEdit extends PureComponent {
                     </div>
                   </div>
                 );
-              })
-            }
+              })}
           </Card>
-          <SupplierModal type={modalType} visible={modalVisibel} formValue={formValue} onOk={this.handleModalOk} onCancel={this.handleModalCancel} country={country} uid={uid} addresses={addresses} />
+          <SupplierModal
+            type={modalType}
+            visible={modalVisibel}
+            formValue={formValue}
+            onOk={this.handleModalOk}
+            onCancel={this.handleModalCancel}
+            country={country}
+            uid={uid}
+            addresses={addresses}
+          />
           <FooterToolbar>
             <div id="noScroll">
-              <Popconfirm getPopupContainer={() => document.getElementById('noScroll')} title={showData.id ? '确认取消编辑供应商?' : '确认取消新建供应商?'} onConfirm={this.handleSupplierCancel}><Button>取消</Button></Popconfirm>
+              <Popconfirm
+                getPopupContainer={() => document.getElementById('noScroll')}
+                title={showData.id ? '确认取消编辑供应商?' : '确认取消新建供应商?'}
+                onConfirm={this.handleSupplierCancel}>
+                <Button>取消</Button>
+              </Popconfirm>
               <Button type="primary" onClick={this.handleSubmit}>
                 确认
               </Button>
