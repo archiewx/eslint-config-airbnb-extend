@@ -5,7 +5,6 @@ import * as customerGroupService from '../services/customerGroup';
 import { imageApiBase } from '../common/index.js';
 
 export default {
-
   namespace: 'goodsDetail',
 
   state: {
@@ -25,21 +24,24 @@ export default {
   },
 
   subscriptions: {
-    setup({ dispatch, history }) {
-    },
+    setup({ dispatch, history }) {},
   },
 
   effects: {
     *getSingle({ payload }, { call, put, select, all }) {
       const condition = {
         date_type: 'custom',
-        sday: moment(new Date((new Date()).getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        sday: moment(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format(
+          'YYYY-MM-DD',
+        ),
         eday: moment(new Date(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
         id: payload.id,
       };
       const condition2 = {
         date_type: 'custom',
-        sday: moment(new Date((new Date()).getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        sday: moment(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format(
+          'YYYY-MM-DD',
+        ),
         eday: moment(new Date(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
         id: payload.id,
         mode: 'customer',
@@ -53,27 +55,33 @@ export default {
         call(goodsService.getSingleStocks, condition),
         call(customerGroupService.getList),
       ]);
-      const { usePricelelvel, priceModel, itemImageLevel } = yield select(({ configSetting }) => (configSetting));
+      const { usePricelelvel, priceModel, itemImageLevel } = yield select(
+        ({ configSetting }) => configSetting,
+      );
       if (data1.code && data1.code != 0) {
         message.error(data1.message);
       } else {
-        yield put({ type: 'setsingleGoodsDetail',
+        yield put({
+          type: 'setsingleGoodsDetail',
           payload: {
             value: data1.result.data,
-            itemimage: data1.result.itemimage_names || [],
+            itemimage: data1.result.data.itemimage_names || [],
             usePricelelvel,
             priceModel,
             itemImageLevel,
-          } });
+          },
+        });
         yield put({ type: 'setShowSaleList', payload: data2.result.data.list });
         yield put({ type: 'setShowPurchaseList', payload: data3.result.data.list });
         yield put({ type: 'setShowStockList', payload: data6.result.data.list });
         yield put({ type: 'setShowCustomerList', payload: data4.result.data });
-        yield put({ type: 'setState',
+        yield put({
+          type: 'setState',
           payload: {
             singleGoodsSuppliers: data5.result.data.list,
             currentId: payload,
-          } });
+          },
+        });
         yield put({ type: 'setShowCustomerMode', payload: data7.result.data });
       }
     },
@@ -89,10 +97,12 @@ export default {
 
     *getSingleMessage({ payload }, { call, put }) {
       const data = yield call(goodsService.getSingle, payload);
-      yield put({ type: 'setsingleGoodsDetail',
+      yield put({
+        type: 'setsingleGoodsDetail',
         payload: {
           value: data.result.data,
-        } });
+        },
+      });
     },
 
     *getSingleSales({ payload }, { call, put }) {
@@ -112,26 +122,30 @@ export default {
 
     *getSingleSuppliers({ payload }, { call, put }) {
       const data = yield call(goodsService.getSingleSuppliers, payload);
-      yield put({ type: 'setState',
+      yield put({
+        type: 'setState',
         payload: {
           singleGoodsSuppliers: data.result.data.list,
-        } });
+        },
+      });
     },
 
     *getSingleStocks({ payload }, { call, put }) {
       const data = yield call(goodsService.getSingleStocks, payload);
-      yield put({type: 'setShowStockList', payload: data.result.data.list});
+      yield put({ type: 'setShowStockList', payload: data.result.data.list });
     },
   },
 
   reducers: {
-
     setState(state, action) {
       return { ...state, ...action.payload };
     },
 
-    setsingleGoodsDetail(state, { payload: { value, itemimage, usePricelelvel, priceModel, itemImageLevel } }) {
-      console.log(value)
+    setsingleGoodsDetail(
+      state,
+      { payload: { value, itemimage, usePricelelvel, priceModel, itemImageLevel } },
+    ) {
+      console.log(value);
       state.singleGoodsDetail = {};
       state.singleGoodsDetail.item_ref = value.item_ref; // 货号
       state.singleGoodsDetail.not_sale = value.not_sale; // 在售出售
@@ -147,11 +161,21 @@ export default {
         if (usePricelelvel == 'yes') {
           if (priceModel == '') {
             priceMatrix.forEach((item) => {
-              if (item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+              if (
+                item.pricelevel_id &&
+                item.shop_id == null &&
+                item.unit_id == null &&
+                item.quantityrange_id == null
+              ) {
                 state.singleGoodsDetail.prices[`${item.pricelevel_id}`] = {
                   price: item.price,
                 };
-              } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+              } else if (
+                item.pricelevel_id == null &&
+                item.shop_id == null &&
+                item.unit_id == null &&
+                item.quantityrange_id == null
+              ) {
                 flag = false;
               } else {
                 flag = true;
@@ -159,11 +183,21 @@ export default {
             });
           } else if (priceModel == 'shop') {
             priceMatrix.forEach((item) => {
-              if (item.pricelevel_id && item.shop_id && item.unit_id == null && item.quantityrange_id == null) {
+              if (
+                item.pricelevel_id &&
+                item.shop_id &&
+                item.unit_id == null &&
+                item.quantityrange_id == null
+              ) {
                 state.singleGoodsDetail.prices[`${item.shop_id}_${item.pricelevel_id}`] = {
                   price: item.price,
                 };
-              } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+              } else if (
+                item.pricelevel_id == null &&
+                item.shop_id == null &&
+                item.unit_id == null &&
+                item.quantityrange_id == null
+              ) {
                 flag = false;
               } else {
                 flag = true;
@@ -171,11 +205,21 @@ export default {
             });
           } else if (priceModel == 'unit') {
             priceMatrix.forEach((item) => {
-              if (item.pricelevel_id && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
+              if (
+                item.pricelevel_id &&
+                item.shop_id == null &&
+                item.unit_id &&
+                item.quantityrange_id == null
+              ) {
                 state.singleGoodsDetail.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
                   price: item.price,
                 };
-              } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+              } else if (
+                item.pricelevel_id == null &&
+                item.shop_id == null &&
+                item.unit_id == null &&
+                item.quantityrange_id == null
+              ) {
                 flag = false;
               } else {
                 flag = true;
@@ -183,11 +227,21 @@ export default {
             });
           } else if (priceModel == 'quantityrange') {
             priceMatrix.forEach((item) => {
-              if (item.pricelevel_id && item.shop_id == null && item.unit_id == null && item.quantityrange_id) {
+              if (
+                item.pricelevel_id &&
+                item.shop_id == null &&
+                item.unit_id == null &&
+                item.quantityrange_id
+              ) {
                 state.singleGoodsDetail.prices[`${item.quantityrange_id}_${item.pricelevel_id}`] = {
                   price: item.price,
                 };
-              } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
+              } else if (
+                item.pricelevel_id == null &&
+                item.shop_id == null &&
+                item.unit_id == null &&
+                item.quantityrange_id == null
+              ) {
                 flag = false;
               } else {
                 flag = true;
@@ -244,8 +298,15 @@ export default {
         state.singleGoodsDetail.selectUnits = [];
         state.singleGoodsDetail.selectQuantityStep = [];
         value.itemprices.data.forEach((item) => {
-          if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {}
-          else if (!state.singleGoodsDetail.priceGrades.some(n => n.id == item.pricelevel.data.id)) {
+          if (
+            item.pricelevel_id == null &&
+            item.shop_id == null &&
+            item.unit_id == null &&
+            item.quantityrange_id == null
+          ) {
+          } else if (
+            !state.singleGoodsDetail.priceGrades.some((n) => n.id == item.pricelevel.data.id)
+          ) {
             state.singleGoodsDetail.priceGrades.push({
               id: item.pricelevel.data.id,
               name: item.pricelevel.data.name,
@@ -253,18 +314,20 @@ export default {
           }
         });
         if (priceModel == 'quantityrange') {
-          state.singleGoodsDetail.selectQuantityStep = value.quantityrangegroup.data.quantityranges.data.map((item, index) => {
-            let name;
-            if (item.max == -1) {
-              name = `${item.min} ~`;
-            } else {
-              name = `${item.min} ~ ${item.max - 1}`;
-            }
-            return {
-              id: item.id,
-              name,
-            };
-          });
+          state.singleGoodsDetail.selectQuantityStep = value.quantityrangegroup.data.quantityranges.data.map(
+            (item, index) => {
+              let name;
+              if (item.max == -1) {
+                name = `${item.min} ~`;
+              } else {
+                name = `${item.min} ~ ${item.max - 1}`;
+              }
+              return {
+                id: item.id,
+                name,
+              };
+            },
+          );
         } else if (priceModel == 'unit') {
           state.singleGoodsDetail.selectUnits = value.units.data.map((item) => {
             return {
@@ -275,7 +338,15 @@ export default {
           });
         } else if (priceModel == 'shop') {
           value.itemprices.data.forEach((item) => {
-            if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {} else if (!state.singleGoodsDetail.selectShops.some(n => n.id == item.shop.data.id)) {
+            if (
+              item.pricelevel_id == null &&
+              item.shop_id == null &&
+              item.unit_id == null &&
+              item.quantityrange_id == null
+            ) {
+            } else if (
+              !state.singleGoodsDetail.selectShops.some((n) => n.id == item.shop.data.id)
+            ) {
               state.singleGoodsDetail.selectShops.push({
                 id: item.shop.data.id,
                 name: item.shop.data.name,
@@ -284,14 +355,16 @@ export default {
           });
         }
       }
-      state.singleGoodsDetail.units = value.units.data.map(item => (`${item.name} x ( ${item.number} )`)).join('、'); // 单位
+      state.singleGoodsDetail.units = value.units.data
+        .map((item) => `${item.name} x ( ${item.number} )`)
+        .join('、'); // 单位
       let colors = [], // 颜色
         sizes = []; // 尺码
       state.singleGoodsDetail.images = []; // 图片
       value.skus.data.forEach((item) => {
         item.skuattributes.data.forEach((subItem) => {
           if (subItem.skuattributetype_id === '1') {
-            if (!colors.some(colorItem => colorItem.id === subItem.id)) {
+            if (!colors.some((colorItem) => colorItem.id === subItem.id)) {
               colors.push({
                 name: subItem.name,
                 id: subItem.id,
@@ -299,7 +372,7 @@ export default {
             }
           }
           if (subItem.skuattributetype_id === '2') {
-            if (!sizes.some(sizeItem => sizeItem.id === subItem.id)) {
+            if (!sizes.some((sizeItem) => sizeItem.id === subItem.id)) {
               sizes.push({
                 name: subItem.name,
                 id: subItem.id,
@@ -309,13 +382,14 @@ export default {
         });
         // 图片策略为sku
         if (itemImageLevel == 'sku') {
-          item.skuimages && item.skuimages.data.forEach((subItem) => {
-            state.singleGoodsDetail.images.push({
-              name: subItem.name,
-              url: subItem.url,
-              id: subItem.id,
+          item.skuimages &&
+            item.skuimages.data.forEach((subItem) => {
+              state.singleGoodsDetail.images.push({
+                name: subItem.name,
+                url: subItem.url,
+                id: subItem.id,
+              });
             });
-          });
         }
       });
       // 图片策略为item
@@ -328,9 +402,11 @@ export default {
           };
         });
       }
-      state.singleGoodsDetail.colors = colors.map(item => item.name).join('、');
-      state.singleGoodsDetail.sizes = sizes.map(item => item.name).join('、');
-      state.singleGoodsDetail.goodsGroup = value.itemgroups.data.map(item => item.name).join('、');
+      state.singleGoodsDetail.colors = colors.map((item) => item.name).join('、');
+      state.singleGoodsDetail.sizes = sizes.map((item) => item.name).join('、');
+      state.singleGoodsDetail.goodsGroup = value.itemgroups.data
+        .map((item) => item.name)
+        .join('、');
       return { ...state };
     },
 
@@ -512,7 +588,7 @@ export default {
               stock_quantity: item.stock_quantity,
             });
           } else if (item.skuattributes.length == 2) {
-            if (state.singleGoodsSales.some(n => n.id == item.skuattributes[0].id)) {
+            if (state.singleGoodsSales.some((n) => n.id == item.skuattributes[0].id)) {
               expandedRowRender[`${item.skuattributes[0].id}`].push({
                 id: `${item.skuattributes[1].id}_${index}`,
                 name: item.skuattributes[1].name,
@@ -547,10 +623,22 @@ export default {
         if (Object.values(expandedRowRender).length != 0) {
           state.singleGoodsSales.forEach((item) => {
             item.children = expandedRowRender[item.id];
-            item.sales_quantity = expandedRowRender[item.id].reduce((sum, item) => (sum + Number(item.sales_quantity)), 0);
-            item.sales_amount = expandedRowRender[item.id].reduce((sum, item) => (sum + Number(item.sales_amount)), 0);
-            item.profit = expandedRowRender[item.id].reduce((sum, item) => (sum + Number(item.profit)), 0);
-            item.stock_quantity = expandedRowRender[item.id].reduce((sum, item) => (sum + Number(item.stock_quantity)), 0);
+            item.sales_quantity = expandedRowRender[item.id].reduce(
+              (sum, item) => sum + Number(item.sales_quantity),
+              0,
+            );
+            item.sales_amount = expandedRowRender[item.id].reduce(
+              (sum, item) => sum + Number(item.sales_amount),
+              0,
+            );
+            item.profit = expandedRowRender[item.id].reduce(
+              (sum, item) => sum + Number(item.profit),
+              0,
+            );
+            item.stock_quantity = expandedRowRender[item.id].reduce(
+              (sum, item) => sum + Number(item.stock_quantity),
+              0,
+            );
           });
         }
       }
@@ -580,7 +668,7 @@ export default {
               stock_quantity: item.stock_quantity,
             });
           } else if (item.skuattributes.length == 2) {
-            if (state.singleGoodsPurchases.some(n => n.id == item.skuattributes[0].id)) {
+            if (state.singleGoodsPurchases.some((n) => n.id == item.skuattributes[0].id)) {
               expandedRowRender[`${item.skuattributes[0].id}`].push({
                 id: `${item.skuattributes[1].id}_${index}`,
                 name: item.skuattributes[1].name,
@@ -611,9 +699,18 @@ export default {
         if (Object.values(expandedRowRender).length != 0) {
           state.singleGoodsPurchases.forEach((item) => {
             item.children = expandedRowRender[item.id];
-            item.purchase_quantity = expandedRowRender[item.id].reduce((sum, item) => (sum, Number(item.purchase_quantity)), 0);
-            item.purchase_amount = expandedRowRender[item.id].reduce((sum, item) => (sum, Number(item.purchase_amount)), 0);
-            item.stock_quantity = expandedRowRender[item.id].reduce((sum, item) => (sum, Number(item.stock_quantity)), 0);
+            item.purchase_quantity = expandedRowRender[item.id].reduce(
+              (sum, item) => (sum, Number(item.purchase_quantity)),
+              0,
+            );
+            item.purchase_amount = expandedRowRender[item.id].reduce(
+              (sum, item) => (sum, Number(item.purchase_amount)),
+              0,
+            );
+            item.stock_quantity = expandedRowRender[item.id].reduce(
+              (sum, item) => (sum, Number(item.stock_quantity)),
+              0,
+            );
           });
         }
       }
@@ -643,7 +740,7 @@ export default {
               stock_quantity: item.stock_quantity,
             });
           } else if (item.skuattributes.length == 2) {
-            if (state.singleGoodsStocks.some(n => n.id == item.skuattributes[0].id)) {
+            if (state.singleGoodsStocks.some((n) => n.id == item.skuattributes[0].id)) {
               expandedRowRender[`${item.skuattributes[0].id}`].push({
                 id: `${item.skuattributes[1].id}_${index}`,
                 name: item.skuattributes[1].name,
@@ -674,9 +771,18 @@ export default {
         if (Object.values(expandedRowRender).length != 0) {
           state.singleGoodsStocks.forEach((item) => {
             item.children = expandedRowRender[item.id];
-            item.sales_quantity = expandedRowRender[item.id].reduce((sum, item) => (sum + Number(item.sales_quantity)), 0);
-            item.purchase_quantity = expandedRowRender[item.id].reduce((sum, item) => (sum + Number(item.purchase_quantity)), 0);
-            item.stock_quantity = expandedRowRender[item.id].reduce((sum, item) => (sum + Number(item.stock_quantity)), 0);
+            item.sales_quantity = expandedRowRender[item.id].reduce(
+              (sum, item) => sum + Number(item.sales_quantity),
+              0,
+            );
+            item.purchase_quantity = expandedRowRender[item.id].reduce(
+              (sum, item) => sum + Number(item.purchase_quantity),
+              0,
+            );
+            item.stock_quantity = expandedRowRender[item.id].reduce(
+              (sum, item) => sum + Number(item.stock_quantity),
+              0,
+            );
           });
         }
       }

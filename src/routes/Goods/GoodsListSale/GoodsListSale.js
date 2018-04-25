@@ -269,6 +269,7 @@ export default class GoodsListSale extends PureComponent {
         title: '',
         dataIndex: 'image',
         width: 60,
+        // eslint-disable-next-line
         render: (text, record) =>
           !record.itemimage_names.length ? null : (
             <img src={record.itemimage_names[0]} style={{ width: 42, height: 42 }} alt="未显示" />
