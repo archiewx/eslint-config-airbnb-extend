@@ -17,6 +17,7 @@ const breadcrumbList = [{
   title: '关系',
 }, {
   title: '客户',
+  href: '/relationship/customer-list',
 }];
 @Form.create()
 @connect(state => ({

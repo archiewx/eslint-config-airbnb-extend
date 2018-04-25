@@ -1,0 +1,120 @@
+/* filter-panel*/
+
+// ul, li 初始化和公共设置mixin
+.mixin-ul-li {
+  ul,
+  li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  a {
+    padding-right: 30px;
+    color: rgba(0, 0, 0, 0.65);
+  }
+}
+
+.duokeFilter {
+  background-color: #fff;
+  box-sizing: border-box;
+  position: relative;
+  font-family: 'Helvetica Neue For Number', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial,
+    sans-serif;
+}
+
+.filterPanel {
+  display: flex;
+  width: 100%;
+  line-height: 45px;
+  border-bottom: 1px dashed #efefef;
+}
+.filterPanelWrapper {
+  flex: 1;
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.filterPanelLabel {
+  align-self: flex-start;
+}
+
+.filterItemTitle {
+  i {
+    margin-left: 4px;
+  }
+  padding: 0 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.filterItemList {
+  top: 100%;
+  padding: 8px;
+  background-color: #ccc;
+  display: none;
+  transition: all 0.5s;
+  width: 150px;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.dropList {
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-top: 1px dashed #efefef;
+  .mixin-ul-li;
+  ul {
+    padding: 0 12px;
+  }
+
+  li {
+    padding: 8px 0;
+  }
+
+  .itemIcon {
+    float: right;
+    color: #85bd54;
+    line-height: 22px;
+  }
+}
+
+.panelList {
+  position: absolute;
+  background-color: #fff;
+  width: 100%;
+  border-top: 1px dashed #efefef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  .mixin-ul-li;
+  ul {
+    display: flex;
+    align-items: center;
+    padding: 10px 4px 0;
+    flex-wrap: wrap;
+  }
+  li {
+    font-size: 14px;
+    padding: 5px 4px;
+    line-height: 14px;
+    margin-bottom: -1px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    transition: all 0.5s;
+  }
+  a {
+    padding-right: 0;
+  }
+}
+
+.panelListItemActive {
+  background: #5192f0;
+  border-radius: 4px;
+  a {
+    color: #fff;
+  }
+}
+
+.bottomLeftRcPopup {
+  width: 100%;
+}

@@ -1,0 +1,43 @@
+.rc-trigger-popup-swipe-enter,
+.rc-trigger-popup-swipe-appear {
+  opacity: 0;
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  animation-play-state: paused;
+}
+.rc-trigger-popup-swipe-leave {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.6, -0.3, 0.74, 0.05);
+  animation-play-state: paused;
+}
+.rc-trigger-popup-swipe-enter.rc-trigger-popup-swipe-enter-active,
+.rc-trigger-popup-swipe-appear.rc-trigger-popup-swipe-appear-active {
+  animation-name: rcTriggerSwipeIn;
+  animation-play-state: running;
+}
+.rc-trigger-popup-swipe-leave.rc-trigger-popup-swipe-leave-active {
+  animation-name: rcTriggerSwipeOut;
+  animation-play-state: running;
+}
+@keyframes rcTriggerSwipeIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes rcTriggerSwipeOut {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+}

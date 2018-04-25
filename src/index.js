@@ -12,7 +12,7 @@ import './index.less';
 const app = dva({
   // history: browserHistory(),
   onError(e) {
-    if(e.type !== 'page') {
+    if (e.type !== 'page') {
       message.error(e.message);
     }
   },
@@ -31,7 +31,7 @@ app.router(require('./router'));
 // 5. Start
 app.start('#root');
 
-window.onbeforeunload = function () {
+window.onbeforeunload = function() {
   sessionStorage.setItem('oncefetch', true);
 };
 

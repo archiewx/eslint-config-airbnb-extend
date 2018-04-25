@@ -84,6 +84,7 @@ export default class SaleSettleDetail extends PureComponent {
       title: '财务',
     }, {
       title: '销售结算',
+      href: '/finance/sale-settle',
     }, {
       title: `#${singleData.number || ''}`,
     }];

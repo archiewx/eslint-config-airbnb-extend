@@ -3,7 +3,6 @@ import * as printService from '../services/print';
 import pathToRegexp from 'path-to-regexp';
 
 export default {
-
   namespace: 'purchaseOrderDetail',
 
   state: {
@@ -15,14 +14,18 @@ export default {
       history.listen(({ pathname }) => {
         const match = pathToRegexp('/bill/purchase-detail/:id').exec(pathname);
         if (match) {
-          dispatch({ type: 'setState',
+          dispatch({
+            type: 'setState',
             payload: {
               singleOrderDetail: {},
-            } });
-          dispatch({ type: 'getSingle',
+            },
+          });
+          dispatch({
+            type: 'getSingle',
             payload: {
               id: match[1],
-            } });
+            },
+          });
         }
       });
     },
@@ -44,7 +47,6 @@ export default {
   },
 
   reducers: {
-
     setState(state, action) {
       return { ...state, ...action.payload };
     },
@@ -66,7 +68,9 @@ export default {
         }
       }
       state.singleOrderDetail.delivery_status = payload.delivery_status;
-      state.singleOrderDetail.label = payload.doctags.data.length ? payload.doctags.data.map(n => n.name).join('、') : '无';
+      state.singleOrderDetail.label = payload.doctags.data.length
+        ? payload.doctags.data.map((n) => n.name).join('、')
+        : '无';
       state.singleOrderDetail.remark = payload.remark || '无';
       state.singleOrderDetail.count = payload.purchaseorderskus.data.length;
       state.singleOrderDetail.quantity = payload.quantity;
@@ -107,11 +111,13 @@ export default {
       state.singleOrderDetail.itemExtraList = {};
       state.singleOrderDetail.itemRecord = {};
       payload.purchaseorderskus.data.forEach((n) => {
-        if (hasItems.some(_ => _ == n.item_id)) {
+        if (hasItems.some((_) => _ == n.item_id)) {
           if (n.sku.data.skuattributes.data.length == 1) {
             if (!state.singleOrderDetail.itemExtraList[`${n.item_id}`]) {
               state.singleOrderDetail.itemExtraList[`${n.item_id}`] = [];
-              state.singleOrderDetail.itemExtraList[`${n.item_id}`].push(state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id));
+              state.singleOrderDetail.itemExtraList[`${n.item_id}`].push(
+                state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id),
+              );
             }
             state.singleOrderDetail.itemExtraList[`${n.item_id}`].push({
               id: n.id,
@@ -126,39 +132,69 @@ export default {
               label: n.docdetailtag_id ? n.docdetailtag.data.name : '-',
               remark: n.remark || '-',
             });
-            const current = JSON.parse(JSON.stringify(state.singleOrderDetail.itemList[state.singleOrderDetail.itemList.findIndex(_ => _.item_id == n.item_id)]));
+            const current = JSON.parse(
+              JSON.stringify(
+                state.singleOrderDetail.itemList[
+                  state.singleOrderDetail.itemList.findIndex((_) => _.item_id == n.item_id)
+                ],
+              ),
+            );
             current.color = '多颜色';
             current.label = '多标签';
             current.remark = '多备注';
             current.quantity = `${Number(n.quantity) + Number(current.number)} x ${n.unit_number}`;
-            current.total = (Number(current.total) + Number(n.deal_price) * Number(n.quantity)).toFixed(2);
-            state.singleOrderDetail.itemList[state.singleOrderDetail.itemList.findIndex(_ => _.item_id == n.item_id)] = current;
+            current.total = (
+              Number(current.total) +
+              Number(n.deal_price) * Number(n.quantity)
+            ).toFixed(2);
+            state.singleOrderDetail.itemList[
+              state.singleOrderDetail.itemList.findIndex((_) => _.item_id == n.item_id)
+            ] = current;
           } else if (n.sku.data.skuattributes.data.length == 2) {
             if (!state.singleOrderDetail.itemExtraList[`${n.item_id}`]) {
               state.singleOrderDetail.itemExtraList[`${n.item_id}`] = [];
               state.singleOrderDetail.itemExtraList[`${n.item_id}`][0] = [];
               state.singleOrderDetail.itemExtraList[`${n.item_id}`][0].push({
-                name: state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id).size,
+                name: state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id).size,
               });
               state.singleOrderDetail.itemExtraList[`${n.item_id}`].push({
-                colorId: state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id).colorId,
-                name: state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id).color,
-                children: [{
-                  sizeId: state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id).sizeId,
-                  quantity: state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id).quantity,
-                  name: state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id).size,
-                  label: state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id).label,
-                  remark: state.singleOrderDetail.itemList.find(_ => _.item_id == n.item_id).remark,
-                }],
+                colorId: state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id)
+                  .colorId,
+                name: state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id).color,
+                children: [
+                  {
+                    sizeId: state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id)
+                      .sizeId,
+                    quantity: state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id)
+                      .quantity,
+                    name: state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id).size,
+                    label: state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id)
+                      .label,
+                    remark: state.singleOrderDetail.itemList.find((_) => _.item_id == n.item_id)
+                      .remark,
+                  },
+                ],
               });
             }
-            if (!state.singleOrderDetail.itemExtraList[`${n.item_id}`][0].some(_ => _.name == n.sku.data.skuattributes.data[1].name)) {
+            if (
+              !state.singleOrderDetail.itemExtraList[`${n.item_id}`][0].some(
+                (_) => _.name == n.sku.data.skuattributes.data[1].name,
+              )
+            ) {
               state.singleOrderDetail.itemExtraList[`${n.item_id}`][0].push({
                 name: n.sku.data.skuattributes.data[1].name,
               });
             }
-            if (state.singleOrderDetail.itemExtraList[`${n.item_id}`].some(_ => _.colorId == n.sku.data.skuattributes.data[0].id)) {
-              state.singleOrderDetail.itemExtraList[`${n.item_id}`][state.singleOrderDetail.itemExtraList[`${n.item_id}`].findIndex(_ => _.colorId == n.sku.data.skuattributes.data[0].id)].children.push({
+            if (
+              state.singleOrderDetail.itemExtraList[`${n.item_id}`].some(
+                (_) => _.colorId == n.sku.data.skuattributes.data[0].id,
+              )
+            ) {
+              state.singleOrderDetail.itemExtraList[`${n.item_id}`][
+                state.singleOrderDetail.itemExtraList[`${n.item_id}`].findIndex(
+                  (_) => _.colorId == n.sku.data.skuattributes.data[0].id,
+                )
+              ].children.push({
                 sizeId: n.sku.data.skuattributes.data[1].id,
                 quantity: `${n.quantity} x ${n.unit_number}`,
                 name: n.sku.data.skuattributes.data[1].name,
@@ -169,23 +205,36 @@ export default {
               state.singleOrderDetail.itemExtraList[`${n.item_id}`].push({
                 colorId: n.sku.data.skuattributes.data[0].id,
                 name: n.sku.data.skuattributes.data[0].name,
-                children: [{
-                  sizeId: n.sku.data.skuattributes.data[1].id,
-                  quantity: `${n.quantity} x ${n.unit_number}`,
-                  name: n.sku.data.skuattributes.data[1].name,
-                  label: n.docdetailtag_id ? n.docdetailtag.data.name : '-',
-                  remark: n.remark || '-',
-                }],
+                children: [
+                  {
+                    sizeId: n.sku.data.skuattributes.data[1].id,
+                    quantity: `${n.quantity} x ${n.unit_number}`,
+                    name: n.sku.data.skuattributes.data[1].name,
+                    label: n.docdetailtag_id ? n.docdetailtag.data.name : '-',
+                    remark: n.remark || '-',
+                  },
+                ],
               });
             }
-            const current = JSON.parse(JSON.stringify(state.singleOrderDetail.itemList[state.singleOrderDetail.itemList.findIndex(_ => _.item_id == n.item_id)]));
+            const current = JSON.parse(
+              JSON.stringify(
+                state.singleOrderDetail.itemList[
+                  state.singleOrderDetail.itemList.findIndex((_) => _.item_id == n.item_id)
+                ],
+              ),
+            );
             current.color = '多颜色';
             current.size = '多尺码';
             current.label = '多标签';
             current.remark = '多备注';
             current.quantity = `${Number(n.quantity) + Number(current.number)} x ${n.unit_number}`;
-            current.total = (Number(current.total) + Number(n.deal_price) * Number(n.quantity)).toFixed(2);
-            state.singleOrderDetail.itemList[state.singleOrderDetail.itemList.findIndex(_ => _.item_id == n.item_id)] = current;
+            current.total = (
+              Number(current.total) +
+              Number(n.deal_price) * Number(n.quantity)
+            ).toFixed(2);
+            state.singleOrderDetail.itemList[
+              state.singleOrderDetail.itemList.findIndex((_) => _.item_id == n.item_id)
+            ] = current;
           }
         } else {
           hasItems.push(n.item_id);
@@ -230,7 +279,7 @@ export default {
               quantity: `${n.quantity} x ${n.unit_number}`,
               number: n.quantity,
               total: (Number(n.deal_price) * Number(n.quantity)).toFixed(2),
-              label: n.docdetailtag_id ? n.docdetailtag.data.name : '-',
+              label: n.docdetailtag_id ? (n.docdetailtag && n.docdetailtag.data && n.docdetailtag.data.name) || '' : '-',
               remark: n.remark || '-',
             });
           }

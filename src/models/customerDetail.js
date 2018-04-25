@@ -3,7 +3,6 @@ import pathToRegexp from 'path-to-regexp';
 import moment from 'moment';
 
 export default {
-
   namespace: 'customerDetail',
 
   state: {
@@ -27,7 +26,9 @@ export default {
   subscriptions: {
     setup({ dispatch, history }) {
       history.listen(() => {
-        const match = pathToRegexp('/relationship/customer-detail/:id').exec(location.hash.slice(1, location.hash.length));
+        const match = pathToRegexp('/relationship/customer-detail/:id').exec(
+          location.hash.slice(1, location.hash.length),
+        );
         dispatch({ type: 'setState', payload: { singleCustomerDetail: {} } });
         if (match) {
           dispatch({ type: 'getSingle', payload: { id: match[1] } });
@@ -43,7 +44,9 @@ export default {
           created_at: 'desc',
         },
         date_type: 'custom',
-        sday: moment(new Date((new Date()).getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        sday: moment(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format(
+          'YYYY-MM-DD',
+        ),
         eday: moment(new Date(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
         id: payload.id,
       };
@@ -52,7 +55,9 @@ export default {
           purchase_time: 'desc',
         },
         date_type: 'custom',
-        sday: moment(new Date((new Date()).getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        sday: moment(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000), 'YYYY-MM-DD').format(
+          'YYYY-MM-DD',
+        ),
         eday: moment(new Date(), 'YYYY-MM-DD').format('YYYY-MM-DD'),
         id: payload.id,
       };
@@ -74,7 +79,8 @@ export default {
       ]);
 
       yield put({ type: 'setShowData', payload: data1.result.data });
-      yield put({ type: 'setState',
+      yield put({
+        type: 'setState',
         payload: {
           singleCustomerSaleHistory: data2.result.data,
           singleCustomerGoodsHistory: data3.result.data,
@@ -87,7 +93,8 @@ export default {
           currentId: payload,
           singleCustomerFinance: data7.result.data,
           singleCustomerPayments: data8.result.data,
-        } });
+        },
+      });
     },
 
     *getSingleDetail({ payload }, { call, put }) {
@@ -97,50 +104,62 @@ export default {
 
     *getSaleHistory({ payload }, { call, put }) {
       const data = yield call(customerService.getCustomerSaleHistory, payload);
-      yield put({ type: 'setState',
+      yield put({
+        type: 'setState',
         payload: {
           singleCustomerSaleHistory: data.result.data,
-        } });
+        },
+      });
     },
 
     *getGoodsHistory({ payload }, { call, put }) {
       const data = yield call(customerService.getCustomerGoodsHistory, payload);
-      yield put({ type: 'setState',
+      yield put({
+        type: 'setState',
         payload: {
           singleCustomerGoodsHistory: data.result.data,
-        } });
+        },
+      });
     },
 
     *getPaymentHistory({ payload }, { call, put }) {
       const data = yield call(customerService.getCustomerPaymentHistory, payload);
-      yield put({ type: 'setState',
+      yield put({
+        type: 'setState',
         payload: {
           singleCustomerPaymentHistory: data.result.data,
-        } });
+        },
+      });
     },
 
     *getSalesorder({ payload }, { call, put }) {
       const data = yield call(customerService.getSalesordersNeedPay, payload);
-      yield put({ type: 'setState',
+      yield put({
+        type: 'setState',
         payload: {
           singleCustomerSalesorders: data.result.data,
-        } });
+        },
+      });
     },
 
     *getStatement({ payload }, { call, put }) {
       const data = yield call(customerService.getStatementsNeedPay, payload);
-      yield put({ type: 'setState',
+      yield put({
+        type: 'setState',
         payload: {
           singleCustomerStatements: data.result.data,
-        } });
+        },
+      });
     },
 
     *getPayments({ payload }, { call, put }) {
       const data = yield call(customerService.getCustomerPayments, payload);
-      yield put({ type: 'setState',
+      yield put({
+        type: 'setState',
         payload: {
           singleCustomerPayments: data.result.data,
-        } });
+        },
+      });
     },
 
     *deleteSingle({ payload }, { call, put }) {
@@ -152,11 +171,9 @@ export default {
       const { currentId } = yield select(({ customerDetail }) => customerDetail);
       yield put({ type: 'getSingleDetail', payload: currentId });
     },
-
   },
 
   reducers: {
-
     setState(state, action) {
       return { ...state, ...action.payload };
     },
@@ -164,23 +181,29 @@ export default {
     setShowData(state, { payload }) {
       state.singleCustomerDetail.name = payload.name; //名称
       state.singleCustomerDetail.phone = payload.phone || '无'; //电话
-      state.singleCustomerDetail.vip = payload.vip && payload.vip.data.name || '无'; 
+      state.singleCustomerDetail.vip = (payload.vip && payload.vip.data.name) || '无';
       state.singleCustomerDetail.debt = payload.debt;
       state.singleCustomerDetail.total_points = payload.total_points;
       state.singleCustomerDetail.basicDetail = [];
 
-      payload.wechat ? state.singleCustomerDetail.basicDetail.push({
-        parentName: '微信号',
-        name: payload.wechat,
-      }) : '';
-      payload.seller ? state.singleCustomerDetail.basicDetail.push({
-        parentName: '专属导购',
-        name: payload.seller.data.name,
-      }) : '';
-      payload.remark1 ? state.singleCustomerDetail.basicDetail.push({
-        parentName: '备注',
-        name: payload.remark1,
-      }) : '';
+      payload.wechat
+        ? state.singleCustomerDetail.basicDetail.push({
+            parentName: '微信号',
+            name: payload.wechat,
+          })
+        : '';
+      payload.seller
+        ? state.singleCustomerDetail.basicDetail.push({
+            parentName: '专属导购',
+            name: payload.seller.data.name,
+          })
+        : '';
+      payload.remark1
+        ? state.singleCustomerDetail.basicDetail.push({
+            parentName: '备注',
+            name: payload.remark1,
+          })
+        : '';
 
       payload.customergroups.data.forEach((item) => {
         state.singleCustomerDetail.basicDetail.push({
@@ -199,81 +222,64 @@ export default {
       return { ...state };
     },
 
-
     setFilterSaleServerData(state, { payload }) {
       const current = {};
-      for (const key in payload) {
-        if (key.indexOf('sale_') == 0) {
-          if (payload[key]) {
-            const name = key.slice(5, key.length);
-            if (name == 'datePick') {
-              current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
-            } else {
-              current[`${name}_in`] = payload[key];
-            }
-          }
+      const params = { ...payload };
+      // 获取key值处理
+      Object.keys(params).forEach((key) => {
+        if (key === 'dates') {
+          current.date_type = 'custom';
+          // 这里得到是一个moment 对象
+          [current.sday, current.eday] = params[key];
+          current.sday = current.sday.format('YYYY-MM-DD');
+          current.eday = current.eday.format('YYYY-MM-DD');
+          delete current.dates;
+        } else {
+          current[`${key}_in`] = params[key];
         }
-      }
-      for (const key in current) {
-        if (Array.isArray(current[key]) && !current[key].length) {
-          delete current[key];
-        }
-      }
+      });
       state.filterSaleServerData = current;
       return { ...state };
     },
 
     setFilterGoodsServerData(state, { payload }) {
       const current = {};
-      for (const key in payload) {
-        if (key.indexOf('goods_') == 0) {
-          if (payload[key]) {
-            const name = key.slice(6, key.length);
-            if (name == 'datePick') {
-              current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
-            } else {
-              current[`${name}_in`] = payload[key];
-            }
-          }
+      const params = { ...payload };
+      // 获取key值处理
+      Object.keys(params).forEach((key) => {
+        if (key === 'dates') {
+          current.date_type = 'custom';
+          // 这里得到是一个moment 对象
+          [current.sday, current.eday] = params[key];
+          current.sday = current.sday.format('YYYY-MM-DD');
+          current.eday = current.eday.format('YYYY-MM-DD');
+          delete current.dates;
+        } else {
+          current[`${key}_in`] = params[key];
         }
-      }
-      for (const key in current) {
-        if (Array.isArray(current[key]) && !current[key].length) {
-          delete current[key];
-        }
-      }
+      });
       state.filterGoodsServerData = current;
       return { ...state };
     },
 
     setFilterPurchaseServerData(state, { payload }) {
       const current = {};
-      for (const key in payload) {
-        if (key.indexOf('payment_') == 0) {
-          if (payload[key]) {
-            const name = key.slice(8, key.length);
-            if (name == 'datePick') {
-              current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
-            } else {
-              current[`${name}_in`] = payload[key];
-            }
-          }
+      const params = { ...payload };
+      // 获取key值处理
+      Object.keys(params).forEach((key) => {
+        if (key === 'dates') {
+          current.date_type = 'custom';
+          // 这里得到是一个moment 对象
+          [current.sday, current.eday] = params[key];
+          current.sday = current.sday.format('YYYY-MM-DD');
+          current.eday = current.eday.format('YYYY-MM-DD');
+          delete current.dates;
+        } else {
+          current[`${key}_in`] = params[key];
         }
-      }
-      for (const key in current) {
-        if (Array.isArray(current[key]) && !current[key].length) {
-          delete current[key];
-        }
-      }
+      });
       state.filterPaymentServerData = current;
       return { ...state };
     },
   },
-
 };

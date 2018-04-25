@@ -22,11 +22,18 @@
 .goodsListExtra {
   :global {
     .ant-tabs {
-      width: 50%
+      width: 50%;
     }
   }
   > div:nth-child(2) {
     margin-bottom: -50px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .goodsListExtra {
+    > div:nth-child(2) {
+      margin-bottom: -20px;
+    }
   }
 }
 
@@ -34,7 +41,7 @@
   text-align: right;
 }
 .numberRightMove span {
- float: right; 
+  float: right;
 }
 
 .specialCardBody {
@@ -42,7 +49,7 @@
     .ant-card-body {
       padding: 24px 32px;
     }
-  }  
+  }
 }
 
 .specialCardHead {

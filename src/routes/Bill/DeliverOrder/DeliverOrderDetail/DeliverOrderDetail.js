@@ -101,6 +101,7 @@ export default class DeliverOrderDetail extends PureComponent {
       title: '单据',
     }, {
       title: '调货单',
+      href: '/bill/deliver-order',
     }, {
       title: `#${singleOrderDetail.number || ''}`,
     }];

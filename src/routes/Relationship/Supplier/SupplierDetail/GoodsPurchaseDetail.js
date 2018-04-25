@@ -6,9 +6,9 @@ import { Row, Col, Card, Button, Icon, Table } from 'antd';
 import PageHeaderLayout from '../../../../layouts/PageHeaderLayout';
 import styles from './SupplierDetail.less';
 
-const NCNF = value => currency(value, { symbol: '', precision: 2 });
-const NCNI = value => currency(value, { symbol: '', precision: 0 });
-@connect(state => ({
+const NCNF = (value) => currency(value, { symbol: '', precision: 2 });
+const NCNI = (value) => currency(value, { symbol: '', precision: 0 });
+@connect((state) => ({
   supplierGoodsPurchaseDetail: state.supplierGoodsPurchaseDetail,
 }))
 export default class GoodsPurchaseDetail extends PureComponent {
@@ -21,71 +21,123 @@ export default class GoodsPurchaseDetail extends PureComponent {
         last_purchase_time: 'desc',
       };
     }
-    this.props.dispatch({ type: 'supplierGoodsPurchaseDetail/getList',
+    this.props.dispatch({
+      type: 'supplierGoodsPurchaseDetail/getList',
       payload: {
         id: this.props.supplierGoodsPurchaseDetail.customerId,
         subId: this.props.supplierGoodsPurchaseDetail.itemId,
         sorts,
-      } });
-  }
+      },
+    });
+  };
 
   render() {
     const { goodsPurchaseList, customerId } = this.props.supplierGoodsPurchaseDetail;
-    let parent = null
+    let parent = null;
 
-    const breadcrumbList = [{
-      title: '关系',
-    }, {
-      title: '供应商',
-    }, {
-      title: this.props.history.location.pathname.slice(this.props.history.location.pathname.lastIndexOf('/') + 1),
-    }, {
-      title: '商品供应详情',
-    }];
+    const { params } = this.props.match;
 
-    const columns = [{
-      title: '名称',
-      dataIndex: 'name',
-    }, {
-      title: '供应量',
-      dataIndex: 'total_quantity ',
-      className: styles.numberRightMove,
-      sorter: true,
-      render: (text, record) => NCNI(record.total_quantity).format(true),
-    }, {
-      title: '供应额',
-      dataIndex: 'total_fee',
-      className: styles.numberRightMove,
-      sorter: true,
-      render: (text, record) => NCNF(record.total_fee).format(true),
-    }, {
-      title: '最后供应时间',
-      dataIndex: 'last_purchase_time',
-      sorter: true,
-    }, {
-      title: '操作',
-      dataIndex: 'operation',
-      render: (text, record) => {
-        // return (
-        //   record.name ? (
-        //     record.children ? (
-        //       ((record.id).toString()).indexOf('_') > -1 ? <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}/${this.props.match.params.name}`}>查看</Link> : null
-        //     ) : <Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${record.skuId}/${this.props.match.params.name}`}>查看</Link>
-        //   ) : null
-        // );
-        if (record.children) {
-          parent = record;
-        } else {
-          return (<Link to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${parent.skuId}/${this.props.match.params.name}`}>查看</Link>);
-        }
-        return null;
+    const breadcrumbList = [
+      {
+        title: '关系',
       },
-    }];
+      {
+        title: '供应商',
+        href: '/relationship/supplier-list',
+      },
+      {
+        title: params.name,
+        href: `/relationship/supplier-detail/${params.id}`,
+      },
+      {
+        title: '商品供应详情',
+      },
+    ];
+
+    const columns = [
+      {
+        title: '名称',
+        dataIndex: 'name',
+      },
+      {
+        title: '供应量',
+        dataIndex: 'total_quantity ',
+        className: styles.numberRightMove,
+        sorter: true,
+        render: (text, record) => NCNI(record.total_quantity).format(true),
+      },
+      {
+        title: '供应额',
+        dataIndex: 'total_fee',
+        className: styles.numberRightMove,
+        sorter: true,
+        render: (text, record) => NCNF(record.total_fee).format(true),
+      },
+      {
+        title: '最后供应时间',
+        dataIndex: 'last_purchase_time',
+        sorter: true,
+      },
+      {
+        title: '操作',
+        dataIndex: 'operation',
+        render: (text, record) => {
+          // return record.name ? (
+          //   record.children ? (
+          //     record.id.toString().indexOf('_') > -1 ? (
+          //       <Link
+          //         to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${
+          //           record.skuId
+          //         }/${params.name}`}>
+          //         查看
+          //       </Link>
+          //     ) : null
+          //   ) : (
+          //     <Link
+          //       to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${
+          //         record.skuId
+          //       }/${params.name}`}>
+          //       查看
+          //     </Link>
+          //   )
+          // ) : null;
+          if (!customerId) {
+            return null;
+          }
+          if (record.children) {
+            parent = record;
+          } else {
+            return parent ? (
+              <Link
+                to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${
+                  params.subId
+                }/${parent.skuId}/${this.props.match.params.name}`}>
+                查看
+              </Link>
+            ) : (
+              <Link
+                to={`/relationship/supplier-detail/skus-purchase-detail/${customerId}/${
+                  params.subId
+                }/${params.skuId}/${record.skuId}/${params.name}`}>
+                查看
+              </Link>
+            );
+          }
+          return null;
+        },
+      },
+    ];
 
     return (
       <PageHeaderLayout breadcrumbList={breadcrumbList}>
         <Card bordered={false}>
-          <Table columns={columns} dataSource={goodsPurchaseList} onChange={this.handleSort} rowKey="id" pagination={false} />
+          <Table
+            columns={columns}
+            dataSource={goodsPurchaseList}
+            onChange={this.handleSort}
+            rowKey="id"
+            pagination={false}
+          />
         </Card>
       </PageHeaderLayout>
     );

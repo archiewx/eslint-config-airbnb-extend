@@ -1,0 +1,16 @@
+{
+  "prettier.semi": true,
+  "prettier.trailingComma": "all",
+  "launch": {
+    "configurations": [
+      {
+        "type": "chrome",
+        "request": "launch",
+        "name": "duoke3",
+        "url": "http://localhost:8000/",
+        "disableNetworkCache": true
+      },
+    ],
+    "compounds": []
+  }
+}

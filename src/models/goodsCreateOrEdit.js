@@ -98,7 +98,7 @@ export default {
           } else if (priceModel == 'unit') {
             priceMatrix.forEach((item) => {
               if (item.pricelevel_id && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
-                stata.showData.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
+                state.showData.prices[`${item.unit_id}_${item.pricelevel_id}`] = {
                   price: item.price,
                 };
               } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {} else {

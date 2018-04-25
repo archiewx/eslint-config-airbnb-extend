@@ -1,4 +1,4 @@
-@import "~antd/lib/style/themes/default.less";
+@import '~antd/lib/style/themes/default.less';
 
 .pageHeader {
   background: @component-background;
@@ -61,19 +61,29 @@
     }
   }
 
-  .title, .action, .status,.content, .extraContent, .main{
+  .title,
+  .action,
+  .status,
+  .content,
+  .extraContent,
+  .main {
     flex: auto;
   }
 
-  .title, .action ,.status{
+  .title,
+  .action,
+  .status {
     margin-bottom: 16px;
   }
 
-  .logo, .content, .extraContent {
+  .logo,
+  .content,
+  .extraContent {
     margin-bottom: 16px;
   }
 
-  .action, .extraContent {
+  .action,
+  .extraContent {
     text-align: right;
   }
 
@@ -105,9 +115,11 @@
       display: block;
     }
 
-    .action, .extraContent {
+    .action,
+    .extraContent {
       margin-left: 0;
-      text-align: left;
+      // text-align: left;
+      text-align: right;
     }
   }
 }
@@ -124,7 +136,8 @@
   .pageHeader {
     .action {
       :global {
-        .ant-btn-group, .ant-btn {
+        .ant-btn-group,
+        .ant-btn {
           display: block;
           margin-bottom: 8px;
         }

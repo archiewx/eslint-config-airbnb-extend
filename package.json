@@ -16,7 +16,10 @@
     "lint-staged:js": "eslint --ext .js",
     "test": "jest",
     "test:all": "node ./tests/run-tests.js",
-    "publish": "scp -r dist/* root@47.96.186.39:/var/www/duoke-admin/"
+    "publish": "scp -r dist/* root@47.96.186.39:/var/www/duoke-admin/",
+    "prepush": "git add .",
+    "push": "git commit -m",
+    "postpush": "git push"
   },
   "dependencies": {
     "@antv/data-set": "^0.8.0",
@@ -38,6 +41,7 @@
     "qrcode": "^1.2.0",
     "qs": "^6.5.0",
     "rc-drawer-menu": "^0.5.0",
+    "rc-trigger": "^2.3.4",
     "react": "^16.0.0",
     "react-container-query": "^0.9.1",
     "react-document-title": "^2.0.3",
@@ -86,27 +90,14 @@
     "nightmare": "^2.10.0"
   },
   "babel": {
-    "presets": [
-      "env",
-      "react"
-    ],
-    "plugins": [
-      "transform-decorators-legacy",
-      "transform-class-properties"
-    ]
+    "presets": ["env", "react"],
+    "plugins": ["transform-decorators-legacy", "transform-class-properties"]
   },
   "jest": {
-    "setupFiles": [
-      "<rootDir>/tests/setupTests.js"
-    ],
-    "testMatch": [
-      "**/?(*.)(spec|test|e2e).js?(x)"
-    ],
+    "setupFiles": ["<rootDir>/tests/setupTests.js"],
+    "testMatch": ["**/?(*.)(spec|test|e2e).js?(x)"],
     "setupTestFrameworkScriptFile": "<rootDir>/tests/jasmine.js",
-    "moduleFileExtensions": [
-      "js",
-      "jsx"
-    ],
+    "moduleFileExtensions": ["js", "jsx"],
     "moduleNameMapper": {
       "\\.(css|less)$": "<rootDir>/tests/styleMock.js"
     }
@@ -115,9 +106,5 @@
     "**/*.{js,jsx}": "lint-staged:js",
     "**/*.less": "stylelint --syntax less"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 10"
-  ]
+  "browserslist": ["> 1%", "last 2 versions", "not ie <= 10"]
 }

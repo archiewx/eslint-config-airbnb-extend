@@ -28,6 +28,7 @@ export default class PaymentsDetail extends PureComponent {
       title: '财务',
     }, {
       title: '流水',
+      href: '/finance/payments',
     }, {
       title: `#${singleData.number || ''}`,
     }];

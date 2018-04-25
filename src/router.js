@@ -22,10 +22,10 @@ function RouterConfig({ history, app }) {
     <LocaleProvider locale={zhCN}>
       <ConnectedRouter history={history}>
         <Switch>
-          <Route path="/user" render={props => <UserLayout {...props} />} />
+          <Route path="/user" render={(props) => <UserLayout {...props} />} />
           <AuthorizedRoute
             path="/"
-            render={props => <BasicLayout {...props} />}
+            render={(props) => <BasicLayout {...props} />}
             authority={['user']}
             redirectPath="/user"
           />
@@ -36,4 +36,3 @@ function RouterConfig({ history, app }) {
 }
 
 export default RouterConfig;
-

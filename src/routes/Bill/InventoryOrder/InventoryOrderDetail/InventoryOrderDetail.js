@@ -112,6 +112,7 @@ export default class InventoryOrderDetail extends PureComponent {
       title: '单据',
     }, {
       title: '盘点单',
+      href: '/bill/inventory-order',
     }, {
       title: `#${singleOrderDetail.number || ''}`,
     }];

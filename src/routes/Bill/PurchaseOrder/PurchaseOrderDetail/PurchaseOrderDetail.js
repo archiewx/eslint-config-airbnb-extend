@@ -166,6 +166,7 @@ export default class PurchaseOrderDetail extends PureComponent {
       title: '单据',
     }, {
       title: '进货单',
+      href: '/bill/purchase-order',
     }, {
       title: `#${singleOrderDetail.number || ''}`,
     }];
