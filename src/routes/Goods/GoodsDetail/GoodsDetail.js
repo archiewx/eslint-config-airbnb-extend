@@ -23,7 +23,8 @@ import PageHeaderLayout from '../../../layouts/PageHeaderLayout';
 import DescriptionList from '../../../components/antd-pro/DescriptionList';
 import LightBoxImage from '../../../components/LightBoxImage/LightBoxImage';
 import PriceTextTable from '../../../components/PriceTextTable/PriceTextTable';
-import FilterDatePick from '../../../components/FilterDatePick';
+// import FilterDatePick from '../../../components/FilterDatePick';
+import FilterPicker from '../../../components/FilterPicker/FilterPicker';
 import styles from './GoodsDetail.less';
 
 const ButtonGroup = Button.Group;
@@ -176,18 +177,10 @@ export default class GoodsDetail extends PureComponent {
   };
 
   // 筛选
-  handleSaleFilter = (value) => {
+  handleSaleFilter = (search) => {
     this.props.dispatch({
       type: 'goodsDetail/setFilterSaleServerData',
-      payload: {
-        ...value,
-        sale_datePick: value.sale_datePick
-          ? [
-              value.sale_datePick[0].format('YYYY-MM-DD'),
-              value.sale_datePick[1].format('YYYY-MM-DD'),
-            ]
-          : undefined,
-      },
+      payload: search,
     });
     const filterSale = this.props.goodsDetail.filterSaleServerData;
     this.setState({ filterSale });
@@ -223,18 +216,10 @@ export default class GoodsDetail extends PureComponent {
   };
 
   // 筛选
-  handlePurchaseFilter = (value) => {
+  handlePurchaseFilter = (search) => {
     this.props.dispatch({
       type: 'goodsDetail/setFilterPurchaseServerData',
-      payload: {
-        ...value,
-        purchase_datePick: value.purchase_datePick
-          ? [
-              value.purchase_datePick[0].format('YYYY-MM-DD'),
-              value.purchase_datePick[1].format('YYYY-MM-DD'),
-            ]
-          : undefined,
-      },
+      payload: search,
     });
     const filterPurchase = this.props.goodsDetail.filterPurchaseServerData;
     this.setState({ filterPurchase });
@@ -276,18 +261,10 @@ export default class GoodsDetail extends PureComponent {
   };
 
   // 筛选
-  handleCustomerFilter = (value) => {
+  handleCustomerFilter = (search) => {
     this.props.dispatch({
       type: 'goodsDetail/setFilterCustomerServerData',
-      payload: {
-        ...value,
-        customer_datePick: value.customer_datePick
-          ? [
-              value.customer_datePick[0].format('YYYY-MM-DD'),
-              value.customer_datePick[1].format('YYYY-MM-DD'),
-            ]
-          : undefined,
-      },
+      payload: search,
     });
     const filterCustomer = this.props.goodsDetail.filterCustomerServerData;
     this.setState({ filterCustomer });
@@ -342,18 +319,10 @@ export default class GoodsDetail extends PureComponent {
   };
 
   // 筛选
-  handleSupplierFilter = (value) => {
+  handleSupplierFilter = (search) => {
     this.props.dispatch({
       type: 'goodsDetail/setFilterSupplierServerData',
-      payload: {
-        ...value,
-        supplier_datePick: value.supplier_datePick
-          ? [
-              value.supplier_datePick[0].format('YYYY-MM-DD'),
-              value.supplier_datePick[1].format('YYYY-MM-DD'),
-            ]
-          : undefined,
-      },
+      payload: search,
     });
     const filterSupplier = this.props.goodsDetail.filterSupplierServerData;
     this.setState({ filterSupplier });
@@ -389,18 +358,10 @@ export default class GoodsDetail extends PureComponent {
   };
 
   // 筛选
-  handleStockFilter = (value) => {
+  handleStockFilter = (search) => {
     this.props.dispatch({
       type: 'goodsDetail/setFilterStockServerData',
-      payload: {
-        ...value,
-        stock_datePick: value.stock_datePick
-          ? [
-              value.stock_datePick[0].format('YYYY-MM-DD'),
-              value.stock_datePick[1].format('YYYY-MM-DD'),
-            ]
-          : undefined,
-      },
+      payload: search,
     });
     const filterStock = this.props.goodsDetail.filterStockServerData;
     this.setState({ filterStock });
@@ -427,7 +388,6 @@ export default class GoodsDetail extends PureComponent {
       singleCustomerMode,
     } = this.props.goodsDetail;
     const { goodsDetailFilter } = this.props.layoutFilter;
-    const { getFieldDecorator, getFieldValue } = this.props.form;
     const { usePricelelvel, priceModel } = this.props.configSetting;
 
     const description = (
@@ -787,14 +747,15 @@ export default class GoodsDetail extends PureComponent {
           </Card>
         </div>
         <div style={{ display: activeTabKey == 'sale' ? 'block' : 'none' }}>
-          <Card bordered={false} className={styles.bottomCardDivided}>
+          {/* <Card bordered={false} className={styles.bottomCardDivided}>
             <FilterDatePick
               onChange={this.handleSaleFilter}
               filterOptions={goodsDetailFilter}
               tagLabel="sale"
               dateLabel="sale"
             />
-          </Card>
+          </Card> */}
+          <FilterPicker onChange={this.handleSaleFilter} filters={goodsDetailFilter} />
           <Card bordered={false}>
             <Table
               columns={saleColumns}
@@ -806,14 +767,15 @@ export default class GoodsDetail extends PureComponent {
           </Card>
         </div>
         <div style={{ display: activeTabKey == 'purchase' ? 'block' : 'none' }}>
-          <Card bordered={false} className={styles.bottomCardDivided}>
+          {/* <Card bordered={false} className={styles.bottomCardDivided}>
             <FilterDatePick
               onChange={this.handlePurchaseFilter}
               filterOptions={goodsDetailFilter}
               tagLabel="purchase"
               dateLabel="purchase"
             />
-          </Card>
+          </Card> */}
+          <FilterPicker onChange={this.handlePurchaseFilter} filters={goodsDetailFilter} />
           <Card bordered={false}>
             <Table
               columns={purchaseColumns}
@@ -825,14 +787,15 @@ export default class GoodsDetail extends PureComponent {
           </Card>
         </div>
         <div style={{ display: activeTabKey == 'customer' ? 'block' : 'none' }}>
-          <Card bordered={false} className={styles.bottomCardDivided}>
+          {/* <Card bordered={false} className={styles.bottomCardDivided}>
             <FilterDatePick
               onChange={this.handleCustomerFilter}
               filterOptions={goodsDetailFilter}
               tagLabel="customer"
               dateLabel="customer"
             />
-          </Card>
+          </Card> */}
+          <FilterPicker onChange={this.handleCustomerFilter} filters={goodsDetailFilter} />
           <Card bordered={false} title={selectCustomerMode.name} extra={customerExrta}>
             <Table
               columns={customerColumns}
@@ -853,14 +816,15 @@ export default class GoodsDetail extends PureComponent {
           </Card>
         </div>
         <div style={{ display: activeTabKey == 'supplier' ? 'block' : 'none' }}>
-          <Card bordered={false} className={styles.bottomCardDivided}>
+          {/* <Card bordered={false} className={styles.bottomCardDivided}>
             <FilterDatePick
               onChange={this.handleSupplierFilter}
               filterOptions={goodsDetailFilter}
               tagLabel="supplier"
               dateLabel="supplier"
             />
-          </Card>
+          </Card> */}
+          <FilterPicker onChange={this.handleSupplierFilter} filters={goodsDetailFilter} />
           <Card bordered={false}>
             <Table
               columns={supplierColumns}
@@ -872,14 +836,7 @@ export default class GoodsDetail extends PureComponent {
           </Card>
         </div>
         <div style={{ display: activeTabKey == 'stock' ? 'block' : 'none' }}>
-          <Card bordered={false} className={styles.bottomCardDivided}>
-            <FilterDatePick
-              onChange={this.handleStockFilter}
-              filterOptions={goodsDetailFilter}
-              tagLabel="stock"
-              dateLabel="stock"
-            />
-          </Card>
+          <FilterPicker onChange={this.handleStockFilter} filters={goodsDetailFilter} />
           <Card bordered={false}>
             <Table
               columns={stockColumns}

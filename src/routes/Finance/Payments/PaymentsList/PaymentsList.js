@@ -222,6 +222,8 @@ export default class PaymentsList extends PureComponent {
     } = this.props;
     const { sorts, pages, filter, sortOrder, sortValue } = this.state;
 
+    const radios = ['revenue_type'];
+
     const tableSortExtra = (
       <Select
         style={{ width: 200 }}
@@ -292,7 +294,7 @@ export default class PaymentsList extends PureComponent {
         {/* <Card bordered={false} className={styles.bottomCardDivided}>
           <FilterDatePick onChange={this.handleFilter} filterOptions={paymentsFilter} />
         </Card> */}
-        <FilterPicker onChange={this.handleFilter} filters={paymentsFilter} />
+        <FilterPicker onChange={this.handleFilter} filters={paymentsFilter} radios={radios} />
         <Card bordered={false} title="流水列表" extra={tableSortExtra}>
           <Table
             rowKey="id"

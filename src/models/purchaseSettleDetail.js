@@ -3,7 +3,6 @@ import * as printService from '../services/print';
 import pathToRegexp from 'path-to-regexp';
 
 export default {
-
   namespace: 'purchaseSettleDetail',
 
   state: {
@@ -16,10 +15,12 @@ export default {
         const match = pathToRegexp('/finance/purchase-settle-detail/:id').exec(pathname);
         if (match) {
           dispatch({ type: 'setState', payload: { singleData: {} } });
-          dispatch({ type: 'getSingle',
+          dispatch({
+            type: 'getSingle',
             payload: {
               id: match[1],
-            } });
+            },
+          });
         }
       });
     },
@@ -38,11 +39,9 @@ export default {
     *deleteSingle({ payload }, { call, put }) {
       yield call(settleService.deleteSingle, payload);
     },
-
   },
 
   reducers: {
-
     setState(state, action) {
       return { ...state, ...action.payload };
     },
@@ -62,7 +61,12 @@ export default {
       // 支付状态
       state.singleData.pay_status = payload.pay_status;
       // 支付方式
-      state.singleData.paymentWays = payload.payments.data.length == 0 ? ['未付款'] : payload.payments.data.map((n) => { return { name: n.paymentmethod.data.name, value: n.value }; });
+      state.singleData.paymentWays =
+        payload.payments.data.length == 0
+          ? ['未付款']
+          : payload.payments.data.map((n) => {
+              return { name: n.paymentmethod && n.paymentmethod.data.name, value: n.value };
+            });
       // 结算清单
       state.singleData.orders = payload.orders.data;
       // 操作记录
@@ -70,5 +74,4 @@ export default {
       return { ...state };
     },
   },
-
 };

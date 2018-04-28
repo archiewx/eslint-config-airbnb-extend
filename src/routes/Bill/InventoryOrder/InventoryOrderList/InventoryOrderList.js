@@ -267,13 +267,10 @@ export default class InventoryOrderList extends PureComponent {
       inventoryOrderList: { inventoryOrderList, inventoryOrderPagination },
       layoutFilter,
     } = this.props;
-    let { inventoryOrderFilter } = layoutFilter;
+    const { inventoryOrderFilter } = layoutFilter;
     const { sorts, pages, filter, sortOrder, sortValue } = this.state;
 
-    inventoryOrderFilter = inventoryOrderFilter.map((cv) => ({
-      ...cv,
-      multi: cv.code !== 'status', // 支付状态单选
-    }));
+    const radios = ['status'];
 
     const tableSortExtra = (
       <Select
@@ -361,7 +358,7 @@ export default class InventoryOrderList extends PureComponent {
         {/* <Card bordered={false} className={styles.bottomCardDivided}>
           <FilterDatePick onChange={this.handleFilter} filterOptions={inventoryOrderFilter} />
         </Card> */}
-        <FilterPicker onChange={this.handleFilter} filters={inventoryOrderFilter} />
+        <FilterPicker onChange={this.handleFilter} filters={inventoryOrderFilter} radios={radios} />
         <Card bordered={false} title="盘点单列表" extra={tableSortExtra}>
           <Table
             rowKey="id"

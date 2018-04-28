@@ -92,6 +92,7 @@ class FilterPicker extends React.Component {
     const {
       filters,
       defaultDate = [moment(agoSevenDays, 'YYYY-MM-DD'), moment(new Date(), 'YYYY-MM-DD')],
+      radios,
     } = this.props;
     return (
       <div className={styles.filterPicker}>
@@ -117,6 +118,7 @@ class FilterPicker extends React.Component {
           bodyStyle={{ paddingTop: 10, paddingBottom: 10 }}
           className={styles.bottomCardDivided}>
           <DuokeFilter
+            radios={radios}
             filters={filters}
             ref={this.setFilterRef}
             onChange={this.onDuokeFilterChange}
@@ -137,11 +139,13 @@ class FilterPicker extends React.Component {
 FilterPicker.propTypes = {
   onChange: propTypes.func,
   filters: propTypes.array,
+  radios: propTypes.array,
 };
 
 FilterPicker.defaultProps = {
   onChange: () => {},
   filters: [],
+  radios: [],
 };
 
 export default FilterPicker;

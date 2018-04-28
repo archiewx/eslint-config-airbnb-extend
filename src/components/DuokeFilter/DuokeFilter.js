@@ -115,24 +115,26 @@ class DuokeFilter extends React.Component {
   renderFilterPanel = () => {
     return (
       <FilterPanel bordered>
-        {this.state.filters.map((filter) => (
-          <FilterItem
-            key={filter.name}
-            filter={filter}
-            // offset={this.state.point}
-            popup={
-              !this.state.currentFilter ? (
-                <div />
-              ) : this.state.currentFilter.options.length < 10 ? (
-                this.renderDropList()
-              ) : (
-                this.renderPanelList()
-              )
-            }
-            onShow={this.onShow}
-            onHide={this.onHide}
-          />
-        ))}
+        {this.state.filters.map(
+          (filter) =>
+            filter.options && filter.options.length ? (
+              <FilterItem
+                key={filter.name}
+                filter={filter}
+                popup={
+                  !this.state.currentFilter ? (
+                    <div />
+                  ) : this.state.currentFilter.options.length < 10 ? (
+                    this.renderDropList()
+                  ) : (
+                    this.renderPanelList()
+                  )
+                }
+                onShow={this.onShow}
+                onHide={this.onHide}
+              />
+            ) : null,
+        )}
       </FilterPanel>
     );
   };
@@ -172,7 +174,7 @@ DuokeFilter.propTypes = {
   filters: propTypes.array,
 };
 DuokeFilter.defaultProps = {
-  radios: ['settle_way'],
+  radios: [],
   onChange: () => {},
   filters: [],
 };

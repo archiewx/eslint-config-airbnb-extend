@@ -176,7 +176,7 @@ export default {
                 item.unit_id == null &&
                 item.quantityrange_id == null
               ) {
-                flag = false;
+                flag = true;
               } else {
                 flag = true;
               }
@@ -198,7 +198,7 @@ export default {
                 item.unit_id == null &&
                 item.quantityrange_id == null
               ) {
-                flag = false;
+                flag = true;
               } else {
                 flag = true;
               }
@@ -220,7 +220,7 @@ export default {
                 item.unit_id == null &&
                 item.quantityrange_id == null
               ) {
-                flag = false;
+                flag = true;
               } else {
                 flag = true;
               }
@@ -242,54 +242,83 @@ export default {
                 item.unit_id == null &&
                 item.quantityrange_id == null
               ) {
-                flag = false;
+                flag = true;
               } else {
                 flag = true;
               }
             });
           }
+        } else if (priceModel == 'shop') {
+          priceMatrix.forEach((item) => {
+            if (
+              item.pricelevel_id == null &&
+              item.shop_id &&
+              item.unit_id == null &&
+              item.quantityrange_id == null
+            ) {
+              state.singleGoodsDetail.prices[`${item.shop_id}`] = {
+                price: item.price,
+              };
+            } else if (
+              item.pricelevel_id == null &&
+              item.shop_id == null &&
+              item.unit_id == null &&
+              item.quantityrange_id == null
+            ) {
+              flag = true;
+            } else {
+              flag = true;
+            }
+          });
+        } else if (priceModel == 'unit') {
+          priceMatrix.forEach((item) => {
+            if (
+              item.pricelevel_id == null &&
+              item.shop_id == null &&
+              item.unit_id &&
+              item.quantityrange_id == null
+            ) {
+              state.singleGoodsDetail.prices[`${item.unit_id}`] = {
+                price: item.price,
+              };
+            } else if (
+              item.pricelevel_id == null &&
+              item.shop_id == null &&
+              item.unit_id == null &&
+              item.quantityrange_id == null
+            ) {
+              flag = true;
+            } else {
+              flag = true;
+            }
+          });
+        } else if (priceModel == 'quantityrange') {
+          priceMatrix.forEach((item) => {
+            if (
+              item.pricelevel_id == null &&
+              item.shop_id == null &&
+              item.unit_id == null &&
+              item.quantityrange_id
+            ) {
+              state.singleGoodsDetail.prices[`${item.quantityrange_id}`] = {
+                price: item.price,
+              };
+            } else if (
+              item.pricelevel_id == null &&
+              item.shop_id == null &&
+              item.unit_id == null &&
+              item.quantityrange_id == null
+            ) {
+              flag = true;
+            } else {
+              flag = true;
+            }
+          });
         }
-        // else if (priceModel == 'shop') {
-        //   priceMatrix.forEach((item) => {
-        //     if (item.pricelevel_id == null && item.shop_id && item.unit_id == null && item.quantityrange_id == null) {
-        //       state.singleGoodsDetail.prices[`${item.shop_id}`] = {
-        //         price: item.price,
-        //       };
-        //     } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-        //       flag = true;
-        //     } else {
-        //       flag = true;
-        //     }
-        //   });
-        // } else if (priceModel == 'unit') {
-        //   priceMatrix.forEach((item) => {
-        //     if (item.pricelevel_id == null && item.shop_id == null && item.unit_id && item.quantityrange_id == null) {
-        //       state.singleGoodsDetail.prices[`${item.unit_id}`] = {
-        //         price: item.price,
-        //       };
-        //     } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-        //       flag = true;
-        //     } else {
-        //       flag = true;
-        //     }
-        //   });
-        // } else if (priceModel == 'quantityrange') {
-        //   priceMatrix.forEach((item) => {
-        //     if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id) {
-        //       state.singleGoodsDetail.prices[`${item.quantityrange_id}`] = {
-        //         price: item.price,
-        //       };
-        //     } else if (item.pricelevel_id == null && item.shop_id == null && item.unit_id == null && item.quantityrange_id == null) {
-        //       flag = true;
-        //     } else {
-        //       flag = true;
-        //     }
-        //   });
-        // }
       } else {
         flag = true;
       }
-      if (flag) {
+      if (!flag) {
         state.singleGoodsDetail.hidePriceTable = true;
       } else {
         state.singleGoodsDetail.hidePriceTable = false;
@@ -431,125 +460,100 @@ export default {
 
     setFilterSaleServerData(state, { payload }) {
       const current = {};
-      for (const key in payload) {
-        if (key.indexOf('sale_') == 0) {
-          if (payload[key]) {
-            const name = key.slice(5, key.length);
-            if (name == 'datePick') {
-              current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
-            } else {
-              current[`${name}_in`] = payload[key];
-            }
-          }
+      const params = { ...payload };
+      // 获取key值处理
+      Object.keys(params).forEach((key) => {
+        if (key === 'dates') {
+          current.date_type = 'custom';
+          // 这里得到是一个moment 对象
+          [current.sday, current.eday] = params[key];
+          current.sday = current.sday.format('YYYY-MM-DD');
+          current.eday = current.eday.format('YYYY-MM-DD');
+          delete current.dates;
+        } else {
+          current[`${key}_in`] = params[key];
         }
-      }
-      for (const key in current) {
-        if (Array.isArray(current[key]) && !current[key].length) {
-          delete current[key];
-        }
-      }
+      });
       state.filterSaleServerData = current;
       return { ...state };
     },
 
     setFilterPurchaseServerData(state, { payload }) {
       const current = {};
-      for (const key in payload) {
-        if (key.indexOf('purchase_') == 0) {
-          if (payload[key]) {
-            const name = key.slice(9, key.length);
-            if (name == 'datePick') {
-              current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
-            } else {
-              current[`${name}_in`] = payload[key];
-            }
-          }
+      const params = { ...payload };
+      // 获取key值处理
+      Object.keys(params).forEach((key) => {
+        if (key === 'dates') {
+          current.date_type = 'custom';
+          // 这里得到是一个moment 对象
+          [current.sday, current.eday] = params[key];
+          current.sday = current.sday.format('YYYY-MM-DD');
+          current.eday = current.eday.format('YYYY-MM-DD');
+          delete current.dates;
+        } else {
+          current[`${key}_in`] = params[key];
         }
-      }
-      for (const key in current) {
-        if (Array.isArray(current[key]) && !current[key].length) {
-          delete current[key];
-        }
-      }
+      });
       state.filterPurchaseServerData = current;
       return { ...state };
     },
 
     setFilterCustomerServerData(state, { payload }) {
       const current = {};
-      for (const key in payload) {
-        if (key.indexOf('customer_') == 0) {
-          if (payload[key]) {
-            const name = key.slice(9, key.length);
-            if (name == 'datePick') {
-              current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
-            } else {
-              current[`${name}_in`] = payload[key];
-            }
-          }
+      const params = { ...payload };
+      // 获取key值处理
+      Object.keys(params).forEach((key) => {
+        if (key === 'dates') {
+          current.date_type = 'custom';
+          // 这里得到是一个moment 对象
+          [current.sday, current.eday] = params[key];
+          current.sday = current.sday.format('YYYY-MM-DD');
+          current.eday = current.eday.format('YYYY-MM-DD');
+          delete current.dates;
+        } else {
+          current[`${key}_in`] = params[key];
         }
-      }
-      for (const key in current) {
-        if (Array.isArray(current[key]) && !current[key].length) {
-          delete current[key];
-        }
-      }
+      });
       state.filterCustomerServerData = current;
       return { ...state };
     },
 
     setFilterSupplierServerData(state, { payload }) {
       const current = {};
-      for (const key in payload) {
-        if (key.indexOf('supplier_') == 0) {
-          if (payload[key]) {
-            const name = key.slice(9, key.length);
-            if (name == 'datePick') {
-              current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
-            } else {
-              current[`${name}_in`] = payload[key];
-            }
-          }
+      const params = { ...payload };
+      // 获取key值处理
+      Object.keys(params).forEach((key) => {
+        if (key === 'dates') {
+          current.date_type = 'custom';
+          // 这里得到是一个moment 对象
+          [current.sday, current.eday] = params[key];
+          current.sday = current.sday.format('YYYY-MM-DD');
+          current.eday = current.eday.format('YYYY-MM-DD');
+          delete current.dates;
+        } else {
+          current[`${key}_in`] = params[key];
         }
-      }
-      for (const key in current) {
-        if (Array.isArray(current[key]) && !current[key].length) {
-          delete current[key];
-        }
-      }
+      });
       state.filterSupplierServerData = current;
       return { ...state };
     },
 
     setFilterStockServerData(state, { payload }) {
       const current = {};
-      for (const key in payload) {
-        if (key.indexOf('stock_') == 0) {
-          if (payload[key]) {
-            const name = key.slice(9, key.length);
-            if (name == 'datePick') {
-              current.date_type = 'custom';
-              current.sday = payload[key][0];
-              current.eday = payload[key][1];
-            } else {
-              current[`${name}_in`] = payload[key];
-            }
-          }
+      const params = { ...payload };
+      // 获取key值处理
+      Object.keys(params).forEach((key) => {
+        if (key === 'dates') {
+          current.date_type = 'custom';
+          // 这里得到是一个moment 对象
+          [current.sday, current.eday] = params[key];
+          current.sday = current.sday.format('YYYY-MM-DD');
+          current.eday = current.eday.format('YYYY-MM-DD');
+          delete current.dates;
+        } else {
+          current[`${key}_in`] = params[key];
         }
-      }
-      for (const key in current) {
-        if (Array.isArray(current[key]) && !current[key].length) {
-          delete current[key];
-        }
-      }
+      });
       state.filterStockServerData = current;
       return { ...state };
     },
@@ -700,15 +704,15 @@ export default {
           state.singleGoodsPurchases.forEach((item) => {
             item.children = expandedRowRender[item.id];
             item.purchase_quantity = expandedRowRender[item.id].reduce(
-              (sum, item) => (sum, Number(item.purchase_quantity)),
+              (sum, item) => (sum += Number(item.purchase_quantity, sum)),
               0,
             );
             item.purchase_amount = expandedRowRender[item.id].reduce(
-              (sum, item) => (sum, Number(item.purchase_amount)),
+              (sum, item) => (sum += Number(item.purchase_amount, sum)),
               0,
             );
             item.stock_quantity = expandedRowRender[item.id].reduce(
-              (sum, item) => (sum, Number(item.stock_quantity)),
+              (sum, item) => (sum += Number(item.stock_quantity, sum)),
               0,
             );
           });

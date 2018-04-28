@@ -322,13 +322,10 @@ export default class PurchaseOrderList extends PureComponent {
       purchaseOrderList: { purchaseOrderList, purchaseOrderPagination },
       layoutFilter,
     } = this.props;
-    let { purchaseOrderFilter } = layoutFilter;
+    const { purchaseOrderFilter } = layoutFilter;
     const { sorts, pages, filter, sortOrder, sortValue } = this.state;
 
-    purchaseOrderFilter = purchaseOrderFilter.map((cv) => ({
-      ...cv,
-      multi: cv.code !== 'settle_way' && cv.code !== 'pay_status' && cv.code !== 'delivery_status',
-    }));
+    const radios = ['settle_way', 'pay_status', 'delivery_status'];
 
     const tableSortExtra = (
       <Select
@@ -404,7 +401,7 @@ export default class PurchaseOrderList extends PureComponent {
         {/* <Card bordered={false} className={styles.bottomCardDivided}>
           <FilterDatePick onChange={this.handleFilter} filterOptions={purchaseOrderFilter} />
         </Card> */}
-        <FilterPicker onChange={this.handleFilter} filters={purchaseOrderFilter} />
+        <FilterPicker onChange={this.handleFilter} filters={purchaseOrderFilter} radios={radios} />
         <Card bordered={false} title="进货单列表" extra={tableSortExtra}>
           <Table
             rowKey="id"

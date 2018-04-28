@@ -392,7 +392,7 @@ export default class SupplierDetail extends PureComponent {
       singleSupplierStatements,
       singleSupplierPayments,
     } = this.props.supplierDetail;
-    let { saleHistoryFilter } = this.props.supplierDetail;
+    const { saleHistoryFilter } = this.props.supplierDetail;
     const {
       activeTabKey,
       activeDebtTabKey,
@@ -403,12 +403,8 @@ export default class SupplierDetail extends PureComponent {
       pageStatement,
       pagePayments,
     } = this.state;
-    const { getFieldDecorator } = this.props.form;
 
-    saleHistoryFilter = saleHistoryFilter.map((cv) => ({
-      ...cv,
-      multi: cv.code !== 'pay_status' && cv.code !== 'settle_way',
-    }));
+    const radios = ['pay_status', 'settle_way'];
 
     const description = (
       <DescriptionList size="small" col="2" className={styles.descriptionPostion}>
@@ -856,7 +852,11 @@ export default class SupplierDetail extends PureComponent {
               dateLabel="sale"
             />
           </Card> */}
-          <FilterPicker filters={saleHistoryFilter} onChange={this.handleSaleFormSubmit} />
+          <FilterPicker
+            radios={radios}
+            filters={saleHistoryFilter}
+            onChange={this.handleSaleFormSubmit}
+          />
           <Card bordered={false}>
             <Table
               columns={saleColumns}

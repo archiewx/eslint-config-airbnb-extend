@@ -235,13 +235,10 @@ export default class DeliverOrderList extends PureComponent {
       deliverOrderList: { deliverOrderList, deliverOrderPagination },
       layoutFilter,
     } = this.props;
-    let { deliverOrderFilter } = layoutFilter;
+    const { deliverOrderFilter } = layoutFilter;
     const { sorts, pages, filter, sortOrder, sortValue } = this.state;
 
-    deliverOrderFilter = deliverOrderFilter.map((cv) => ({
-      ...cv,
-      multi: cv.code !== 'delivery_status' && cv.code !== 'receive_status',
-    }));
+    const radios = ['delivery_status', 'receive_status'];
 
     const tableSortExtra = (
       <Select
@@ -323,7 +320,7 @@ export default class DeliverOrderList extends PureComponent {
         {/* <Card bordered={false} className={styles.bottomCardDivided}>
           <FilterDatePick onChange={this.handleFilter} filterOptions={deliverOrderFilter} />
         </Card> */}
-        <FilterPicker onChange={this.handleFilter} filters={deliverOrderFilter} />
+        <FilterPicker onChange={this.handleFilter} filters={deliverOrderFilter} radios={radios} />
         <Card bordered={false} title="调货单列表" extra={tableSortExtra}>
           <Table
             rowKey="id"

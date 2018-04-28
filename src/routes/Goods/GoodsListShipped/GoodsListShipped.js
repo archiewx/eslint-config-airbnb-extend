@@ -264,12 +264,7 @@ export default class GoodsListShipped extends PureComponent {
       goodsPurchasePagination,
     } = this.props.goodsList;
     const { goodsPurchaseFilter } = this.props.layoutFilter;
-    let { goodsSaleFilter } = this.props.layoutFilter;
-
-    goodsSaleFilter = goodsSaleFilter.map((cv) => ({
-      ...cv,
-      multi: cv.code !== 'not_sale',
-    }));
+    const radios = ['not_sale'];
 
     const extra = (
       <Button type="primary" onClick={this.handleToGoodsCreate}>
@@ -306,39 +301,34 @@ export default class GoodsListShipped extends PureComponent {
       {
         title: '货号',
         dataIndex: 'item_ref',
-        width: '10%',
       },
       {
         title: '标准价',
         dataIndex: 'standard_price',
-        width: '15%',
         className: styles.numberRightMove,
         render: (text, record) => NCNF(record.standard_price).format(true),
       },
       {
         title: '进货量',
-        width: '15%',
         dataIndex: 'purchase_quantity',
         className: styles.numberRightMove,
         render: (text, record) => NCNI(record.purchase_quantity).format(true),
       },
       {
         title: '进货额',
-        width: '15%',
         dataIndex: 'purchase_amount',
         className: styles.numberRightMove,
         render: (text, record) => NCNF(record.purchase_amount).format(true),
       },
       {
         title: '库存量',
-        width: '15%',
         dataIndex: 'stock_quantity',
         className: styles.numberRightMove,
         render: (text, record) => NCNF(record.stock_quantity).format(true),
       },
       {
         title: '状态',
-        width: 100,
+        width: 170,
         dataIndex: 'not_sale',
         render: (text, record) =>
           record.not_sale == 0 ? (
@@ -409,7 +399,11 @@ export default class GoodsListShipped extends PureComponent {
               dateLabel="purchase"
             />
           </Card> */}
-          <FilterPicker onChange={this.handlePurchaseFilter} filters={goodsPurchaseFilter} />
+          <FilterPicker
+            onChange={this.handlePurchaseFilter}
+            filters={goodsPurchaseFilter}
+            radios={radios}
+          />
           <Card
             bordered={false}
             title="商品"

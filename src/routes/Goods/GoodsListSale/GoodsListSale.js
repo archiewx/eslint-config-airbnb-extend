@@ -235,12 +235,8 @@ export default class GoodsListSale extends PureComponent {
   render() {
     const { sortSale, pagesSale, filterSale } = this.state;
     const { goodsListSales, goodsSalePagination } = this.props.goodsList;
-    let { goodsSaleFilter } = this.props.layoutFilter;
-
-    goodsSaleFilter = goodsSaleFilter.map((cv) => ({
-      ...cv,
-      multi: cv.code !== 'not_sale',
-    }));
+    const { goodsSaleFilter } = this.props.layoutFilter;
+    const radios = ['not_sale'];
 
     const extra = (
       <Button type="primary" onClick={this.handleToGoodsCreate}>
@@ -278,33 +274,28 @@ export default class GoodsListSale extends PureComponent {
       {
         title: '货号',
         dataIndex: 'item_ref',
-        width: '10%',
       },
       {
         title: '标准价',
         dataIndex: 'standard_price',
-        width: '15%',
         className: styles.numberRightMove,
         render: (text, record) => NCNF(record.standard_price).format(true),
       },
       {
         title: '销售量',
         dataIndex: 'sales_quantity',
-        width: '15%',
         className: styles.numberRightMove,
         render: (text, record) => NCNI(record.sales_quantity).format(true),
       },
       {
         title: '销售额',
         dataIndex: 'sales_amount',
-        width: '15%',
         className: styles.numberRightMove,
         render: (text, record) => NCNF(record.sales_amount).format(true),
       },
       {
         title: '库存量',
         dataIndex: 'stock_quantity',
-        width: '15%',
         className: styles.numberRightMove,
         render: (text, record) => NCNF(record.stock_quantity).format(true),
       },
@@ -312,6 +303,7 @@ export default class GoodsListSale extends PureComponent {
         title: '状态',
         width: 100,
         dataIndex: 'not_sale',
+        // eslint-disable-next-line
         render: (text, record) =>
           record.not_sale == 0 ? (
             <div>
@@ -328,7 +320,7 @@ export default class GoodsListSale extends PureComponent {
       {
         title: '操作',
         dataIndex: 'operation',
-        width: '172px',
+        width: 172,
         render: (text, record, index) => this.handleMoreOperation(record),
       },
     ];
@@ -373,7 +365,11 @@ export default class GoodsListSale extends PureComponent {
         onTabChange={this.handleTabChange}>
         <div key="sale">
           {/* <Card bordered={false} className={styles.bottomCardDivided}> */}
-          <FilterPicker onChange={this.filterPickerChange} filters={goodsSaleFilter} />
+          <FilterPicker
+            onChange={this.filterPickerChange}
+            filters={goodsSaleFilter}
+            radios={radios}
+          />
           {/* <FilterDatePick
               onChange={this.handleSaleFilter}
               filterOptions={goodsSaleFilter}

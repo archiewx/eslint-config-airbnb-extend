@@ -402,7 +402,6 @@ export default class CustomerDetail extends PureComponent {
       pageStatement,
       pagePayments,
     } = this.state;
-    const { getFieldDecorator } = this.props.form;
     const description = (
       <DescriptionList size="small" col="2" className={styles.descriptionPostion}>
         <Description term="手机号">{`${singleCustomerDetail.phone || ''}`}</Description>
