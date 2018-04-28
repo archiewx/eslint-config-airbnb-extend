@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-airbnb-base-extend",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "base on airbnb config",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,10 @@
     "publish:minor": "npm version minor && npm publish",
     "publish:major": "npm version major && npm publish"
   },
-  "keywords": ["eslint", "airbnb"],
+  "keywords": [
+    "eslint",
+    "airbnb"
+  ],
   "peerDepentdencies": {
     "eslint": ">= 3"
   },
