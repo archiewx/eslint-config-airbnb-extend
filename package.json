@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "npm link && echo '在项目中使用npm link eslint-config-airbnb-extend测试'",
+    "prepush": "git add .",
+    "push": "git commit -m",
+    "postpush": "git push",
     "publish:patch": "npm version patch && npm publish",
     "publish:minor": "npm version minor && npm publish",
     "publish:major": "npm version major && npm publish"
   },
-  "keywords": [
-    "eslint",
-    "airbnb"
-  ],
+  "keywords": ["eslint", "airbnb"],
   "peerDepentdencies": {
     "eslint": ">= 3"
   },
