@@ -1,17 +1,17 @@
 # 代码规则
 
+![](https://www.npmjs.com/package/eslint-config-airbnb-base-extend)
+
 [toc]
 
 ## 普通代码规则
 
 ```javascript
-
 ```
 
-## vue项目代码规则
+## vue 项目代码规则
 
 ```javascript
-
 // https://eslint.org/docs/user-guide/configuring
 
 module.exports = {
@@ -72,12 +72,44 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   }
 }
-
 ```
 
-## react项目代码规则
+## react 项目代码规则
 
-```javascript
+### 使用方法
 
+```bash
+$ touch .eslintrc
+$ touch .eslintignore
+```
+
+输入下面代码:
+
+.eslintrc
+
+```json
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true,
+    "mocha": true,
+    "jest": true,
+    "jasmine": true
+  },
+  "extends": ["airbnb-base-extend/eslint-config-react"],
+  "rules": {
+    "semi": ["error", "never"],
+    "comma-dangle": ["error", "never"]
+  }
+}
+```
+
+.eslintignore
 
 ```
+node_modules
+.DS_Store
+```
+
