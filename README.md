@@ -1,6 +1,6 @@
 # 代码规则
 
-![](https://www.npmjs.com/package/eslint-config-airbnb-base-extend)
+![](https://img.shields.io/npm/v/eslint-config-airbnb-base-extend.svg?style=flat)
 ## 普通代码规则
 
 ```javascript
