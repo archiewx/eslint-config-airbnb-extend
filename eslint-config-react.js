@@ -11,6 +11,7 @@ module.exports = {
     jasmine: true
   },
   rules: {
+    semi: ['error', 'never'],
     'arrow-parens': ['error', 'always'],
     'no-return-assign': ['off'],
     'no-confusing-arrow': ['off'],
@@ -19,7 +20,7 @@ module.exports = {
     'generator-star-spacing': [0],
     'consistent-return': [0],
     'react/forbid-prop-types': [0],
-    'react/jsx-filename-extension': [1, { extensions: ['.js'] }],
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     'global-require': [1],
     'import/prefer-default-export': [0],
     'react/jsx-no-bind': [0],
