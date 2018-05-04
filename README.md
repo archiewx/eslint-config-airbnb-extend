@@ -1,9 +1,6 @@
 # 代码规则
 
 ![](https://www.npmjs.com/package/eslint-config-airbnb-base-extend)
-
-[toc]
-
 ## 普通代码规则
 
 ```javascript
