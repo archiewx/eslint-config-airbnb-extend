@@ -1,6 +1,7 @@
 # 代码规则
 
-![](https://img.shields.io/npm/v/eslint-config-airbnb-base-extend.svg?style=flat)
+[![](https://img.shields.io/npm/v/eslint-config-airbnb-base-extend.svg?style=flat)](https://www.npmjs.com/package/eslint-config-airbnb-base-extend)
+
 ## 普通代码规则
 
 ```javascript
@@ -109,4 +110,3 @@ $ touch .eslintignore
 node_modules
 .DS_Store
 ```
-
