@@ -1,5 +1,13 @@
 module.exports = {
   parser: 'babel-eslint',
+  parseOptions: {
+    ecmaVersion: 6,
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+      experimentalObjectRestSpread: true
+    }
+  },
   extends: 'airbnb',
   plugins: ['compat'],
   env: {
@@ -67,11 +75,6 @@ module.exports = {
     'no-restricted-globals': [0],
     'require-yield': [1],
     'compat/compat': 'error'
-  },
-  parserOptions: {
-    ecmaFeatures: {
-      experimentalObjectRestSpread: true
-    }
   },
   settings: {
     polyfills: ['fetch', 'promises']
